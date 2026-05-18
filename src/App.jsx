@@ -475,6 +475,126 @@ function reducer(state, action) {
 // SECTION 4: UI
 // ═══════════════════════════════════════════════════════════════════
 
+function ProfileSwitcher({ state, dispatch }) {
+  const [open, setOpen] = useState(false)
+  const [importModal, setImportModal] = useState(false)
+  const [importText, setImportText] = useState('')
+  const [importError, setImportError] = useState('')
+  const [toast, setToast] = useState('')
+
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 2000) }
+
+  const handleExport = () => {
+    const data = JSON.stringify({ _name: state.activeProfile, ...state.profiles[state.activeProfile] })
+    navigator.clipboard.writeText(data)
+      .then(() => showToast('Copied to clipboard!'))
+      .catch(() => showToast('Copy failed — check browser permissions'))
+    setOpen(false)
+  }
+
+  const handleImport = () => {
+    try {
+      const data = JSON.parse(importText)
+      const { _name, ...profile } = data
+      if (!profile.heroes || !profile.gear) { setImportError('Invalid format — missing heroes or gear fields.'); return }
+      const name = _name ?? `Import ${Date.now()}`
+      dispatch({ type: 'IMPORT_PROFILE', name, data: profile })
+      setImportModal(false)
+      setImportText('')
+      setImportError('')
+    } catch {
+      setImportError('Invalid JSON — paste the exported string exactly.')
+    }
+  }
+
+  const names = Object.keys(state.profiles)
+
+  return (
+    <div className="relative">
+      <button onClick={() => setOpen(o => !o)}
+        className="font-orbitron text-xs text-neutral-400 border border-neutral-700 px-2 py-1 hover:border-amber-600 hover:text-amber-600 transition-colors min-h-[32px] max-w-[120px] truncate">
+        {state.activeProfile}
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-1 bg-neutral-900 border border-amber-700 z-50 min-w-[180px]">
+          {names.map(name => (
+            <button key={name} onClick={() => { dispatch({ type: 'SWITCH_PROFILE', name }); setOpen(false) }}
+              className={`w-full text-left px-3 py-2 font-rajdhani text-sm border-b border-neutral-800 min-h-[40px] transition-colors
+                ${name === state.activeProfile ? 'text-amber-600 bg-amber-600/10' : 'text-gray-300 hover:bg-neutral-800'}`}>
+              {name}
+            </button>
+          ))}
+          <div className="border-t border-neutral-700">
+            <button onClick={() => {
+              const name = prompt('New profile name:')
+              if (name?.trim()) dispatch({ type: 'NEW_PROFILE', name: name.trim() })
+              setOpen(false)
+            }} className="w-full text-left px-3 py-2 font-orbitron text-xs text-neutral-400 hover:text-gray-200 hover:bg-neutral-800 min-h-[40px]">
+              + NEW PROFILE
+            </button>
+            <button onClick={() => {
+              const newName = prompt('Rename to:', state.activeProfile)
+              if (newName?.trim() && newName.trim() !== state.activeProfile) {
+                dispatch({ type: 'RENAME_PROFILE', oldName: state.activeProfile, newName: newName.trim() })
+              }
+              setOpen(false)
+            }} className="w-full text-left px-3 py-2 font-orbitron text-xs text-neutral-400 hover:text-gray-200 hover:bg-neutral-800 min-h-[40px]">
+              RENAME
+            </button>
+            <button onClick={() => { dispatch({ type: 'DUPLICATE_PROFILE', name: state.activeProfile }); setOpen(false) }}
+              className="w-full text-left px-3 py-2 font-orbitron text-xs text-neutral-400 hover:text-gray-200 hover:bg-neutral-800 min-h-[40px]">
+              DUPLICATE
+            </button>
+            <button onClick={() => { dispatch({ type: 'DELETE_PROFILE', name: state.activeProfile }); setOpen(false) }}
+              className="w-full text-left px-3 py-2 font-orbitron text-xs text-red-600 hover:bg-red-900/20 min-h-[40px]">
+              DELETE
+            </button>
+            <div className="border-t border-neutral-700">
+              <button onClick={handleExport}
+                className="w-full text-left px-3 py-2 font-orbitron text-xs text-neutral-400 hover:text-gray-200 hover:bg-neutral-800 min-h-[40px]">
+                EXPORT JSON
+              </button>
+              <button onClick={() => { setImportModal(true); setOpen(false) }}
+                className="w-full text-left px-3 py-2 font-orbitron text-xs text-neutral-400 hover:text-gray-200 hover:bg-neutral-800 min-h-[40px]">
+                IMPORT JSON
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {importModal && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <div className="bg-neutral-900 border border-amber-600 w-full max-w-sm p-4 space-y-3">
+            <p className="font-orbitron text-amber-600 text-xs tracking-widest">// IMPORT PROFILE</p>
+            <textarea value={importText} onChange={e => { setImportText(e.target.value); setImportError('') }}
+              placeholder="Paste exported JSON here..."
+              className="w-full bg-neutral-800 border border-neutral-700 text-gray-200 font-mono text-xs p-2 h-32 resize-none" />
+            {importError && <p className="font-rajdhani text-xs text-red-400">{importError}</p>}
+            <div className="flex gap-2">
+              <button onClick={handleImport}
+                className="flex-1 py-2 font-orbitron text-xs bg-amber-600 text-black hover:bg-amber-500 min-h-[44px]">
+                IMPORT
+              </button>
+              <button onClick={() => { setImportModal(false); setImportText(''); setImportError('') }}
+                className="px-4 py-2 font-orbitron text-xs border border-neutral-700 text-neutral-400 hover:bg-neutral-800 min-h-[44px]">
+                CANCEL
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {toast && (
+        <div className="fixed bottom-48 left-1/2 -translate-x-1/2 bg-neutral-800 border border-amber-600 px-4 py-2 font-orbitron text-xs text-amber-600 z-50 pointer-events-none">
+          {toast}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function RecPanel({ state, dispatch, recommendedSquad, gearAssignment, upgradePriority, warnings }) {
   const slotLabels = { gun: 'GUN', chip: 'CHIP', armor: 'ARMOR', radar: 'RADAR' }
 
@@ -1179,7 +1299,7 @@ export default function App() {
       {/* Top bar */}
       <div className="flex-none h-12 bg-neutral-900 border-b border-neutral-800 flex items-center justify-between px-3 z-10">
         <span className="font-orbitron text-amber-600 text-sm tracking-widest">LAST WAR OPS</span>
-        <span className="font-rajdhani text-xs text-neutral-500 tracking-widest">PROFILE SWITCHER</span>
+        <ProfileSwitcher state={state} dispatch={dispatch} />
       </div>
 
       {/* Main area */}
