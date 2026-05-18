@@ -476,11 +476,123 @@ function reducer(state, action) {
 // ═══════════════════════════════════════════════════════════════════
 
 export default function App() {
+  const [state, dispatch] = useReducer(reducer, null, buildInitialState)
+
+  // Persist to localStorage on every state change
+  useEffect(() => {
+    try {
+      localStorage.setItem('lastwar_optimizer_v1', JSON.stringify({
+        profiles: state.profiles,
+        activeProfile: state.activeProfile,
+      }))
+    } catch { /* quota exceeded — ignore */ }
+  }, [state.profiles, state.activeProfile])
+
+  // Derived / computed values — all optimizer results are pure functions of state
+  const ownedIds = useMemo(
+    () => Object.keys(state.heroes).filter(id => state.heroes[id].owned),
+    [state.heroes]
+  )
+
+  const heroScores = useMemo(
+    () => computeAllHeroScores(state.heroes, state.season, state.goal),
+    [state.heroes, state.season, state.goal]
+  )
+
+  const recommendedSquad = useMemo(
+    () => findRecommendedSquad(ownedIds, heroScores, state.heroes, state.intent),
+    [ownedIds, heroScores, state.heroes, state.intent]
+  )
+
+  const gearAssignment = useMemo(
+    () => assignGear(recommendedSquad.squad, state.gear, heroScores),
+    [recommendedSquad.squad, state.gear, heroScores]
+  )
+
+  const hasSquadEW5 = useMemo(
+    () => recommendedSquad.squad.some(id => (state.heroes[id]?.ewLevel ?? 0) >= 5),
+    [recommendedSquad.squad, state.heroes]
+  )
+
+  const upgradePriority = useMemo(
+    () => computeUpgradePriority(gearAssignment.assigned, heroScores, state.upgradeMode, state.intent, hasSquadEW5),
+    [gearAssignment.assigned, heroScores, state.upgradeMode, state.intent, hasSquadEW5]
+  )
+
+  const warnings = useMemo(
+    () => computeWarnings(state, recommendedSquad.squad, state.season),
+    [state, recommendedSquad.squad, state.season]
+  )
+
+  const sections = {
+    goal:     <div className="p-4 font-rajdhani text-gray-400">Goal Selector — coming soon</div>,
+    roster:   <div className="p-4 font-rajdhani text-gray-400">Roster Manager — coming soon</div>,
+    gear:     <div className="p-4 font-rajdhani text-gray-400">Gear Inventory — coming soon</div>,
+    squad:    <div className="p-4 font-rajdhani text-gray-400">Squad Optimizer — coming soon</div>,
+    upgrades: <div className="p-4 font-rajdhani text-gray-400">Upgrade Priority — coming soon</div>,
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <p className="font-orbitron text-amber-600 text-xl tracking-widest">
-        LAST WAR · OPS TERMINAL
-      </p>
+    <div className="h-screen flex flex-col bg-neutral-950 text-gray-200 overflow-hidden">
+      {/* Top bar */}
+      <div className="flex-none h-12 bg-neutral-900 border-b border-neutral-800 flex items-center justify-between px-3 z-10">
+        <span className="font-orbitron text-amber-600 text-sm tracking-widest">LAST WAR OPS</span>
+        <span className="font-rajdhani text-xs text-neutral-500 tracking-widest">PROFILE SWITCHER</span>
+      </div>
+
+      {/* Main area */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Icon rail */}
+        <nav className="flex-none w-10 md:w-40 bg-neutral-900 border-r border-neutral-800 flex flex-col py-2 overflow-y-auto">
+          {[
+            { key: 'goal',     icon: '🎯', label: 'GOAL'     },
+            { key: 'roster',   icon: '👥', label: 'ROSTER'   },
+            { key: 'gear',     icon: '⚙️', label: 'GEAR'     },
+            { key: 'squad',    icon: '📊', label: 'SQUAD'    },
+            { key: 'upgrades', icon: '📈', label: 'UPGRADES' },
+          ].map(({ key, icon, label }) => (
+            <button
+              key={key}
+              onClick={() => dispatch({ type: 'SET_SECTION', payload: key })}
+              className={`flex items-center gap-2 px-2 py-3 text-left border-l-2 transition-colors min-h-[44px]
+                ${state.activeSection === key
+                  ? 'border-amber-600 bg-amber-600/10 text-amber-600'
+                  : 'border-transparent text-neutral-500 hover:text-gray-300 hover:bg-neutral-800'
+                }`}
+            >
+              <span className="text-base flex-none w-6 text-center">{icon}</span>
+              <span className="hidden md:block font-orbitron text-xs tracking-widest">{label}</span>
+            </button>
+          ))}
+        </nav>
+
+        {/* Section content */}
+        <main className="flex-1 overflow-y-auto">
+          {sections[state.activeSection]}
+        </main>
+      </div>
+
+      {/* Recommendation panel */}
+      <div className="flex-none border-t-2 border-amber-600 bg-neutral-900">
+        <div className="flex border-b border-neutral-800">
+          {['loadout', 'upgrades', 'warnings'].map(tab => (
+            <button
+              key={tab}
+              onClick={() => dispatch({ type: 'SET_REC_TAB', payload: tab })}
+              className={`flex-1 py-2 font-orbitron text-xs tracking-widest transition-colors min-h-[40px]
+                ${state.activeRecTab === tab
+                  ? 'text-amber-600 border-b-2 border-amber-600'
+                  : 'text-neutral-500 hover:text-gray-300'
+                }`}
+            >
+              {tab.toUpperCase()}
+            </button>
+          ))}
+        </div>
+        <div className="p-3 h-32 overflow-y-auto font-rajdhani text-xs text-neutral-500">
+          Rec panel content coming soon
+        </div>
+      </div>
     </div>
   )
 }
