@@ -288,6 +288,44 @@ function computeUpgradePriority(assigned, heroScores, mode, intent, hasEW5) {
   return [...callout, ...list]
 }
 
+// Returns { severity: 'danger'|'caution', message: string }[]
+function computeWarnings(state, squad, season) {
+  const { intent, heroes, gear } = state
+  const warnings = []
+
+  // Hybrid formation risk
+  if (intent === 'hybrid_progress' || intent === 'full_hybrid') {
+    const hasEW5 = Object.entries(heroes).some(([, h]) => h.owned && h.ewLevel >= 5)
+    if (!hasEW5) {
+      warnings.push({ severity: 'danger', message: 'Hybrid squad is high risk — no hero has EW 5+. Level an Exclusive Weapon to 5 before investing further in gear.' })
+    }
+  }
+
+  // No Legendary gear
+  if (!gear.some(g => g.quality === 'legendary')) {
+    warnings.push({ severity: 'danger', message: 'You have no Legendary gear — prioritize crafting Legendary pieces before upgrading Epic or below.' })
+  }
+
+  // Per-squad-member warnings
+  for (const heroId of squad) {
+    const h = heroes[heroId]
+    if (!h) continue
+    const hero = HEROES[heroId]
+
+    // Low star — skills offline
+    if (h.stars < 3) {
+      warnings.push({ severity: 'caution', message: `${hero.name} is ${h.stars}★ — core skills are offline. Starring up will outperform any gear upgrade right now.` })
+    }
+
+    // Season-gated UR promotion upcoming
+    if (hero.promotionSeason && hero.promotionSeason > season) {
+      warnings.push({ severity: 'caution', message: `${hero.name}'s gear investment has low ROI until UR promotion at Season ${hero.promotionSeason} — you are in Season ${season}.` })
+    }
+  }
+
+  return warnings
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // SECTION 3: STATE
 // ═══════════════════════════════════════════════════════════════════
