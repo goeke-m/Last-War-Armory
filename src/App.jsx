@@ -44,6 +44,44 @@ const HERO_ORDER = [
   'drake','kane','ambolt',
 ]
 
+const SLOTS = ['gun', 'chip', 'armor', 'radar']
+const QUALITIES = ['legendary', 'epic', 'rare', 'common']
+const QUALITY_WEIGHTS = { legendary: 4, epic: 2, rare: 1, common: 0.5 }
+const RARITY_WEIGHTS = { UR: 3, SSR: 2, SR: 1 }
+
+// Slot priority order by hero role for gear assignment
+const SLOT_PRIORITY = {
+  dps:     ['gun', 'chip', 'radar', 'armor'],
+  tank:    ['armor', 'radar', 'gun', 'chip'],
+  support: ['radar', 'chip', 'armor', 'gun'],
+}
+
+// Unit type → Tailwind color tokens
+const UNIT_COLORS = {
+  tank:     { border: 'border-amber-600',    bg: 'bg-amber-600',    text: 'text-amber-600',    label: 'TANK VEH' },
+  aircraft: { border: 'border-sky-500',      bg: 'bg-sky-500',      text: 'text-sky-500',      label: 'AIRCRAFT' },
+  missile:  { border: 'border-lime-600',     bg: 'bg-lime-600',     text: 'text-lime-600',     label: 'MISSILE'  },
+}
+
+// Explicit per-hero goal modifiers (named heroes from spec)
+const GOAL_WEIGHTS = {
+  pvp_rally:    { schuyler: 1.3, dva: 1.2, kimberly: 1.2 },
+  world_boss:   { mason: 1.3, sarah: 1.25, elsa: 1.2, swift: 1.2 },
+  code_battles: { kimberly: 1.25, stetmann: 1.2, williams: 1.2, murphy: 1.2 },
+  balanced:     {},
+}
+
+// Returns per-hero goal multiplier; unnamed back-row DPS get 1.15 in pvp/wb
+function getGoalMod(heroId, goal) {
+  const explicit = GOAL_WEIGHTS[goal][heroId]
+  if (explicit !== undefined) return explicit
+  const hero = HEROES[heroId]
+  if ((goal === 'pvp_rally' || goal === 'world_boss') && hero.role === 'dps' && hero.defaultRow === 'back') {
+    return 1.15
+  }
+  return 1.0
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // SECTION 2: OPTIMIZER ENGINE
 // ═══════════════════════════════════════════════════════════════════
