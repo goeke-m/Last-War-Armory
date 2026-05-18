@@ -202,6 +202,92 @@ function assignGear(squadIds, gear, heroScores) {
   return { assigned, unassigned }
 }
 
+function maxEfficiencyUpgrades(assigned, heroScores) {
+  const upgrades = []
+  for (const [heroId, slots] of Object.entries(assigned)) {
+    const hScore = heroScores[heroId] ?? 1
+    for (const [slot, piece] of Object.entries(slots)) {
+      if (!piece) continue
+      if (piece.level < 40) {
+        const next = piece.level + 1
+        const mult = (next === 10 || next === 40) ? 2 : 1
+        const reason = next === 40 ? 'Hits Lv 40 milestone' : next === 10 ? 'Hits Lv 10 milestone' : 'Max efficiency'
+        upgrades.push({ type: 'level', slot, heroId, from: piece.level, to: next, blueprintWarning: false, reason,
+          score: pieceScore({ ...piece, level: next }) * mult * hScore })
+      }
+      if (piece.stars < 5) {
+        const next = piece.stars + 1
+        const mult = (next === 2 || next === 4) ? 2 : 1
+        const reason = next === 4 ? '4★ breakpoint — major power spike' : next === 2 ? '2★ breakpoint — significant bonus' : 'Blueprint spend justified here'
+        upgrades.push({ type: 'stars', slot, heroId, from: piece.stars, to: next, blueprintWarning: true, reason,
+          score: pieceScore({ ...piece, stars: next }) * mult * hScore })
+      }
+    }
+  }
+  return upgrades.sort((a, b) => b.score - a.score)
+}
+
+function roleBasedUpgrades(assigned) {
+  const items = []
+  for (const [heroId, slots] of Object.entries(assigned)) {
+    const role = HEROES[heroId].role
+    if (role === 'dps') {
+      const gunLv = slots.gun?.level ?? 0
+      const armorLv = slots.armor?.level ?? 0
+      if (armorLv > gunLv && slots.gun) {
+        items.push({ heroId, slot: 'gun', piece: slots.gun, gap: armorLv - gunLv, reason: 'Role misalignment — Gun should lead for DPS hero' })
+      }
+      if (slots.chip && (slots.chip.level < (slots.gun?.level ?? 0))) {
+        items.push({ heroId, slot: 'chip', piece: slots.chip, gap: (slots.gun?.level ?? 0) - slots.chip.level, reason: 'Biggest DPS gap — Chip trails Gun' })
+      }
+    } else if (role === 'tank') {
+      const armorLv = slots.armor?.level ?? 0
+      const gunLv = slots.gun?.level ?? 0
+      if (gunLv > armorLv && slots.armor) {
+        items.push({ heroId, slot: 'armor', piece: slots.armor, gap: gunLv - armorLv, reason: 'Role misalignment — Armor should lead for Tank hero' })
+      }
+    } else if (role === 'support') {
+      const radarLv = slots.radar?.level ?? 0
+      const maxOther = Math.max(slots.gun?.level ?? 0, slots.chip?.level ?? 0, slots.armor?.level ?? 0)
+      if (maxOther > radarLv && slots.radar) {
+        items.push({ heroId, slot: 'radar', piece: slots.radar, gap: maxOther - radarLv, reason: 'Role misalignment — Radar should lead for Support hero' })
+      }
+    }
+  }
+  return items
+    .sort((a, b) => b.gap - a.gap)
+    .map(u => ({ type: 'level', slot: u.slot, heroId: u.heroId, from: u.piece.level, to: u.piece.level + 1, blueprintWarning: false, reason: u.reason, score: u.gap }))
+}
+
+function weakestLinkUpgrades(assigned, heroScores) {
+  const all = []
+  for (const [heroId, slots] of Object.entries(assigned)) {
+    for (const [slot, piece] of Object.entries(slots)) {
+      if (piece) all.push({ heroId, slot, piece, ps: pieceScore(piece) })
+    }
+  }
+  if (all.length === 0) return []
+  const avg = all.reduce((s, p) => s + p.ps, 0) / all.length
+  return all
+    .sort((a, b) => a.ps - b.ps)
+    .slice(0, 10)
+    .map(p => ({ type: 'level', slot: p.slot, heroId: p.heroId, from: p.piece.level, to: p.piece.level + 1, blueprintWarning: false, reason: 'Weakest link in squad', score: avg - p.ps }))
+}
+
+// hasEW5: boolean — true if any squad member has ewLevel >= 5
+function computeUpgradePriority(assigned, heroScores, mode, intent, hasEW5) {
+  let list = []
+  if (mode === 'max_efficiency') list = maxEfficiencyUpgrades(assigned, heroScores)
+  else if (mode === 'role_based') list = roleBasedUpgrades(assigned)
+  else list = weakestLinkUpgrades(assigned, heroScores)
+
+  const needsEWCallout = (intent === 'hybrid_progress') && !hasEW5
+  const callout = needsEWCallout
+    ? [{ type: 'callout', reason: 'Priority: Level an Exclusive Weapon to 5 before investing further in gear — hybrid formation is high-risk without it.', score: Infinity, blueprintWarning: false }]
+    : []
+  return [...callout, ...list]
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // SECTION 3: STATE
 // ═══════════════════════════════════════════════════════════════════
