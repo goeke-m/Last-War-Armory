@@ -396,6 +396,81 @@ function buildInitialState() {
   }
 }
 
+function reducer(state, action) {
+  switch (action.type) {
+    // Global context
+    case 'SET_SEASON':
+      return syncProfile({ ...state, season: action.payload })
+    case 'SET_GOAL':
+      return syncProfile({ ...state, goal: action.payload })
+    case 'SET_INTENT':
+      return syncProfile({ ...state, intent: action.payload })
+
+    // Hero mutations
+    case 'TOGGLE_HERO_OWNED': {
+      const current = state.heroes[action.heroId]
+      return syncProfile({ ...state, heroes: { ...state.heroes, [action.heroId]: { ...current, owned: !current.owned } } })
+    }
+    case 'UPDATE_HERO': {
+      const current = state.heroes[action.heroId]
+      return syncProfile({ ...state, heroes: { ...state.heroes, [action.heroId]: { ...current, ...action.updates } } })
+    }
+
+    // Gear mutations
+    case 'ADD_GEAR':
+      return syncProfile({ ...state, gear: [...state.gear, { ...action.piece, id: crypto.randomUUID() }] })
+    case 'UPDATE_GEAR':
+      return syncProfile({ ...state, gear: state.gear.map(g => g.id === action.id ? { ...g, ...action.updates } : g) })
+    case 'DELETE_GEAR':
+      return syncProfile({ ...state, gear: state.gear.filter(g => g.id !== action.id) })
+
+    // UI state (not synced to profile)
+    case 'SET_SECTION':
+      return { ...state, activeSection: action.payload }
+    case 'SET_REC_TAB':
+      return { ...state, activeRecTab: action.payload }
+    case 'SET_UPGRADE_MODE':
+      return { ...state, upgradeMode: action.payload }
+
+    // Profile management
+    case 'NEW_PROFILE': {
+      const name = action.name
+      const blank = { ...BLANK_PROFILE, heroes: { ...INITIAL_HEROES_STATE } }
+      return { ...state, profiles: { ...state.profiles, [name]: blank }, activeProfile: name, ...blank }
+    }
+    case 'SWITCH_PROFILE': {
+      const profile = state.profiles[action.name]
+      if (!profile) return state
+      return { ...state, activeProfile: action.name, ...profile }
+    }
+    case 'RENAME_PROFILE': {
+      const { oldName, newName } = action
+      const { [oldName]: profile, ...rest } = state.profiles
+      const nextActive = state.activeProfile === oldName ? newName : state.activeProfile
+      return { ...state, profiles: { ...rest, [newName]: profile }, activeProfile: nextActive }
+    }
+    case 'DUPLICATE_PROFILE': {
+      const src = state.profiles[action.name] ?? getProfileData(state)
+      const newName = `${action.name} (copy)`
+      return { ...state, profiles: { ...state.profiles, [newName]: src } }
+    }
+    case 'DELETE_PROFILE': {
+      if (Object.keys(state.profiles).length <= 1) return state
+      const { [action.name]: _, ...remaining } = state.profiles
+      const nextActive = state.activeProfile === action.name ? Object.keys(remaining)[0] : state.activeProfile
+      const nextProfile = remaining[nextActive]
+      return { ...state, profiles: remaining, activeProfile: nextActive, ...nextProfile }
+    }
+    case 'IMPORT_PROFILE': {
+      const { name, data } = action
+      return { ...state, profiles: { ...state.profiles, [name]: data }, activeProfile: name, ...data }
+    }
+
+    default:
+      return state
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // SECTION 4: UI
 // ═══════════════════════════════════════════════════════════════════
