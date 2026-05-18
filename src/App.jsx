@@ -330,7 +330,71 @@ function computeWarnings(state, squad, season) {
 // SECTION 3: STATE
 // ═══════════════════════════════════════════════════════════════════
 
-// (placeholder — filled in Tasks 10–11)
+const INITIAL_HERO_STATE = { owned: false, stars: 0, level: 1, skills: [1, 1, 1, 1], ewLevel: 0 }
+
+const INITIAL_HEROES_STATE = Object.fromEntries(
+  Object.keys(HEROES).map(id => [id, { ...INITIAL_HERO_STATE }])
+)
+
+function getProfileData(state) {
+  return {
+    season: state.season,
+    goal: state.goal,
+    intent: state.intent,
+    heroes: state.heroes,
+    gear: state.gear,
+  }
+}
+
+// Syncs profiles[activeProfile] from flat state fields — called in reducer after every profile-affecting action
+function syncProfile(state) {
+  return { ...state, profiles: { ...state.profiles, [state.activeProfile]: getProfileData(state) } }
+}
+
+function loadFromLocalStorage() {
+  try {
+    const raw = localStorage.getItem('lastwar_optimizer_v1')
+    if (!raw) return null
+    const saved = JSON.parse(raw)
+    if (!saved.profiles || !saved.activeProfile) return null
+    return saved
+  } catch {
+    return null
+  }
+}
+
+const DEFAULT_PROFILE_NAME = 'Main Account'
+
+const BLANK_PROFILE = {
+  season: 1,
+  goal: 'pvp_rally',
+  intent: 'mono',
+  heroes: INITIAL_HEROES_STATE,
+  gear: [],
+}
+
+function buildInitialState() {
+  const saved = loadFromLocalStorage()
+  if (saved) {
+    const profile = saved.profiles[saved.activeProfile] ?? BLANK_PROFILE
+    return {
+      ...profile,
+      profiles: saved.profiles,
+      activeProfile: saved.activeProfile,
+      activeSection: 'roster',
+      activeRecTab: 'loadout',
+      upgradeMode: 'max_efficiency',
+    }
+  }
+  return {
+    ...BLANK_PROFILE,
+    profiles: { [DEFAULT_PROFILE_NAME]: BLANK_PROFILE },
+    activeProfile: DEFAULT_PROFILE_NAME,
+    activeSection: 'roster',
+    activeRecTab: 'loadout',
+    upgradeMode: 'max_efficiency',
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // SECTION 4: UI
