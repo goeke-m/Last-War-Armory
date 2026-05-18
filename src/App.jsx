@@ -475,6 +475,81 @@ function reducer(state, action) {
 // SECTION 4: UI
 // ═══════════════════════════════════════════════════════════════════
 
+function RecPanel({ state, dispatch, recommendedSquad, gearAssignment, upgradePriority, warnings }) {
+  const slotLabels = { gun: 'GUN', chip: 'CHIP', armor: 'ARMOR', radar: 'RADAR' }
+
+  const loadoutContent = recommendedSquad.insufficient ? (
+    <p className="font-rajdhani text-xs text-neutral-600">Own 5+ heroes to generate loadout.</p>
+  ) : (
+    <div className="space-y-1">
+      {recommendedSquad.squad.map(heroId => {
+        const slots = gearAssignment.assigned[heroId] ?? {}
+        return (
+          <div key={heroId} className="flex items-center gap-1">
+            <span className="font-rajdhani text-xs text-gray-300 w-20 truncate">{HEROES[heroId].name}</span>
+            {SLOTS.map(slot => {
+              const p = slots[slot]
+              return (
+                <span key={slot} className={`font-mono text-xs px-1 border ${p ? 'border-amber-800 text-amber-600' : 'border-neutral-800 text-neutral-700'}`}>
+                  {p ? `${slot.slice(0,1).toUpperCase()}${p.level}` : '—'}
+                </span>
+              )
+            })}
+          </div>
+        )
+      })}
+    </div>
+  )
+
+  const upgradesContent = (
+    <div className="space-y-1">
+      {upgradePriority.slice(0, 5).map((item, i) => (
+        <p key={i} className="font-rajdhani text-xs text-gray-300">
+          {item.type === 'callout'
+            ? `⚠ ${item.reason}`
+            : item.type === 'level'
+              ? `${i+1}. ${slotLabels[item.slot]} Lv${item.from}→${item.to} · ${HEROES[item.heroId]?.name}`
+              : `${i+1}. ${slotLabels[item.slot]} → ${item.to}★ · ${HEROES[item.heroId]?.name}`}
+        </p>
+      ))}
+      {upgradePriority.length === 0 && <p className="font-rajdhani text-xs text-neutral-600">No upgrade data — add heroes and gear.</p>}
+    </div>
+  )
+
+  const warningsContent = (
+    <div className="space-y-1">
+      {warnings.length === 0 && <p className="font-rajdhani text-xs text-neutral-600">No warnings — squad looks good.</p>}
+      {warnings.map((w, i) => (
+        <p key={i} className={`font-rajdhani text-xs ${w.severity === 'danger' ? 'text-red-400' : 'text-amber-400'}`}>
+          {w.severity === 'danger' ? '⛔' : '⚠'} {w.message}
+        </p>
+      ))}
+    </div>
+  )
+
+  const content = { loadout: loadoutContent, upgrades: upgradesContent, warnings: warningsContent }
+
+  return (
+    <div className="flex-none border-t-2 border-amber-600 bg-neutral-900">
+      <div className="flex border-b border-neutral-800">
+        {['loadout', 'upgrades', 'warnings'].map(tab => (
+          <button key={tab} onClick={() => dispatch({ type: 'SET_REC_TAB', payload: tab })}
+            className={`flex-1 py-2 font-orbitron text-xs tracking-widest transition-colors min-h-[40px]
+              ${state.activeRecTab === tab ? 'text-amber-600 border-b-2 border-amber-600' : 'text-neutral-500 hover:text-gray-300'}`}>
+            {tab.toUpperCase()}
+            {tab === 'warnings' && warnings.length > 0 && (
+              <span className="ml-1 text-red-500">({warnings.filter(w => w.severity === 'danger').length})</span>
+            )}
+          </button>
+        ))}
+      </div>
+      <div className="p-2 h-28 overflow-y-auto">
+        {content[state.activeRecTab]}
+      </div>
+    </div>
+  )
+}
+
 function UpgradePriority({ state, dispatch, upgradePriority }) {
   const modes = [
     { key: 'max_efficiency', label: 'MAX EFF' },
@@ -1139,27 +1214,14 @@ export default function App() {
         </main>
       </div>
 
-      {/* Recommendation panel */}
-      <div className="flex-none border-t-2 border-amber-600 bg-neutral-900">
-        <div className="flex border-b border-neutral-800">
-          {['loadout', 'upgrades', 'warnings'].map(tab => (
-            <button
-              key={tab}
-              onClick={() => dispatch({ type: 'SET_REC_TAB', payload: tab })}
-              className={`flex-1 py-2 font-orbitron text-xs tracking-widest transition-colors min-h-[40px]
-                ${state.activeRecTab === tab
-                  ? 'text-amber-600 border-b-2 border-amber-600'
-                  : 'text-neutral-500 hover:text-gray-300'
-                }`}
-            >
-              {tab.toUpperCase()}
-            </button>
-          ))}
-        </div>
-        <div className="p-3 h-32 overflow-y-auto font-rajdhani text-xs text-neutral-500">
-          Rec panel content coming soon
-        </div>
-      </div>
+      <RecPanel
+        state={state}
+        dispatch={dispatch}
+        recommendedSquad={recommendedSquad}
+        gearAssignment={gearAssignment}
+        upgradePriority={upgradePriority}
+        warnings={warnings}
+      />
     </div>
   )
 }
