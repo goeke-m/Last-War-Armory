@@ -624,7 +624,7 @@ function RecPanel({ state, dispatch, recommendedSquad, gearAssignment, upgradePr
   const upgradesContent = (
     <div className="space-y-1">
       {upgradePriority.slice(0, 5).map((item, i) => (
-        <p key={i} className="font-rajdhani text-xs text-gray-300">
+        <p key={item.type === 'callout' ? `callout-${i}` : `${item.heroId}-${item.slot}-${item.type}-${i}`} className="font-rajdhani text-xs text-gray-300">
           {item.type === 'callout'
             ? `⚠ ${item.reason}`
             : item.type === 'level'
@@ -640,7 +640,7 @@ function RecPanel({ state, dispatch, recommendedSquad, gearAssignment, upgradePr
     <div className="space-y-1">
       {warnings.length === 0 && <p className="font-rajdhani text-xs text-neutral-600">No warnings — squad looks good.</p>}
       {warnings.map((w, i) => (
-        <p key={i} className={`font-rajdhani text-xs ${w.severity === 'danger' ? 'text-red-400' : 'text-amber-400'}`}>
+        <p key={`${w.severity}-${i}`} className={`font-rajdhani text-xs ${w.severity === 'danger' ? 'text-red-400' : 'text-amber-400'}`}>
           {w.severity === 'danger' ? '⛔' : '⚠'} {w.message}
         </p>
       ))}
@@ -701,7 +701,7 @@ function UpgradePriority({ state, dispatch, upgradePriority }) {
           </p>
         )}
         {upgradePriority.map((item, i) => (
-          <div key={i} className={`flex items-start gap-2 p-2 border ${item.type === 'callout' ? 'border-amber-800 bg-amber-900/20' : 'border-neutral-800 bg-neutral-900'}`}>
+          <div key={item.type === 'callout' ? `callout-${i}` : `${item.heroId}-${item.slot}-${item.type}-${i}`} className={`flex items-start gap-2 p-2 border ${item.type === 'callout' ? 'border-amber-800 bg-amber-900/20' : 'border-neutral-800 bg-neutral-900'}`}>
             {item.type !== 'callout' && (
               <span className="font-mono text-xs text-neutral-600 w-5 flex-none pt-0.5">{i+1}.</span>
             )}
@@ -1283,7 +1283,7 @@ export default function App() {
 
   const warnings = useMemo(
     () => computeWarnings(state, recommendedSquad.squad, state.season),
-    [state, recommendedSquad.squad, state.season]
+    [state.intent, state.heroes, state.gear, recommendedSquad.squad, state.season]
   )
 
   const sections = {
