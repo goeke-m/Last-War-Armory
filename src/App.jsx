@@ -475,6 +475,70 @@ function reducer(state, action) {
 // SECTION 4: UI
 // ═══════════════════════════════════════════════════════════════════
 
+function UpgradePriority({ state, dispatch, upgradePriority }) {
+  const modes = [
+    { key: 'max_efficiency', label: 'MAX EFF' },
+    { key: 'role_based',     label: 'ROLE'    },
+    { key: 'weakest_link',   label: 'W-LINK'  },
+  ]
+  const slotLabels = { gun: 'GUN', chip: 'CHIP', armor: 'ARMOR', radar: 'RADAR' }
+
+  return (
+    <div className="p-3 max-w-lg">
+      <p className="font-orbitron text-amber-600 text-xs tracking-widest border-b border-dashed border-neutral-700 pb-2 mb-3">
+        // UPGRADE PRIORITY ENGINE
+      </p>
+
+      <div className="flex gap-1 mb-4">
+        {modes.map(({ key, label }) => (
+          <button key={key} onClick={() => dispatch({ type: 'SET_UPGRADE_MODE', payload: key })}
+            className={`flex-1 py-2 font-orbitron text-xs border min-h-[40px] transition-colors
+              ${state.upgradeMode === key ? 'border-amber-600 text-amber-600 bg-amber-600/10' : 'border-neutral-700 text-neutral-500 hover:border-neutral-500'}`}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div className="space-y-1">
+        {upgradePriority.length === 0 && (
+          <p className="font-rajdhani text-sm text-neutral-600 py-4 text-center">
+            Own heroes and add gear to generate upgrade recommendations.
+          </p>
+        )}
+        {upgradePriority.map((item, i) => (
+          <div key={i} className={`flex items-start gap-2 p-2 border ${item.type === 'callout' ? 'border-amber-800 bg-amber-900/20' : 'border-neutral-800 bg-neutral-900'}`}>
+            {item.type !== 'callout' && (
+              <span className="font-mono text-xs text-neutral-600 w-5 flex-none pt-0.5">{i+1}.</span>
+            )}
+            <div className="flex-1 min-w-0">
+              {item.type === 'callout' ? (
+                <p className="font-rajdhani text-sm text-amber-500">⚠ {item.reason}</p>
+              ) : item.type === 'level' ? (
+                <>
+                  <p className="font-rajdhani text-sm text-gray-200">
+                    Upgrade <span className="text-amber-600">{slotLabels[item.slot]}</span> Lv {item.from} → {item.to}
+                    <span className="text-neutral-500 ml-1 text-xs">— {HEROES[item.heroId]?.name}</span>
+                  </p>
+                  <p className="font-orbitron text-xs text-neutral-500">{item.reason}</p>
+                </>
+              ) : (
+                <>
+                  <p className="font-rajdhani text-sm text-gray-200">
+                    Promote <span className="text-amber-600">{slotLabels[item.slot]}</span> to {item.to}★
+                    <span className="text-neutral-500 ml-1 text-xs">— {HEROES[item.heroId]?.name}</span>
+                  </p>
+                  <p className="font-orbitron text-xs text-neutral-500">{item.reason}</p>
+                  {item.blueprintWarning && <p className="font-orbitron text-xs text-amber-700">⚠ Blueprint cost — confirm availability</p>}
+                </>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function SquadOptimizer({ state, recommendedSquad, gearAssignment, heroScores }) {
   if (recommendedSquad.insufficient) {
     return (
@@ -1032,7 +1096,7 @@ export default function App() {
     roster:   <RosterManager state={state} dispatch={dispatch} heroScores={heroScores} season={state.season} />,
     gear:     <GearInventory state={state} dispatch={dispatch} />,
     squad:    <SquadOptimizer state={state} recommendedSquad={recommendedSquad} gearAssignment={gearAssignment} heroScores={heroScores} />,
-    upgrades: <div className="p-4 font-rajdhani text-gray-400">Upgrade Priority — coming soon</div>,
+    upgrades: <UpgradePriority state={state} dispatch={dispatch} upgradePriority={upgradePriority} />,
   }
 
   return (
