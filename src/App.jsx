@@ -475,6 +475,153 @@ function reducer(state, action) {
 // SECTION 4: UI
 // ═══════════════════════════════════════════════════════════════════
 
+function HeroCard({ heroId, heroState, heroScore, season, dispatch }) {
+  const [expanded, setExpanded] = useState(false)
+  const hero = HEROES[heroId]
+  const colors = UNIT_COLORS[hero.unitType]
+  const isEffectiveUR = hero.rarity === 'UR' || isPromotedUR(heroId, season)
+  const showEW = isEffectiveUR
+  const nearPromotion = hero.promotionSeason && hero.promotionSeason === season + 1
+
+  return (
+    <div className={`border-l-4 ${colors.border} bg-neutral-900 border border-neutral-800 mb-1 ${heroState.owned ? '' : 'opacity-50'}`}>
+      {/* Compact row */}
+      <div
+        className="flex items-center gap-2 px-2 py-2 min-h-[44px] cursor-pointer select-none"
+        onClick={() => {
+          if (!heroState.owned) dispatch({ type: 'TOGGLE_HERO_OWNED', heroId })
+          else setExpanded(e => !e)
+        }}
+      >
+        {/* Rarity badge */}
+        <span className={`font-orbitron text-xs px-1 py-0.5 border flex-none ${hero.rarity === 'UR' ? 'border-amber-500 text-amber-500' : hero.rarity === 'SSR' ? 'border-purple-500 text-purple-400' : 'border-neutral-600 text-neutral-500'}`}>
+          {isPromotedUR(heroId, season) && hero.rarity === 'SSR' ? 'UR*' : hero.rarity}
+        </span>
+
+        {/* Name + role */}
+        <div className="flex-1 min-w-0">
+          <p className="font-rajdhani font-semibold text-sm text-gray-200 truncate">{hero.name}</p>
+          <p className={`font-orbitron text-xs ${colors.text} opacity-70`}>{colors.label} · {hero.role.toUpperCase()}</p>
+        </div>
+
+        {/* Near-promotion badge */}
+        {nearPromotion && (
+          <span className="font-orbitron text-xs text-lime-500 border border-lime-600 px-1 flex-none">→UR S{hero.promotionSeason}</span>
+        )}
+
+        {/* Score */}
+        {heroState.owned && (
+          <span className="font-mono text-xs text-amber-600 ml-1">{heroScore?.toFixed(1) ?? '—'}</span>
+        )}
+
+        {/* Owned toggle + expand indicator */}
+        <span className="font-orbitron text-xs text-neutral-600 flex-none">
+          {heroState.owned ? (expanded ? '▲' : '▼') : '+ OWN'}
+        </span>
+      </div>
+
+      {/* Expanded edit form */}
+      {heroState.owned && expanded && (
+        <div className="px-3 pb-3 space-y-3 border-t border-neutral-800 pt-2">
+          {/* Stars */}
+          <div>
+            <p className="font-orbitron text-xs text-neutral-500 mb-1">STARS</p>
+            <div className="flex gap-1">
+              {[0,1,2,3,4,5].map(s => (
+                <button key={s} onClick={() => dispatch({ type: 'UPDATE_HERO', heroId, updates: { stars: s } })}
+                  className={`flex-1 py-1 font-rajdhani text-sm border min-h-[36px] transition-colors
+                    ${heroState.stars === s ? 'border-amber-600 text-amber-600 bg-amber-600/10' : 'border-neutral-700 text-neutral-500'}`}>
+                  {s}★
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Level */}
+          <div>
+            <p className="font-orbitron text-xs text-neutral-500 mb-1">HERO LEVEL: <span className="text-amber-600">{heroState.level}</span></p>
+            <input type="range" min="1" max="60" value={heroState.level}
+              onChange={e => dispatch({ type: 'UPDATE_HERO', heroId, updates: { level: Number(e.target.value) } })}
+              className="w-full" />
+          </div>
+
+          {/* Skills */}
+          <div>
+            <p className="font-orbitron text-xs text-neutral-500 mb-1">SKILL LEVELS</p>
+            <div className="grid grid-cols-4 gap-1">
+              {heroState.skills.map((lvl, i) => (
+                <div key={i} className="text-center">
+                  <p className="font-orbitron text-xs text-neutral-600 mb-0.5">SK{i+1}</p>
+                  <input type="number" min="1" max="10" value={lvl}
+                    onChange={e => {
+                      const skills = [...heroState.skills]
+                      skills[i] = Math.min(10, Math.max(1, Number(e.target.value)))
+                      dispatch({ type: 'UPDATE_HERO', heroId, updates: { skills } })
+                    }}
+                    className="w-full bg-neutral-800 border border-neutral-700 text-center font-mono text-sm text-gray-200 py-1 min-h-[36px]" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* EW Level (UR / promoted SSR only) */}
+          {showEW && (
+            <div>
+              <p className="font-orbitron text-xs text-neutral-500 mb-1">EW LEVEL: <span className="text-amber-600">{heroState.ewLevel}</span></p>
+              <div className="flex gap-1 flex-wrap">
+                {[0,1,2,3,4,5,6,7,8,9,10].map(lvl => (
+                  <button key={lvl} onClick={() => dispatch({ type: 'UPDATE_HERO', heroId, updates: { ewLevel: lvl } })}
+                    className={`px-2 py-1 font-mono text-xs border min-h-[32px] transition-colors
+                      ${heroState.ewLevel === lvl ? 'border-amber-600 text-amber-600 bg-amber-600/10' : 'border-neutral-700 text-neutral-500'}`}>
+                    {lvl}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Unown button */}
+          <button onClick={() => { setExpanded(false); dispatch({ type: 'TOGGLE_HERO_OWNED', heroId }) }}
+            className="font-orbitron text-xs text-red-600 border border-red-900 px-3 py-1 hover:bg-red-900/20 min-h-[36px]">
+            REMOVE FROM ROSTER
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function RosterManager({ state, dispatch, heroScores, season }) {
+  const RARITY_GROUPS = [
+    { label: '// UR — ULTRA RARE', ids: ['kimberly','dva','williams','murphy','marshall','tesla','morrison'] },
+    { label: '// SSR — SUPER RARE', ids: ['mason','violet','scarlett','venom','schuyler','fiona','sarah','lucius','carlie','stetmann','mcgregor','adam','swift','richard','elsa','maxwell'] },
+    { label: '// SR — RARE', ids: ['drake','kane','ambolt'] },
+  ]
+
+  return (
+    <div className="p-3 max-w-lg">
+      <p className="font-orbitron text-amber-600 text-xs tracking-widest border-b border-dashed border-neutral-700 pb-2 mb-3">
+        // FIELD ROSTER — TAP HERO TO OWN · EXPAND FOR STATS
+      </p>
+      {RARITY_GROUPS.map(({ label, ids }) => (
+        <div key={label} className="mb-4">
+          <p className="font-orbitron text-xs text-neutral-500 tracking-widest mb-2">{label}</p>
+          {ids.map(id => (
+            <HeroCard
+              key={id}
+              heroId={id}
+              heroState={state.heroes[id]}
+              heroScore={heroScores[id]}
+              season={state.season}
+              dispatch={dispatch}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function GoalSelector({ state, dispatch, ownedIds }) {
   const hasEW5 = ownedIds.some(id => (state.heroes[id]?.ewLevel ?? 0) >= 5)
   const showHybridWarning = (state.intent === 'hybrid_progress' || state.intent === 'full_hybrid') && !hasEW5
@@ -616,7 +763,7 @@ export default function App() {
 
   const sections = {
     goal:     <GoalSelector state={state} dispatch={dispatch} ownedIds={ownedIds} />,
-    roster:   <div className="p-4 font-rajdhani text-gray-400">Roster Manager — coming soon</div>,
+    roster:   <RosterManager state={state} dispatch={dispatch} heroScores={heroScores} season={state.season} />,
     gear:     <div className="p-4 font-rajdhani text-gray-400">Gear Inventory — coming soon</div>,
     squad:    <div className="p-4 font-rajdhani text-gray-400">Squad Optimizer — coming soon</div>,
     upgrades: <div className="p-4 font-rajdhani text-gray-400">Upgrade Priority — coming soon</div>,
