@@ -475,6 +475,88 @@ function reducer(state, action) {
 // SECTION 4: UI
 // ═══════════════════════════════════════════════════════════════════
 
+function SquadOptimizer({ state, recommendedSquad, gearAssignment, heroScores }) {
+  if (recommendedSquad.insufficient) {
+    return (
+      <div className="p-4">
+        <p className="font-orbitron text-amber-600 text-xs tracking-widest border-b border-dashed border-neutral-700 pb-2 mb-3">
+          // RECOMMENDED SQUAD
+        </p>
+        <p className="font-rajdhani text-sm text-neutral-500 py-4 text-center">
+          Own at least 5 heroes to generate a squad recommendation.
+        </p>
+      </div>
+    )
+  }
+
+  const { squad, alternates } = recommendedSquad
+  const frontRow = squad.filter(id => HEROES[id].defaultRow === 'front')
+  const backRow = squad.filter(id => HEROES[id].defaultRow === 'back')
+  const rows = [{ label: 'FRONT ROW', ids: frontRow }, { label: 'BACK ROW', ids: backRow }]
+
+  return (
+    <div className="p-3 max-w-lg">
+      <p className="font-orbitron text-amber-600 text-xs tracking-widest border-b border-dashed border-neutral-700 pb-2 mb-3">
+        // OPTIMAL SQUAD · SCORE {recommendedSquad.score.toFixed(1)}
+      </p>
+
+      {rows.map(({ label, ids }) => (
+        <div key={label} className="mb-4">
+          <p className="font-orbitron text-xs text-neutral-500 tracking-widest mb-2">{label}</p>
+          <div className="space-y-2">
+            {ids.map(heroId => {
+              const hero = HEROES[heroId]
+              const colors = UNIT_COLORS[hero.unitType]
+              const h = state.heroes[heroId]
+              const slots = gearAssignment.assigned[heroId] ?? {}
+              const alt = alternates[heroId]
+
+              return (
+                <div key={heroId} className={`border-l-4 ${colors.border} bg-neutral-900 border border-neutral-800 p-2`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className={`font-orbitron text-xs ${colors.text}`}>{hero.rarity}</span>
+                    <span className="font-rajdhani font-semibold text-sm text-gray-200 flex-1">{hero.name}</span>
+                    <span className="font-mono text-xs text-neutral-500">{h.stars}★</span>
+                    {h.ewLevel > 0 && <span className="font-mono text-xs text-sky-500">EW{h.ewLevel}</span>}
+                    <span className="font-mono text-xs text-amber-600">{heroScores[heroId]?.toFixed(1)}</span>
+                  </div>
+
+                  <div className="grid grid-cols-4 gap-1 mb-2">
+                    {SLOTS.map(slot => {
+                      const piece = slots[slot]
+                      return (
+                        <div key={slot} className={`border ${piece ? 'border-neutral-700' : 'border-neutral-800 opacity-40'} p-1 text-center`}>
+                          <p className="font-orbitron text-xs text-neutral-500">{slot.toUpperCase()}</p>
+                          {piece ? (
+                            <>
+                              <p className="font-mono text-xs text-amber-600">Lv{piece.level}</p>
+                              <p className="font-mono text-xs text-neutral-400">{piece.stars}★</p>
+                              <p className="font-orbitron text-xs text-neutral-600">{piece.quality.slice(0,3).toUpperCase()}</p>
+                            </>
+                          ) : (
+                            <p className="font-orbitron text-xs text-neutral-700">—</p>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  {alt && (
+                    <p className="font-rajdhani text-xs text-neutral-600">
+                      Alt: <span className="text-neutral-400">{HEROES[alt.heroId].name}</span>
+                      <span className="text-red-500 ml-1">({alt.scoreDiff.toFixed(1)} pts)</span>
+                    </p>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function GearSegBar({ level }) {
   return (
     <div className="flex gap-0.5 mt-1">
@@ -949,7 +1031,7 @@ export default function App() {
     goal:     <GoalSelector state={state} dispatch={dispatch} ownedIds={ownedIds} />,
     roster:   <RosterManager state={state} dispatch={dispatch} heroScores={heroScores} season={state.season} />,
     gear:     <GearInventory state={state} dispatch={dispatch} />,
-    squad:    <div className="p-4 font-rajdhani text-gray-400">Squad Optimizer — coming soon</div>,
+    squad:    <SquadOptimizer state={state} recommendedSquad={recommendedSquad} gearAssignment={gearAssignment} heroScores={heroScores} />,
     upgrades: <div className="p-4 font-rajdhani text-gray-400">Upgrade Priority — coming soon</div>,
   }
 
