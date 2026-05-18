@@ -86,7 +86,36 @@ function getGoalMod(heroId, goal) {
 // SECTION 2: OPTIMIZER ENGINE
 // ═══════════════════════════════════════════════════════════════════
 
-// (placeholder — filled in Tasks 5–9)
+function isPromotedUR(heroId, season) {
+  const h = HEROES[heroId]
+  return h.promotionSeason !== null && h.promotionSeason <= season
+}
+
+function heroScore(heroId, heroState, season, goal) {
+  const { stars, skills, ewLevel } = heroState
+  const effectiveRarity = isPromotedUR(heroId, season) ? 'UR' : HEROES[heroId].rarity
+  const rarityWeight = RARITY_WEIGHTS[effectiveRarity]
+  const avgSkill = skills.reduce((a, b) => a + b, 0) / skills.length
+  const base = rarityWeight * (stars / 5) * avgSkill
+  const starBonus = stars >= 4 ? 1.4 : stars >= 3 ? 1.2 : 1.0
+  // ewBonus applies to native UR and promoted SSRs (both resolve to effectiveRarity==='UR')
+  const ewBonus = effectiveRarity === 'UR' && ewLevel > 0 ? 1 + ewLevel * 0.15 : 1.0
+  const goalMod = getGoalMod(heroId, goal)
+  return base * starBonus * ewBonus * goalMod
+}
+
+function pieceScore(piece) {
+  return QUALITY_WEIGHTS[piece.quality] * (piece.level / 40) * (1 + piece.stars * 0.2)
+}
+
+// Returns { [heroId]: score } for all owned heroes
+function computeAllHeroScores(heroes, season, goal) {
+  const scores = {}
+  for (const [id, state] of Object.entries(heroes)) {
+    if (state.owned) scores[id] = heroScore(id, state, season, goal)
+  }
+  return scores
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // SECTION 3: STATE
