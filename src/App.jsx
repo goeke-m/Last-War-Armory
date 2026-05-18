@@ -475,6 +475,96 @@ function reducer(state, action) {
 // SECTION 4: UI
 // ═══════════════════════════════════════════════════════════════════
 
+function GoalSelector({ state, dispatch, ownedIds }) {
+  const hasEW5 = ownedIds.some(id => (state.heroes[id]?.ewLevel ?? 0) >= 5)
+  const showHybridWarning = (state.intent === 'hybrid_progress' || state.intent === 'full_hybrid') && !hasEW5
+
+  return (
+    <div className="p-4 space-y-6 max-w-lg">
+      <p className="font-orbitron text-amber-600 text-xs tracking-widest border-b border-dashed border-neutral-700 pb-2">
+        // MISSION PARAMETERS
+      </p>
+
+      {/* Season */}
+      <div>
+        <p className="font-orbitron text-xs text-neutral-400 tracking-widest mb-2">CURRENT SEASON</p>
+        <div className="flex gap-1">
+          {[1,2,3,4,5,6].map(s => (
+            <button
+              key={s}
+              onClick={() => dispatch({ type: 'SET_SEASON', payload: s })}
+              className={`flex-1 py-2 font-orbitron text-sm min-h-[44px] border transition-colors
+                ${state.season === s
+                  ? 'border-amber-600 text-amber-600 bg-amber-600/10 glow-amber'
+                  : 'border-neutral-700 text-neutral-500 hover:border-neutral-500'
+                }`}
+            >
+              S{s}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Goal */}
+      <div>
+        <p className="font-orbitron text-xs text-neutral-400 tracking-widest mb-2">OPTIMIZATION GOAL</p>
+        <div className="space-y-1">
+          {[
+            { value: 'pvp_rally',    label: 'PvP Rally',    sub: 'Burst damage, alliance wars' },
+            { value: 'world_boss',   label: 'World Boss',   sub: 'Sustained DPS, PvE' },
+            { value: 'code_battles', label: 'Code Battles', sub: 'Specialized mode bonuses' },
+            { value: 'balanced',     label: 'Balanced',     sub: 'No goal modifiers' },
+          ].map(({ value, label, sub }) => (
+            <button
+              key={value}
+              onClick={() => dispatch({ type: 'SET_GOAL', payload: value })}
+              className={`w-full flex items-center justify-between px-3 py-2 border text-left min-h-[44px] transition-colors
+                ${state.goal === value
+                  ? 'border-amber-600 text-amber-600 bg-amber-600/10'
+                  : 'border-neutral-700 text-neutral-400 hover:border-neutral-500'
+                }`}
+            >
+              <span className="font-orbitron text-sm">{label}</span>
+              <span className="font-rajdhani text-xs text-neutral-500">{sub}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Intent */}
+      <div>
+        <p className="font-orbitron text-xs text-neutral-400 tracking-widest mb-2">SQUAD FORMATION INTENT</p>
+        <div className="space-y-1">
+          {[
+            { value: 'mono',             label: 'Mono Type',          sub: '+25% bonus if all 5 same unit' },
+            { value: 'hybrid_progress',  label: 'Hybrid In Progress', sub: 'Building toward full hybrid' },
+            { value: 'full_hybrid',      label: 'Full Hybrid',        sub: 'EW 5+ present, mixed units' },
+          ].map(({ value, label, sub }) => (
+            <button
+              key={value}
+              onClick={() => dispatch({ type: 'SET_INTENT', payload: value })}
+              className={`w-full flex items-center justify-between px-3 py-2 border text-left min-h-[44px] transition-colors
+                ${state.intent === value
+                  ? 'border-amber-600 text-amber-600 bg-amber-600/10'
+                  : 'border-neutral-700 text-neutral-400 hover:border-neutral-500'
+                }`}
+            >
+              <span className="font-orbitron text-sm">{label}</span>
+              <span className="font-rajdhani text-xs text-neutral-500">{sub}</span>
+            </button>
+          ))}
+        </div>
+
+        {showHybridWarning && (
+          <div className="mt-3 p-3 border border-red-600 bg-red-600/10 font-rajdhani text-sm text-red-400">
+            ⚠ Hybrid formation is high-risk — no owned hero has EW 5+. Level an Exclusive Weapon before switching intent.
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   const [state, dispatch] = useReducer(reducer, null, buildInitialState)
 
@@ -525,7 +615,7 @@ export default function App() {
   )
 
   const sections = {
-    goal:     <div className="p-4 font-rajdhani text-gray-400">Goal Selector — coming soon</div>,
+    goal:     <GoalSelector state={state} dispatch={dispatch} ownedIds={ownedIds} />,
     roster:   <div className="p-4 font-rajdhani text-gray-400">Roster Manager — coming soon</div>,
     gear:     <div className="p-4 font-rajdhani text-gray-400">Gear Inventory — coming soon</div>,
     squad:    <div className="p-4 font-rajdhani text-gray-400">Squad Optimizer — coming soon</div>,
