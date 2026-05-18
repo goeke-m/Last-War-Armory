@@ -117,6 +117,68 @@ function computeAllHeroScores(heroes, season, goal) {
   return scores
 }
 
+// Generates all k-element combinations of arr
+function getCombinations(arr, k) {
+  const result = []
+  function recurse(start, combo) {
+    if (combo.length === k) { result.push([...combo]); return }
+    for (let i = start; i <= arr.length - (k - combo.length); i++) {
+      combo.push(arr[i])
+      recurse(i + 1, combo)
+      combo.pop()
+    }
+  }
+  recurse(0, [])
+  return result
+}
+
+function computeSquadScore(combo, heroScores, heroes, intent) {
+  const base = combo.reduce((sum, id) => sum + (heroScores[id] ?? 0), 0)
+  const unitTypes = new Set(combo.map(id => HEROES[id].unitType))
+  const isMonotype = unitTypes.size === 1
+  const hasDPS = combo.some(id => HEROES[id].role === 'dps')
+  const hasEW5 = combo.some(id => (heroes[id]?.ewLevel ?? 0) >= 5)
+  let score = base
+  if (isMonotype) score *= 1.25
+  else if (!hasEW5) score *= 0.8
+  if (!hasDPS) score *= 0.6
+  return score
+}
+
+function hasFrontTank(combo) {
+  return combo.some(id => HEROES[id].role === 'tank' && HEROES[id].defaultRow === 'front')
+}
+
+// Returns { squad: heroId[], alternates: {[heroId]: {heroId, scoreDiff}}, score, insufficient }
+function findRecommendedSquad(ownedIds, heroScores, heroes, intent) {
+  if (ownedIds.length < 5) {
+    return { squad: ownedIds, alternates: {}, score: 0, insufficient: true }
+  }
+  const combos = getCombinations(ownedIds, 5)
+  const valid = combos.filter(hasFrontTank)
+  const pool = valid.length > 0 ? valid : combos
+  const scored = pool
+    .map(combo => ({ combo, score: computeSquadScore(combo, heroScores, heroes, intent) }))
+    .sort((a, b) => b.score - a.score)
+  const best = scored[0]
+
+  // Per-slot alternates: best single-hero swap for each member of the squad
+  const alternates = {}
+  for (const heroId of best.combo) {
+    let bestAlt = null, bestAltScore = -Infinity
+    for (const altId of ownedIds) {
+      if (best.combo.includes(altId)) continue
+      const swapped = best.combo.map(id => id === heroId ? altId : id)
+      if (valid.length > 0 && !hasFrontTank(swapped)) continue
+      const s = computeSquadScore(swapped, heroScores, heroes, intent)
+      if (s > bestAltScore) { bestAltScore = s; bestAlt = altId }
+    }
+    if (bestAlt) alternates[heroId] = { heroId: bestAlt, scoreDiff: bestAltScore - best.score }
+  }
+
+  return { squad: best.combo, alternates, score: best.score, insufficient: false }
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // SECTION 3: STATE
 // ═══════════════════════════════════════════════════════════════════
