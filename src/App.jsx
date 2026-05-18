@@ -179,6 +179,29 @@ function findRecommendedSquad(ownedIds, heroScores, heroes, intent) {
   return { squad: best.combo, alternates, score: best.score, insufficient: false }
 }
 
+// Returns { assigned: {[heroId]: {gun,chip,armor,radar}}, unassigned: piece[] }
+function assignGear(squadIds, gear, heroScores) {
+  // Best heroes pick first
+  const sortedSquad = [...squadIds].sort((a, b) => (heroScores[b] ?? 0) - (heroScores[a] ?? 0))
+  // Sort available gear by score descending for fast best-first lookup
+  const available = [...gear].sort((a, b) => pieceScore(b) - pieceScore(a))
+  const usedIds = new Set()
+  const assigned = {}
+
+  for (const heroId of sortedSquad) {
+    const role = HEROES[heroId].role
+    const priority = SLOT_PRIORITY[role] ?? SLOT_PRIORITY.dps
+    assigned[heroId] = { gun: null, chip: null, armor: null, radar: null }
+    for (const slot of priority) {
+      const best = available.find(p => p.slot === slot && !usedIds.has(p.id))
+      if (best) { assigned[heroId][slot] = best; usedIds.add(best.id) }
+    }
+  }
+
+  const unassigned = gear.filter(p => !usedIds.has(p.id))
+  return { assigned, unassigned }
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // SECTION 3: STATE
 // ═══════════════════════════════════════════════════════════════════
