@@ -475,6 +475,190 @@ function reducer(state, action) {
 // SECTION 4: UI
 // ═══════════════════════════════════════════════════════════════════
 
+function GearSegBar({ level }) {
+  return (
+    <div className="flex gap-0.5 mt-1">
+      {[0,10,20,30].map(start => {
+        const segLevel = Math.min(10, Math.max(0, level - start))
+        return (
+          <div key={start} className="flex-1 h-1.5 bg-neutral-800 rounded-sm overflow-hidden">
+            <div className="h-full bg-amber-600 transition-all" style={{ width: `${segLevel * 10}%` }} />
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+function StarPips({ stars }) {
+  return (
+    <div className="flex gap-0.5 mt-0.5">
+      {[0,1,2,3,4].map(i => (
+        <span key={i} className={`text-xs ${i < stars ? 'text-amber-500' : 'text-neutral-700'}`}>★</span>
+      ))}
+    </div>
+  )
+}
+
+function GearPieceRow({ piece, onEdit }) {
+  const qualityColors = {
+    legendary: 'text-amber-400 border-amber-700',
+    epic: 'text-purple-400 border-purple-800',
+    rare: 'text-blue-400 border-blue-800',
+    common: 'text-neutral-400 border-neutral-700'
+  }
+  const slotLabels = { gun: 'GUN', chip: 'CHIP', armor: 'ARMOR', radar: 'RADAR' }
+
+  return (
+    <div className="flex items-center gap-2 px-2 py-2 border border-neutral-800 bg-neutral-900 mb-1 cursor-pointer hover:border-neutral-600 min-h-[44px]"
+      onClick={onEdit}>
+      <span className={`font-orbitron text-xs border px-1 flex-none ${qualityColors[piece.quality]}`}>{piece.quality.slice(0,3).toUpperCase()}</span>
+      <span className="font-orbitron text-xs text-neutral-400 w-10 flex-none">{slotLabels[piece.slot]}</span>
+      <div className="flex-1 min-w-0">
+        <p className="font-mono text-xs text-gray-300">Lv {piece.level}</p>
+        <GearSegBar level={piece.level} />
+        <StarPips stars={piece.stars} />
+      </div>
+      <span className="font-mono text-xs text-amber-600 flex-none">{pieceScore(piece).toFixed(2)}</span>
+    </div>
+  )
+}
+
+function GearEditModal({ piece, onSave, onDelete, onClose }) {
+  const [slot, setSlot] = useState(piece?.slot ?? 'gun')
+  const [quality, setQuality] = useState(piece?.quality ?? 'legendary')
+  const [level, setLevel] = useState(piece?.level ?? 0)
+  const [stars, setStars] = useState(piece?.stars ?? 0)
+  const isNew = !piece?.id
+
+  return (
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-end sm:items-center justify-center p-4">
+      <div className="bg-neutral-900 border border-amber-600 w-full max-w-sm p-4 space-y-4">
+        <p className="font-orbitron text-amber-600 text-xs tracking-widest">{isNew ? '// ADD GEAR' : '// EDIT GEAR'}</p>
+
+        {/* Slot */}
+        <div>
+          <p className="font-orbitron text-xs text-neutral-500 mb-1">SLOT</p>
+          <div className="flex gap-1">
+            {SLOTS.map(s => (
+              <button key={s} onClick={() => setSlot(s)}
+                className={`flex-1 py-2 font-orbitron text-xs border min-h-[40px] transition-colors
+                  ${slot === s ? 'border-amber-600 text-amber-600 bg-amber-600/10' : 'border-neutral-700 text-neutral-500'}`}>
+                {s.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Quality */}
+        <div>
+          <p className="font-orbitron text-xs text-neutral-500 mb-1">QUALITY</p>
+          <div className="flex gap-1">
+            {QUALITIES.map(q => (
+              <button key={q} onClick={() => setQuality(q)}
+                className={`flex-1 py-2 font-orbitron text-xs border min-h-[40px] transition-colors
+                  ${quality === q ? 'border-amber-600 text-amber-600 bg-amber-600/10' : 'border-neutral-700 text-neutral-500'}`}>
+                {q.slice(0,3).toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Level */}
+        <div>
+          <p className="font-orbitron text-xs text-neutral-500 mb-1">LEVEL: <span className="text-amber-600">{level}</span></p>
+          <input type="range" min="0" max="40" value={level} onChange={e => setLevel(Number(e.target.value))} className="w-full" />
+        </div>
+
+        {/* Stars */}
+        <div>
+          <p className="font-orbitron text-xs text-neutral-500 mb-1">STARS</p>
+          <div className="flex gap-1">
+            {[0,1,2,3,4,5].map(s => (
+              <button key={s} onClick={() => setStars(s)}
+                className={`flex-1 py-1 font-orbitron text-xs border min-h-[36px] transition-colors
+                  ${stars === s ? 'border-amber-600 text-amber-600 bg-amber-600/10' : 'border-neutral-700 text-neutral-500'}`}>
+                {s}★
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-2 pt-2">
+          <button onClick={() => onSave({ slot, quality, level, stars })}
+            className="flex-1 py-2 font-orbitron text-xs bg-amber-600 text-black hover:bg-amber-500 min-h-[44px]">
+            {isNew ? 'ADD' : 'SAVE'}
+          </button>
+          {!isNew && (
+            <button onClick={onDelete}
+              className="px-4 py-2 font-orbitron text-xs border border-red-800 text-red-500 hover:bg-red-900/20 min-h-[44px]">
+              DELETE
+            </button>
+          )}
+          <button onClick={onClose}
+            className="px-4 py-2 font-orbitron text-xs border border-neutral-700 text-neutral-400 hover:bg-neutral-800 min-h-[44px]">
+            CANCEL
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function GearInventory({ state, dispatch }) {
+  const [editPiece, setEditPiece] = useState(null)
+
+  const counts = SLOTS.reduce((acc, slot) => {
+    acc[slot] = state.gear.filter(g => g.slot === slot).length
+    return acc
+  }, {})
+
+  return (
+    <div className="p-3 max-w-lg">
+      <p className="font-orbitron text-amber-600 text-xs tracking-widest border-b border-dashed border-neutral-700 pb-2 mb-3">
+        // GEAR INVENTORY — FLAT LIST, NO HERO LOCK
+      </p>
+
+      {/* Summary + tooltip */}
+      <div className="flex items-center gap-2 mb-3 flex-wrap" title="Moving gear between heroes costs a small gold fee in-game but is always worth it when the optimizer recommends it.">
+        {SLOTS.map(s => (
+          <span key={s} className="font-mono text-xs text-neutral-400 border border-neutral-700 px-2 py-0.5">
+            {counts[s]}× {s.toUpperCase()}
+          </span>
+        ))}
+        <span className="font-orbitron text-xs text-neutral-600 cursor-help">ⓘ</span>
+      </div>
+
+      {state.gear.length === 0 && (
+        <p className="font-rajdhani text-sm text-neutral-600 py-4 text-center">No gear in inventory. Tap + ADD GEAR to begin.</p>
+      )}
+      {state.gear.map(piece => (
+        <GearPieceRow key={piece.id} piece={piece} onEdit={() => setEditPiece(piece)} />
+      ))}
+
+      {/* FAB — positioned relative to avoid covering rec panel */}
+      <button onClick={() => setEditPiece({})}
+        className="fixed bottom-64 right-4 bg-amber-600 text-black font-orbitron text-xs px-4 py-3 hover:bg-amber-500 shadow-lg z-10 glow-amber min-h-[44px]">
+        + ADD GEAR
+      </button>
+
+      {editPiece !== null && (
+        <GearEditModal
+          piece={Object.keys(editPiece).length > 0 ? editPiece : null}
+          onSave={data => {
+            if (editPiece.id) dispatch({ type: 'UPDATE_GEAR', id: editPiece.id, updates: data })
+            else dispatch({ type: 'ADD_GEAR', piece: data })
+            setEditPiece(null)
+          }}
+          onDelete={() => { dispatch({ type: 'DELETE_GEAR', id: editPiece.id }); setEditPiece(null) }}
+          onClose={() => setEditPiece(null)}
+        />
+      )}
+    </div>
+  )
+}
+
 function HeroCard({ heroId, heroState, heroScore, season, dispatch }) {
   const [expanded, setExpanded] = useState(false)
   const hero = HEROES[heroId]
@@ -764,7 +948,7 @@ export default function App() {
   const sections = {
     goal:     <GoalSelector state={state} dispatch={dispatch} ownedIds={ownedIds} />,
     roster:   <RosterManager state={state} dispatch={dispatch} heroScores={heroScores} season={state.season} />,
-    gear:     <div className="p-4 font-rajdhani text-gray-400">Gear Inventory — coming soon</div>,
+    gear:     <GearInventory state={state} dispatch={dispatch} />,
     squad:    <div className="p-4 font-rajdhani text-gray-400">Squad Optimizer — coming soon</div>,
     upgrades: <div className="p-4 font-rajdhani text-gray-400">Upgrade Priority — coming soon</div>,
   }
