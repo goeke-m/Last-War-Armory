@@ -71,6 +71,9 @@ const GOAL_WEIGHTS = {
   balanced:     {},
 }
 
+// Rock-paper-scissors counter table: key beats value
+const BEATS = { tank: 'missile', missile: 'aircraft', aircraft: 'tank' }
+
 // Returns per-hero goal multiplier; unnamed back-row DPS get 1.15 in pvp/wb
 function getGoalMod(heroId, goal) {
   const explicit = GOAL_WEIGHTS[goal][heroId]
@@ -135,15 +138,35 @@ function getCombinations(arr, k) {
   return result
 }
 
-function computeSquadScore(combo, heroScores, heroes, intent) {
+function computeSquadScore(combo, heroScores, heroes, intent, opponentType) {
   const base = combo.reduce((sum, id) => sum + (heroScores[id] ?? 0), 0)
-  const unitTypes = new Set(combo.map(id => HEROES[id].unitType))
-  const isMonotype = unitTypes.size === 1
+
+  // Graduated mono bonus — actual game mechanic (+20% max, graduated by majority count)
+  const typeCounts = {}
+  for (const id of combo) {
+    const t = HEROES[id].unitType
+    typeCounts[t] = (typeCounts[t] || 0) + 1
+  }
+  const counts = Object.values(typeCounts).sort((a, b) => b - a)
+  let monoMult = 1.0
+  if (counts[0] === 5) monoMult = 1.20
+  else if (counts[0] === 4) monoMult = 1.15
+  else if (counts[0] === 3 && counts[1] === 2) monoMult = 1.10
+  else if (counts[0] === 3) monoMult = 1.05
+
+  // Counter advantage: heroes whose type beats the opponent type get +20% damage
+  let counterMult = 1.0
+  if (opponentType && BEATS[opponentType] !== undefined) {
+    // find which type counters the opponent
+    const counterType = Object.keys(BEATS).find(t => BEATS[t] === opponentType)
+    const counterCount = combo.filter(id => HEROES[id].unitType === counterType).length
+    if (counterCount >= 4) counterMult = 1.20
+    else if (counterCount >= 3) counterMult = 1.15
+    else if (counterCount >= 1) counterMult = 1.08
+  }
+
   const hasDPS = combo.some(id => HEROES[id].role === 'dps')
-  const hasEW5 = combo.some(id => (heroes[id]?.ewLevel ?? 0) >= 5)
-  let score = base
-  if (isMonotype) score *= 1.25
-  else if (!hasEW5) score *= 0.8
+  let score = base * monoMult * counterMult
   if (!hasDPS) score *= 0.6
   return score
 }
@@ -153,7 +176,7 @@ function hasFrontTank(combo) {
 }
 
 // Returns { squad: heroId[], alternates: {[heroId]: {heroId, scoreDiff}}, score, insufficient }
-function findRecommendedSquad(ownedIds, heroScores, heroes, intent) {
+function findRecommendedSquad(ownedIds, heroScores, heroes, intent, opponentType) {
   if (ownedIds.length < 5) {
     return { squad: ownedIds, alternates: {}, score: 0, insufficient: true }
   }
@@ -161,7 +184,7 @@ function findRecommendedSquad(ownedIds, heroScores, heroes, intent) {
   const valid = combos.filter(hasFrontTank)
   const pool = valid.length > 0 ? valid : combos
   const scored = pool
-    .map(combo => ({ combo, score: computeSquadScore(combo, heroScores, heroes, intent) }))
+    .map(combo => ({ combo, score: computeSquadScore(combo, heroScores, heroes, intent, opponentType) }))
     .sort((a, b) => b.score - a.score)
   const best = scored[0]
 
@@ -173,7 +196,7 @@ function findRecommendedSquad(ownedIds, heroScores, heroes, intent) {
       if (best.combo.includes(altId)) continue
       const swapped = best.combo.map(id => id === heroId ? altId : id)
       if (valid.length > 0 && !hasFrontTank(swapped)) continue
-      const s = computeSquadScore(swapped, heroScores, heroes, intent)
+      const s = computeSquadScore(swapped, heroScores, heroes, intent, opponentType)
       if (s > bestAltScore) { bestAltScore = s; bestAlt = altId }
     }
     if (bestAlt) alternates[heroId] = { heroId: bestAlt, scoreDiff: bestAltScore - best.score }
@@ -213,8 +236,9 @@ function maxEfficiencyUpgrades(assigned, heroScores) {
       if (!piece) continue
       if (piece.level < 40) {
         const next = piece.level + 1
-        const mult = (next === 10 || next === 40) ? 2 : 1
-        const reason = next === 40 ? 'Hits Lv 40 milestone' : next === 10 ? 'Hits Lv 10 milestone' : 'Max efficiency'
+        const mult = (next === 10 || next === 20 || next === 30 || next === 40) ? 2 : 1
+        const reason = next === 40 ? 'Hits Lv 40 milestone' : next === 30 ? 'Hits Lv 30 milestone'
+          : next === 20 ? 'Hits Lv 20 milestone' : next === 10 ? 'Hits Lv 10 milestone' : 'Max efficiency'
         upgrades.push({ type: 'level', slot, heroId, from: piece.level, to: next, blueprintWarning: false, reason,
           score: pieceScore({ ...piece, level: next }) * mult * hScore })
       }
@@ -344,6 +368,7 @@ function getProfileData(state) {
     season: state.season,
     goal: state.goal,
     intent: state.intent,
+    opponentType: state.opponentType,
     heroes: state.heroes,
     gear: state.gear,
   }
@@ -372,6 +397,7 @@ const BLANK_PROFILE = {
   season: 1,
   goal: 'pvp_rally',
   intent: 'mono',
+  opponentType: null,
   heroes: INITIAL_HEROES_STATE,
   gear: [],
 }
@@ -408,6 +434,8 @@ function reducer(state, action) {
       return syncProfile({ ...state, goal: action.payload })
     case 'SET_INTENT':
       return syncProfile({ ...state, intent: action.payload })
+    case 'SET_OPPONENT_TYPE':
+      return syncProfile({ ...state, opponentType: action.payload })
 
     // Hero mutations
     case 'TOGGLE_HERO_OWNED': {
@@ -1235,6 +1263,36 @@ function GoalSelector({ state, dispatch, ownedIds }) {
           </div>
         )}
       </div>
+
+      {/* Opponent type — counter system (PvP/Code Battles only) */}
+      {(state.goal === 'pvp_rally' || state.goal === 'code_battles') && (
+        <div>
+          <p className="font-orbitron text-xs text-neutral-400 tracking-widest mb-2">
+            OPPONENT TYPE <span className="text-neutral-600 normal-case font-rajdhani">(+20% counter bonus)</span>
+          </p>
+          <div className="grid grid-cols-2 gap-1">
+            {[
+              { value: null,        label: 'Unknown / Mixed', sub: 'No counter modifier' },
+              { value: 'tank',      label: 'Tank',            sub: 'Aircraft counters tanks' },
+              { value: 'aircraft',  label: 'Aircraft',        sub: 'Missiles counter aircraft' },
+              { value: 'missile',   label: 'Missile',         sub: 'Tanks counter missiles' },
+            ].map(({ value, label, sub }) => (
+              <button
+                key={String(value)}
+                onClick={() => dispatch({ type: 'SET_OPPONENT_TYPE', payload: value })}
+                className={`flex flex-col items-start px-3 py-2 border text-left min-h-[44px] transition-colors
+                  ${state.opponentType === value
+                    ? 'border-amber-600 text-amber-600 bg-amber-600/10'
+                    : 'border-neutral-700 text-neutral-400 hover:border-neutral-500'
+                  }`}
+              >
+                <span className="font-orbitron text-xs">{label}</span>
+                <span className="font-rajdhani text-xs text-neutral-500">{sub}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -1264,8 +1322,8 @@ export default function App() {
   )
 
   const recommendedSquad = useMemo(
-    () => findRecommendedSquad(ownedIds, heroScores, state.heroes, state.intent),
-    [ownedIds, heroScores, state.heroes, state.intent]
+    () => findRecommendedSquad(ownedIds, heroScores, state.heroes, state.intent, state.opponentType),
+    [ownedIds, heroScores, state.heroes, state.intent, state.opponentType]
   )
 
   const gearAssignment = useMemo(
