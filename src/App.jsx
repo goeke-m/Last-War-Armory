@@ -186,14 +186,14 @@ function getGoalMod(heroId, goal, codeType) {
 // SECTION 2: OPTIMIZER ENGINE
 // ═══════════════════════════════════════════════════════════════════
 
-function isPromotedUR(heroId, season) {
+function isPromotedUR(heroId, heroState, season) {
   const h = HEROES[heroId]
-  return h.promotionSeason !== null && h.promotionSeason <= season
+  return h.promotionSeason !== null && h.promotionSeason <= season && (heroState?.promoted ?? false)
 }
 
 function heroScore(heroId, heroState, season, goal, codeType) {
   const { stars, skills, ewLevel } = heroState
-  const effectiveRarity = isPromotedUR(heroId, season) ? 'UR' : HEROES[heroId].rarity
+  const effectiveRarity = isPromotedUR(heroId, heroState, season) ? 'UR' : HEROES[heroId].rarity
   const rarityWeight = RARITY_WEIGHTS[effectiveRarity]
   // UR skill cap starts at 30 and gains +1 per 3 EW levels (EW 30 = cap 40)
   const skillMax = effectiveRarity === 'UR' ? Math.min(40, 30 + Math.floor(ewLevel / 3)) : 30
@@ -557,7 +557,7 @@ function computeWarnings(state, squad, season) {
 // SECTION 3: STATE
 // ═══════════════════════════════════════════════════════════════════
 
-const INITIAL_HERO_STATE = { owned: false, stars: 0, level: 1, skills: [1, 1, 1, 1], ewLevel: 0 }
+const INITIAL_HERO_STATE = { owned: false, stars: 0, level: 1, skills: [1, 1, 1, 1], ewLevel: 0, promoted: false }
 
 const INITIAL_HEROES_STATE = Object.fromEntries(
   Object.keys(HEROES).map(id => [id, { ...INITIAL_HERO_STATE }])
@@ -1327,7 +1327,7 @@ function HeroCard({ heroId, heroState: heroStateProp, heroScore, season, dispatc
   const heroState = heroStateProp ?? { ...INITIAL_HERO_STATE }
   const hero = HEROES[heroId]
   const colors = UNIT_COLORS[hero.unitType]
-  const isEffectiveUR = hero.rarity === 'UR' || isPromotedUR(heroId, season)
+  const isEffectiveUR = hero.rarity === 'UR' || isPromotedUR(heroId, heroState, season)
   const showEW = isEffectiveUR
   // Skill cap scales with EW: base 30, +1 per 3 EW levels, max 40
   const skillMax = isEffectiveUR ? Math.min(40, 30 + Math.floor(heroState.ewLevel / 3)) : 30
@@ -1345,7 +1345,7 @@ function HeroCard({ heroId, heroState: heroStateProp, heroScore, season, dispatc
       >
         {/* Rarity badge */}
         <span className={`font-orbitron text-xs px-1 py-0.5 border flex-none ${hero.rarity === 'UR' ? 'border-amber-500 text-amber-500' : hero.rarity === 'SSR' ? 'border-purple-500 text-purple-400' : 'border-neutral-600 text-neutral-500'}`}>
-          {isPromotedUR(heroId, season) && hero.rarity === 'SSR' ? 'UR*' : hero.rarity}
+          {isPromotedUR(heroId, heroState, season) && hero.rarity === 'SSR' ? 'UR*' : hero.rarity}
         </span>
 
         {/* Name + role */}
@@ -1431,6 +1431,24 @@ function HeroCard({ heroId, heroState: heroStateProp, heroScore, season, dispatc
               })}
             </div>
           </div>
+
+          {/* Promotion toggle — SSR heroes eligible in current or past season */}
+          {hero.rarity === 'SSR' && hero.promotionSeason !== null && hero.promotionSeason <= season && (
+            <div>
+              <p className="font-orbitron text-xs text-neutral-500 mb-1">PROMOTION</p>
+              <button
+                onClick={() => dispatch({ type: 'UPDATE_HERO', heroId, updates: { promoted: !heroState.promoted } })}
+                className={`w-full flex items-center justify-between px-3 py-2 border text-left min-h-[40px] transition-colors
+                  ${heroState.promoted
+                    ? 'border-amber-600 text-amber-600 bg-amber-600/10'
+                    : 'border-neutral-700 text-neutral-400 hover:border-neutral-500'
+                  }`}
+              >
+                <span className="font-orbitron text-xs">PROMOTED TO UR</span>
+                <span className="font-mono text-xs">{heroState.promoted ? '✓ YES' : 'NO'}</span>
+              </button>
+            </div>
+          )}
 
           {/* EW Level (UR / promoted SSR only) */}
           {showEW && (
