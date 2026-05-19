@@ -30,6 +30,7 @@ const HEROES = {
   richard:  { id: 'richard',  name: 'Richard',  rarity: 'SSR', unitType: 'tank', role: 'tank', defaultRow: 'front', promotionSeason: null },
   elsa:     { id: 'elsa',     name: 'Elsa',     rarity: 'SSR', unitType: 'missile', role: 'support', defaultRow: 'back', promotionSeason: null },
   maxwell:  { id: 'maxwell',  name: 'Maxwell',  rarity: 'SSR', unitType: 'aircraft', role: 'dps', defaultRow: 'back', promotionSeason: null },
+  braz:     { id: 'braz',    name: 'Braz',    rarity: 'SSR', unitType: 'aircraft', role: 'dps', defaultRow: 'back', promotionSeason: 6 },
   // SR heroes
   drake:    { id: 'drake',    name: 'Drake',    rarity: 'SR', unitType: 'tank', role: 'tank', defaultRow: 'front', promotionSeason: null },
   kane:     { id: 'kane',     name: 'Kane',     rarity: 'SR', unitType: 'missile', role: 'dps', defaultRow: 'back', promotionSeason: null },
@@ -40,9 +41,72 @@ const HEROES = {
 const HERO_ORDER = [
   'kimberly','dva','williams','murphy','marshall','tesla','morrison',
   'mason','violet','scarlett','venom','schuyler','fiona','sarah',
-  'lucius','carlie','stetmann','mcgregor','adam','swift','richard','elsa','maxwell',
+  'lucius','carlie','stetmann','mcgregor','adam','swift','richard','elsa','maxwell','braz',
   'drake','kane','ambolt',
 ]
+
+// Actual in-game skill names per hero, ordered [skill1, skill2, skill3, skill4]
+const HERO_SKILLS = {
+  kimberly: ['Energy Assault',      'Energy Boost',          'Barrage Strike',        'Super Sensory'],
+  dva:      ['Vortex Missile',      'Armament Upgrade',      'Steel Barrage',         'Super Sensory'],
+  williams: ['Stun Bomb',           'All-Around Armor',      'Iron Will',             'Super Sensory'],
+  murphy:   ['Cannon Fire',         'Stand Firm',            'Ironclad Barrier',      'Super Sensory'],
+  marshall: ['Triad Harmony',       'Rapid Start',           'Command Strategy',      'Super Sensory'],
+  tesla:    ['Lightning Chain',     'Electric Power Boost',  'Electric Grid Lockdown','Super Sensory'],
+  morrison: ['Full-Auto MG',        'Full Firepower',        'Armor-Piercing Shot',   'Super Sensory'],
+  mason:    ['Quick Reload',        'Zombie Purge',          'Fire Cover',            'Super Sensory'],
+  violet:   ['Poison Frog Spray',   'Z-Armor',               'Poison Gas Corrosion',  'Special Tactics'],
+  scarlett: ['Flame Burst',         'T-5 Armor',             'Bastion Guard',         'Super Sensory'],
+  venom:    ['Energy Bullet',       'Core Surge',            'Energy Overload',       'Super Sensory'],
+  schuyler: ['Power Barrage',       'Antimatter Armor',      'Blast Frenzy',          'Super Sensory'],
+  fiona:    ['Double Trajectory',   'Ballistic Boost',       'Atomic Blast',          'Super Sensory'],
+  sarah:    ['Gunfire Negotiation', 'Special Armor',         'MG Symphony',           'Super Sensory'],
+  elsa:     ['Icicle Strike',       'Special Armor',         'Armor Boost',           'Special Tactics'],
+  lucius:   ['Triple Strike',       'Silver Armor',          "Knight's Spirit",       'Super Sensory'],
+  carlie:   ['Dual-string Rocket',  'Energy Adaption',       'Inferno Blaze',         'Super Sensory'],
+  mcgregor: ['Forward Rush',        'HP Boost',              'Unyielding Heart',      'Super Sensory'],
+  adam:     ['MK43 Machine Gun',    'Spike Armor',           'Counter Defense',       'Super Sensory'],
+  richard:  ['Howitzer',            'Ballistic Boost',       'Multi-Load',            'Super Sensory'],
+  stetmann: ['Orb Lightning',       'Critical Charge',       'Lightning Rush',        'Super Sensory'],
+  swift:    ['Targeted Strike',     'Precise Guidance',      'Weakness Targeting',    'Super Sensory'],
+  maxwell:  ['Missile Strike',      'Zombie Killer',         'Destructive Firepower', 'Special Tactics'],
+  braz:     ['Rocket Spread',       'Zombie Killer',         'Intense Bombing',       'Special Tactics'],
+  drake:    ['Cannon Fire',         'Hard Armor',            'Shield Bash',           'Special Tactics'],
+  kane:     ['Blasting Grenade',    'Steady Aim',            'Grenade Barrage',       'Field Combat'],
+  ambolt:   ['Missile Strikes',     'Rapid Fire',            'Missile Barrage',       'Field Combat'],
+}
+
+// Per-hero skill upgrade priority weights [skill1, skill2, skill3, skill4]
+// Higher = more impactful to level. Derived from community skill priority guides.
+const HERO_SKILL_WEIGHTS = {
+  kimberly: [3, 2, 4, 1], // priority: 3>1>2>4
+  dva:      [4, 2, 3, 1], // priority: 1>3>2>4
+  williams: [1, 4, 3, 2], // priority: 2>3>4>1
+  murphy:   [3, 1, 4, 2], // priority: 3>1>4>2
+  marshall: [3, 2, 4, 1], // priority: 3>1>2>4
+  tesla:    [3, 2, 4, 1], // priority: 3>1>2>4
+  morrison: [3, 2, 4, 1], // priority: 3>1>2>4
+  mason:    [2, 3, 4, 1], // priority: 3>2>1>4
+  violet:   [1, 4, 3, 2], // priority: 2>3>4>1
+  scarlett: [3, 2, 4, 1], // priority: 3>1>2>4
+  venom:    [1, 3, 4, 2], // priority: 3>2>4>1
+  schuyler: [3, 2, 4, 1], // priority: 3>1>2>4
+  fiona:    [1, 2, 4, 3], // priority: 3>4>2>1
+  sarah:    [1, 2, 4, 3], // priority: 3>4>2>1
+  elsa:     [3, 1, 4, 2], // priority: 3>1>4>2
+  lucius:   [1, 3, 4, 2], // priority: 3>2>4>1
+  carlie:   [2, 4, 3, 1], // priority: 2>3>1>4
+  mcgregor: [1, 3, 4, 2], // priority: 3>2>4>1
+  adam:     [1, 3, 4, 2], // priority: 3>2>4>1
+  richard:  [3, 1, 4, 2], // priority: 3>1>4>2
+  stetmann: [3, 2, 4, 1], // priority: 3>1>2>4
+  swift:    [3, 2, 4, 1], // priority: 3>1>2>4
+  maxwell:  [1, 3, 4, 2], // priority: 3>2>4>1
+  braz:     [3, 2, 4, 1], // priority: 3>1>2>4
+  drake:    [1, 3, 4, 2], // priority: 3>2>4>1
+  kane:     [3, 2, 4, 1], // priority: 3>1>2>4
+  ambolt:   [3, 2, 4, 1], // priority: 3>1>2>4
+}
 
 const SLOTS = ['gun', 'chip', 'armor', 'radar']
 const QUALITIES = ['legendary', 'epic', 'rare', 'common']
@@ -108,8 +172,11 @@ function heroScore(heroId, heroState, season, goal, codeType) {
   const skillMax = effectiveRarity === 'UR' ? Math.min(40, 30 + Math.floor(ewLevel / 3)) : 30
   // Skills unlock by star: 0-1★=skill1 only, 2★=skills1-2, 3★=skills1-3, 4★+=all4
   const unlockedCount = stars <= 1 ? 1 : Math.min(stars, 4)
-  const activeSkills = skills.slice(0, unlockedCount)
-  const avgSkill = activeSkills.reduce((a, b) => a + b, 0) / unlockedCount
+  const weights = HERO_SKILL_WEIGHTS[heroId] ?? [1, 2, 3, 2]
+  const activeWeights = weights.slice(0, unlockedCount)
+  const weightSum = activeWeights.reduce((a, b) => a + b, 0)
+  const weightedSkillSum = skills.slice(0, unlockedCount).reduce((sum, lvl, i) => sum + lvl * activeWeights[i], 0)
+  const avgSkill = weightedSkillSum / weightSum
   const base = rarityWeight * (stars / 5) * (avgSkill / skillMax)
   const starBonus = stars >= 4 ? 1.4 : stars >= 3 ? 1.2 : 1.0
   // ewBonus: 5% per level across 0-30 range
@@ -1146,10 +1213,14 @@ function HeroCard({ heroId, heroState, heroScore, season, dispatch }) {
             <div className="grid grid-cols-4 gap-1">
               {heroState.skills.map((lvl, i) => {
                 const unlocked = i < (heroState.stars <= 1 ? 1 : Math.min(heroState.stars, 4))
+                const weights = HERO_SKILL_WEIGHTS[heroId] ?? [1, 2, 3, 2]
+                const isPriority = weights[i] === Math.max(...weights)
+                const skillName = HERO_SKILLS[heroId]?.[i] ?? `Skill ${i + 1}`
                 return (
                   <div key={i} className="text-center">
-                    <p className={`font-orbitron text-xs mb-0.5 ${unlocked ? 'text-neutral-600' : 'text-neutral-800'}`}>
-                      SK{i+1}{!unlocked && ' 🔒'}
+                    <p className={`font-orbitron text-xs mb-0.5 truncate ${unlocked ? (isPriority ? 'text-amber-500' : 'text-neutral-600') : 'text-neutral-800'}`}
+                       title={skillName}>
+                      {!unlocked ? '🔒' : isPriority ? '★' : ''} {skillName.length > 9 ? skillName.slice(0, 8) + '…' : skillName}
                     </p>
                     <input type="number" min="1" max={unlocked ? skillMax : 1} value={unlocked ? lvl : 1}
                       disabled={!unlocked}
@@ -1194,7 +1265,7 @@ function HeroCard({ heroId, heroState, heroScore, season, dispatch }) {
 function RosterManager({ state, dispatch, heroScores, season }) {
   const RARITY_GROUPS = [
     { label: '// UR — ULTRA RARE', ids: ['kimberly','dva','williams','murphy','marshall','tesla','morrison'] },
-    { label: '// SSR — SUPER RARE', ids: ['mason','violet','scarlett','venom','schuyler','fiona','sarah','lucius','carlie','stetmann','mcgregor','adam','swift','richard','elsa','maxwell'] },
+    { label: '// SSR — SUPER RARE', ids: ['mason','violet','scarlett','venom','schuyler','fiona','sarah','lucius','carlie','stetmann','mcgregor','adam','swift','richard','elsa','maxwell','braz'] },
     { label: '// SR — RARE', ids: ['drake','kane','ambolt'] },
   ]
 
