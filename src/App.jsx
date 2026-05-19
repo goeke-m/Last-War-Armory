@@ -494,12 +494,18 @@ const BLANK_PROFILE = {
   gear: [],
 }
 
+// Merges any heroes added after a profile was saved so new heroes always exist in state
+function mergeHeroes(saved) {
+  return { ...INITIAL_HEROES_STATE, ...saved }
+}
+
 function buildInitialState() {
   const saved = loadFromLocalStorage()
   if (saved) {
     const profile = saved.profiles[saved.activeProfile] ?? BLANK_PROFILE
     return {
       ...profile,
+      heroes: mergeHeroes(profile.heroes ?? {}),
       profiles: saved.profiles,
       activeProfile: saved.activeProfile,
       activeSection: 'roster',
@@ -566,7 +572,7 @@ function reducer(state, action) {
     case 'SWITCH_PROFILE': {
       const profile = state.profiles[action.name]
       if (!profile) return state
-      return { ...state, activeProfile: action.name, ...profile }
+      return { ...state, activeProfile: action.name, ...profile, heroes: mergeHeroes(profile.heroes ?? {}) }
     }
     case 'RENAME_PROFILE': {
       const { oldName, newName } = action
@@ -1135,8 +1141,9 @@ function GearInventory({ state, dispatch }) {
   )
 }
 
-function HeroCard({ heroId, heroState, heroScore, season, dispatch }) {
+function HeroCard({ heroId, heroState: heroStateProp, heroScore, season, dispatch }) {
   const [expanded, setExpanded] = useState(false)
+  const heroState = heroStateProp ?? { ...INITIAL_HERO_STATE }
   const hero = HEROES[heroId]
   const colors = UNIT_COLORS[hero.unitType]
   const isEffectiveUR = hero.rarity === 'UR' || isPromotedUR(heroId, season)
