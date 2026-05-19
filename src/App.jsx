@@ -95,11 +95,13 @@ function heroScore(heroId, heroState, season, goal) {
   const { stars, skills, ewLevel } = heroState
   const effectiveRarity = isPromotedUR(heroId, season) ? 'UR' : HEROES[heroId].rarity
   const rarityWeight = RARITY_WEIGHTS[effectiveRarity]
+  const skillMax = effectiveRarity === 'UR' ? 40 : 30
   const avgSkill = skills.reduce((a, b) => a + b, 0) / skills.length
-  const base = rarityWeight * (stars / 5) * avgSkill
+  const base = rarityWeight * (stars / 5) * (avgSkill / skillMax)
   const starBonus = stars >= 4 ? 1.4 : stars >= 3 ? 1.2 : 1.0
   // ewBonus applies to native UR and promoted SSRs (both resolve to effectiveRarity==='UR')
-  const ewBonus = effectiveRarity === 'UR' && ewLevel > 0 ? 1 + ewLevel * 0.15 : 1.0
+  // 5% per level scales correctly across the 0-30 range (same max bonus as original formula at 0-10)
+  const ewBonus = effectiveRarity === 'UR' && ewLevel > 0 ? 1 + ewLevel * 0.05 : 1.0
   const goalMod = getGoalMod(heroId, goal)
   return base * starBonus * ewBonus * goalMod
 }
@@ -1006,6 +1008,7 @@ function HeroCard({ heroId, heroState, heroScore, season, dispatch }) {
   const colors = UNIT_COLORS[hero.unitType]
   const isEffectiveUR = hero.rarity === 'UR' || isPromotedUR(heroId, season)
   const showEW = isEffectiveUR
+  const skillMax = isEffectiveUR ? 40 : 30
   const nearPromotion = hero.promotionSeason && hero.promotionSeason === season + 1
 
   return (
@@ -1065,22 +1068,22 @@ function HeroCard({ heroId, heroState, heroScore, season, dispatch }) {
           {/* Level */}
           <div>
             <p className="font-orbitron text-xs text-neutral-500 mb-1">HERO LEVEL: <span className="text-amber-600">{heroState.level}</span></p>
-            <input type="range" min="1" max="60" value={heroState.level}
+            <input type="range" min="1" max="175" value={heroState.level}
               onChange={e => dispatch({ type: 'UPDATE_HERO', heroId, updates: { level: Number(e.target.value) } })}
               className="w-full" />
           </div>
 
           {/* Skills */}
           <div>
-            <p className="font-orbitron text-xs text-neutral-500 mb-1">SKILL LEVELS</p>
+            <p className="font-orbitron text-xs text-neutral-500 mb-1">SKILL LEVELS <span className="text-neutral-600">(max {skillMax})</span></p>
             <div className="grid grid-cols-4 gap-1">
               {heroState.skills.map((lvl, i) => (
                 <div key={i} className="text-center">
                   <p className="font-orbitron text-xs text-neutral-600 mb-0.5">SK{i+1}</p>
-                  <input type="number" min="1" max="10" value={lvl}
+                  <input type="number" min="1" max={skillMax} value={lvl}
                     onChange={e => {
                       const skills = [...heroState.skills]
-                      skills[i] = Math.min(10, Math.max(1, Number(e.target.value)))
+                      skills[i] = Math.min(skillMax, Math.max(1, Number(e.target.value)))
                       dispatch({ type: 'UPDATE_HERO', heroId, updates: { skills } })
                     }}
                     className="w-full bg-neutral-800 border border-neutral-700 text-center font-mono text-sm text-gray-200 py-1 min-h-[36px]" />
@@ -1092,15 +1095,12 @@ function HeroCard({ heroId, heroState, heroScore, season, dispatch }) {
           {/* EW Level (UR / promoted SSR only) */}
           {showEW && (
             <div>
-              <p className="font-orbitron text-xs text-neutral-500 mb-1">EW LEVEL: <span className="text-amber-600">{heroState.ewLevel}</span></p>
-              <div className="flex gap-1 flex-wrap">
-                {[0,1,2,3,4,5,6,7,8,9,10].map(lvl => (
-                  <button key={lvl} onClick={() => dispatch({ type: 'UPDATE_HERO', heroId, updates: { ewLevel: lvl } })}
-                    className={`px-2 py-1 font-mono text-xs border min-h-[32px] transition-colors
-                      ${heroState.ewLevel === lvl ? 'border-amber-600 text-amber-600 bg-amber-600/10' : 'border-neutral-700 text-neutral-500'}`}>
-                    {lvl}
-                  </button>
-                ))}
+              <p className="font-orbitron text-xs text-neutral-500 mb-1">EW LEVEL: <span className="text-amber-600">{heroState.ewLevel}</span> <span className="text-neutral-600">/ 30</span></p>
+              <input type="range" min="0" max="30" value={heroState.ewLevel}
+                onChange={e => dispatch({ type: 'UPDATE_HERO', heroId, updates: { ewLevel: Number(e.target.value) } })}
+                className="w-full" />
+              <div className="flex justify-between font-mono text-xs text-neutral-600 mt-0.5">
+                <span>0</span><span>5</span><span>10</span><span>15</span><span>20</span><span>25</span><span>30</span>
               </div>
             </div>
           )}
