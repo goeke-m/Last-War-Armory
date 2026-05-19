@@ -133,6 +133,12 @@ const SLOTS = ['gun', 'chip', 'armor', 'radar']
 const QUALITIES = ['legendary', 'epic', 'rare', 'common']
 const QUALITY_WEIGHTS = { legendary: 4, epic: 2, rare: 1, common: 0.5 }
 const QUALITY_MAX_LEVEL = { legendary: 40, epic: 30, rare: 15, common: 10 }
+const QUALITY_META = {
+  legendary: { label: 'Legendary', tag: 'GOLD',   hint: 'Max Lv40 · invest here', rowColor: 'text-amber-400 border-amber-700',   selected: 'border-amber-500 text-amber-400 bg-amber-900/20' },
+  epic:      { label: 'Epic',      tag: 'PURPLE', hint: 'Max Lv30 · dismantle for mats', rowColor: 'text-purple-400 border-purple-800', selected: 'border-purple-600 text-purple-400 bg-purple-900/20' },
+  rare:      { label: 'Rare',      tag: 'BLUE',   hint: 'Max Lv15 · early game only', rowColor: 'text-blue-400 border-blue-800',    selected: 'border-blue-600 text-blue-400 bg-blue-900/20' },
+  common:    { label: 'Common',    tag: 'GREEN',  hint: 'Max Lv10 · dismantle immediately', rowColor: 'text-neutral-400 border-neutral-700', selected: 'border-neutral-500 text-neutral-300 bg-neutral-800' },
+}
 const RARITY_WEIGHTS = { UR: 3, SSR: 2, SR: 1 }
 
 // Slot priority order by hero role for gear assignment
@@ -997,18 +1003,13 @@ function StarPips({ stars }) {
 }
 
 function GearPieceRow({ piece, onEdit }) {
-  const qualityColors = {
-    legendary: 'text-amber-400 border-amber-700',
-    epic: 'text-purple-400 border-purple-800',
-    rare: 'text-blue-400 border-blue-800',
-    common: 'text-neutral-400 border-neutral-700'
-  }
   const slotLabels = { gun: 'GUN', chip: 'CHIP', armor: 'ARMOR', radar: 'RADAR' }
+  const meta = QUALITY_META[piece.quality]
 
   return (
     <div className="flex items-center gap-2 px-2 py-2 border border-neutral-800 bg-neutral-900 mb-1 cursor-pointer hover:border-neutral-600 min-h-[44px]"
       onClick={onEdit}>
-      <span className={`font-orbitron text-xs border px-1 flex-none ${qualityColors[piece.quality]}`}>{piece.quality.slice(0,3).toUpperCase()}</span>
+      <span className={`font-orbitron text-xs border px-1 flex-none ${meta.rowColor}`}>{meta.tag}</span>
       <span className="font-orbitron text-xs text-neutral-400 w-10 flex-none">{slotLabels[piece.slot]}</span>
       <div className="flex-1 min-w-0">
         <p className="font-mono text-xs text-gray-300">Lv {piece.level}</p>
@@ -1054,15 +1055,19 @@ function GearEditModal({ piece, onSave, onDelete, onClose }) {
 
         {/* Quality */}
         <div>
-          <p className="font-orbitron text-xs text-neutral-500 mb-1">QUALITY</p>
-          <div className="flex gap-1">
-            {QUALITIES.map(q => (
-              <button key={q} onClick={() => handleQualityChange(q)}
-                className={`flex-1 py-2 font-orbitron text-xs border min-h-[40px] transition-colors
-                  ${quality === q ? 'border-amber-600 text-amber-600 bg-amber-600/10' : 'border-neutral-700 text-neutral-500'}`}>
-                {q.slice(0,3).toUpperCase()}
-              </button>
-            ))}
+          <p className="font-orbitron text-xs text-neutral-500 mb-1">QUALITY — <span className="font-rajdhani normal-case text-neutral-600">match the color of your gear in-game</span></p>
+          <div className="grid grid-cols-2 gap-1">
+            {QUALITIES.map(q => {
+              const meta = QUALITY_META[q]
+              return (
+                <button key={q} onClick={() => handleQualityChange(q)}
+                  className={`flex flex-col items-start px-2 py-2 border text-left min-h-[44px] transition-colors
+                    ${quality === q ? meta.selected : 'border-neutral-700 text-neutral-500 hover:border-neutral-500'}`}>
+                  <span className="font-orbitron text-xs">{meta.tag} — {meta.label}</span>
+                  <span className="font-rajdhani text-xs text-neutral-500">{meta.hint}</span>
+                </button>
+              )
+            })}
           </div>
         </div>
 
