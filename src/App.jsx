@@ -895,6 +895,54 @@ function UpgradePriority({ state, dispatch, upgradePriority }) {
   )
 }
 
+function HeroFormationCard({ heroId, state, heroScores, gearAssignment, alternates }) {
+  const hero = HEROES[heroId]
+  const colors = UNIT_COLORS[hero.unitType]
+  const h = state.heroes[heroId]
+  const slots = gearAssignment.assigned[heroId] ?? {}
+  const alt = alternates[heroId]
+
+  return (
+    <div className={`border-t-4 ${colors.border} bg-neutral-900 border border-neutral-800 p-2 flex flex-col gap-1`}>
+      {/* Hero identity */}
+      <div>
+        <p className="font-rajdhani font-semibold text-sm text-gray-200 truncate leading-tight">{hero.name}</p>
+        <div className="flex items-center gap-1 flex-wrap">
+          <span className={`font-orbitron text-xs ${colors.text}`}>{hero.rarity}</span>
+          <span className="font-mono text-xs text-neutral-500">{h.stars}★</span>
+          {h.ewLevel > 0 && <span className="font-mono text-xs text-sky-500">EW{h.ewLevel}</span>}
+          <span className="font-mono text-xs text-amber-600 ml-auto">{heroScores[heroId]?.toFixed(1)}</span>
+        </div>
+      </div>
+
+      {/* Gear slots — 2×2 grid */}
+      <div className="grid grid-cols-2 gap-0.5">
+        {SLOTS.map(slot => {
+          const piece = slots[slot]
+          const qColor = piece ? QUALITY_META[piece.quality]?.rowColor.split(' ')[0] : 'text-neutral-700'
+          return (
+            <div key={slot} className={`border ${piece ? 'border-neutral-700' : 'border-neutral-800 opacity-40'} px-1 py-0.5 text-center`}>
+              <p className={`font-orbitron text-xs leading-tight ${piece ? qColor : 'text-neutral-600'}`}>{slot.toUpperCase()}</p>
+              {piece
+                ? <p className="font-mono text-xs text-gray-400 leading-tight">Lv{piece.level}{piece.stars > 0 ? ` ${piece.stars}★` : ''}</p>
+                : <p className="font-orbitron text-xs text-neutral-800 leading-tight">—</p>
+              }
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Alt hero */}
+      {alt && (
+        <p className="font-rajdhani text-xs text-neutral-600 leading-tight truncate">
+          Alt: <span className="text-neutral-400">{HEROES[alt.heroId].name}</span>
+          <span className="text-red-500 ml-1">({alt.scoreDiff.toFixed(1)})</span>
+        </p>
+      )}
+    </div>
+  )
+}
+
 function SquadOptimizer({ state, recommendedSquad, gearAssignment, heroScores }) {
   if (recommendedSquad.insufficient) {
     return (
@@ -910,73 +958,42 @@ function SquadOptimizer({ state, recommendedSquad, gearAssignment, heroScores })
   }
 
   const { squad, alternates } = recommendedSquad
-  // Always 2 front, 3 back — sort front-row heroes first, then hard-slice
   const sorted = [...squad].sort((a, b) =>
     (HEROES[a].defaultRow === 'front' ? 0 : 1) - (HEROES[b].defaultRow === 'front' ? 0 : 1)
   )
   const frontRow = sorted.slice(0, 2)
   const backRow = sorted.slice(2)
-  const rows = [{ label: 'FRONT ROW', ids: frontRow }, { label: 'BACK ROW', ids: backRow }]
+  const cardProps = { state, heroScores, gearAssignment, alternates }
 
   return (
     <div className="p-3 max-w-lg">
-      <p className="font-orbitron text-amber-600 text-xs tracking-widest border-b border-dashed border-neutral-700 pb-2 mb-3">
+      <p className="font-orbitron text-amber-600 text-xs tracking-widest border-b border-dashed border-neutral-700 pb-2 mb-4">
         // OPTIMAL SQUAD · SCORE {recommendedSquad.score.toFixed(1)}
       </p>
 
-      {rows.map(({ label, ids }) => (
-        <div key={label} className="mb-4">
-          <p className="font-orbitron text-xs text-neutral-500 tracking-widest mb-2">{label}</p>
-          <div className="space-y-2">
-            {ids.map(heroId => {
-              const hero = HEROES[heroId]
-              const colors = UNIT_COLORS[hero.unitType]
-              const h = state.heroes[heroId]
-              const slots = gearAssignment.assigned[heroId] ?? {}
-              const alt = alternates[heroId]
+      {/* Enemy direction label */}
+      <p className="font-orbitron text-xs text-neutral-600 tracking-widest text-center mb-1">▲ ENEMY ▲</p>
 
-              return (
-                <div key={heroId} className={`border-l-4 ${colors.border} bg-neutral-900 border border-neutral-800 p-2`}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className={`font-orbitron text-xs ${colors.text}`}>{hero.rarity}</span>
-                    <span className="font-rajdhani font-semibold text-sm text-gray-200 flex-1">{hero.name}</span>
-                    <span className="font-mono text-xs text-neutral-500">{h.stars}★</span>
-                    {h.ewLevel > 0 && <span className="font-mono text-xs text-sky-500">EW{h.ewLevel}</span>}
-                    <span className="font-mono text-xs text-amber-600">{heroScores[heroId]?.toFixed(1)}</span>
-                  </div>
-
-                  <div className="grid grid-cols-4 gap-1 mb-2">
-                    {SLOTS.map(slot => {
-                      const piece = slots[slot]
-                      const qualityTextColor = piece ? QUALITY_META[piece.quality]?.rowColor.split(' ')[0] : 'text-neutral-700'
-                      return (
-                        <div key={slot} className={`border ${piece ? 'border-neutral-700' : 'border-neutral-800 opacity-40'} p-1 text-center`}>
-                          <p className={`font-orbitron text-xs ${piece ? qualityTextColor : 'text-neutral-500'}`}>{slot.toUpperCase()}</p>
-                          {piece ? (
-                            <>
-                              <p className="font-mono text-xs text-gray-300">Lv{piece.level}</p>
-                              <p className="font-mono text-xs text-neutral-400">{piece.stars}★</p>
-                            </>
-                          ) : (
-                            <p className="font-orbitron text-xs text-neutral-700">—</p>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
-
-                  {alt && (
-                    <p className="font-rajdhani text-xs text-neutral-600">
-                      Alt: <span className="text-neutral-400">{HEROES[alt.heroId].name}</span>
-                      <span className="text-red-500 ml-1">({alt.scoreDiff.toFixed(1)} pts)</span>
-                    </p>
-                  )}
-                </div>
-              )
-            })}
-          </div>
+      {/* Front row — 2 cards side by side */}
+      <div className="mb-1">
+        <p className="font-orbitron text-xs text-neutral-500 tracking-widest mb-1">FRONT ROW</p>
+        <div className="grid grid-cols-2 gap-2">
+          {frontRow.map(id => <HeroFormationCard key={id} heroId={id} {...cardProps} />)}
         </div>
-      ))}
+      </div>
+
+      {/* Divider */}
+      <div className="border-t border-dashed border-neutral-700 my-2" />
+
+      {/* Back row — 3 cards side by side */}
+      <div className="mb-3">
+        <p className="font-orbitron text-xs text-neutral-500 tracking-widest mb-1">BACK ROW</p>
+        <div className="grid grid-cols-3 gap-2">
+          {backRow.map(id => <HeroFormationCard key={id} heroId={id} {...cardProps} />)}
+        </div>
+      </div>
+
+      <p className="font-orbitron text-xs text-neutral-600 tracking-widest text-center">▼ YOUR BASE ▼</p>
     </div>
   )
 }
