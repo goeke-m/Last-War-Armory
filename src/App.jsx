@@ -891,7 +891,7 @@ function RecPanel({ state, dispatch, recommendedSquad, gearAssignment, upgradePr
   const content = { loadout: loadoutContent, upgrades: upgradesContent, warnings: warningsContent }
 
   return (
-    <div className="flex-none border-t-2 border-amber-600 bg-neutral-900">
+    <div className="flex-none border-t-2 border-amber-600 bg-neutral-900 rec-panel-shadow">
       <div className="flex border-b border-neutral-800">
         {['loadout', 'upgrades', 'warnings'].map(tab => (
           <button key={tab} onClick={() => dispatch({ type: 'SET_REC_TAB', payload: tab })}
@@ -1704,6 +1704,55 @@ function HelpGuide() {
   )
 }
 
+const NAV_ICONS = {
+  goal: (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+      <circle cx="8" cy="8" r="6.5"/>
+      <circle cx="8" cy="8" r="3"/>
+      <line x1="8" y1="1.5" x2="8" y2="5"/>
+      <line x1="8" y1="11" x2="8" y2="14.5"/>
+      <line x1="1.5" y1="8" x2="5" y2="8"/>
+      <line x1="11" y1="8" x2="14.5" y2="8"/>
+    </svg>
+  ),
+  roster: (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="5.5" cy="5" r="2"/>
+      <circle cx="10.5" cy="5" r="2"/>
+      <path d="M1.5 14c0-2.2 1.8-3.5 4-3.5s4 1.3 4 3.5"/>
+      <path d="M9 14c0-1.8 1.1-3 2.5-3s2.5 1.2 2.5 3"/>
+    </svg>
+  ),
+  gear: (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+      <circle cx="8" cy="8" r="2.5"/>
+      <path d="M8 1.5V4M8 12v2.5M1.5 8H4M12 8h2.5M3.4 3.4l1.8 1.8M10.8 10.8l1.8 1.8M3.4 12.6l1.8-1.8M10.8 5.2l1.8-1.8"/>
+    </svg>
+  ),
+  squad: (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="1" y="1.5" width="4" height="5" rx="0.5"/>
+      <rect x="6" y="1.5" width="4" height="5" rx="0.5"/>
+      <rect x="11" y="1.5" width="4" height="5" rx="0.5"/>
+      <rect x="3" y="9.5" width="4" height="5" rx="0.5"/>
+      <rect x="9" y="9.5" width="4" height="5" rx="0.5"/>
+    </svg>
+  ),
+  upgrades: (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="1.5,11.5 5,7.5 8.5,9.5 14.5,3"/>
+      <polyline points="11,3 14.5,3 14.5,6.5"/>
+    </svg>
+  ),
+  help: (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+      <circle cx="8" cy="8" r="6.5"/>
+      <path d="M6 6.5a2 2 0 1 1 2.5 1.9C7.5 8.8 8 9.4 8 10.5"/>
+      <circle cx="8" cy="12.5" r="0.6" fill="currentColor" stroke="none"/>
+    </svg>
+  ),
+}
+
 export default function App() {
   const [state, dispatch] = useReducer(reducer, null, buildInitialState)
 
@@ -1775,23 +1824,23 @@ export default function App() {
         {/* Icon rail */}
         <nav className="flex-none w-10 md:w-40 bg-neutral-900 border-r border-neutral-800 flex flex-col py-2 overflow-y-auto">
           {[
-            { key: 'goal',     icon: '🎯', label: 'GOAL'     },
-            { key: 'roster',   icon: '👥', label: 'ROSTER'   },
-            { key: 'gear',     icon: '⚙️', label: 'GEAR'     },
-            { key: 'squad',    icon: '📊', label: 'SQUAD'    },
-            { key: 'upgrades', icon: '📈', label: 'UPGRADES' },
-            { key: 'help',     icon: '❓', label: 'HELP'     },
-          ].map(({ key, icon, label }) => (
+            { key: 'goal',     label: 'GOAL'     },
+            { key: 'roster',   label: 'ROSTER'   },
+            { key: 'gear',     label: 'GEAR'     },
+            { key: 'squad',    label: 'SQUAD'    },
+            { key: 'upgrades', label: 'UPGRADES' },
+            { key: 'help',     label: 'HELP'     },
+          ].map(({ key, label }) => (
             <button
               key={key}
               onClick={() => dispatch({ type: 'SET_SECTION', payload: key })}
               className={`flex items-center gap-2 px-2 py-3 text-left border-l-2 transition-colors min-h-[44px]
                 ${state.activeSection === key
-                  ? 'border-amber-600 bg-amber-600/10 text-amber-600'
+                  ? 'border-amber-600 bg-amber-600/10 text-amber-600 nav-active'
                   : 'border-transparent text-neutral-500 hover:text-gray-300 hover:bg-neutral-800'
                 }`}
             >
-              <span className="text-base flex-none w-6 text-center">{icon}</span>
+              <span className="flex-none w-6 flex items-center justify-center">{NAV_ICONS[key]}</span>
               <span className="hidden md:block font-orbitron text-xs tracking-widest">{label}</span>
             </button>
           ))}
@@ -1799,7 +1848,9 @@ export default function App() {
 
         {/* Section content */}
         <main className="flex-1 overflow-y-auto">
-          {sections[state.activeSection]}
+          <div key={state.activeSection} className="section-enter">
+            {sections[state.activeSection]}
+          </div>
         </main>
       </div>
 

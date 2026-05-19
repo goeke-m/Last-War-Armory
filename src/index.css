@@ -4,31 +4,114 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Reset ──────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 
+/* ─── Selection ──────────────────────────── */
+::selection {
+  background: rgba(217, 119, 6, 0.35);
+  color: #fcd34d;
+}
+
+/* ─── Body + atmosphere ──────────────────── */
 body {
-  background-color: #0a0a0a;
-  background-image: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(255, 255, 255, 0.015) 2px,
-    rgba(255, 255, 255, 0.015) 4px
-  );
+  background-color: #080808;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.018) 2px,
+      rgba(255, 255, 255, 0.018) 4px
+    ),
+    radial-gradient(ellipse 70% 55% at 12% 65%, rgba(217, 119, 6, 0.045) 0%, transparent 100%),
+    radial-gradient(ellipse 45% 35% at 88% 12%, rgba(217, 119, 6, 0.03) 0%, transparent 100%);
   font-family: 'Rajdhani', sans-serif;
   color: #e5e7eb;
   min-height: 100vh;
 }
 
+/* CRT scanline overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, 0.055) 3px,
+    rgba(0, 0, 0, 0.055) 4px
+  );
+}
+
+/* ─── Typography ─────────────────────────── */
 h1, h2, h3, h4, label, .font-orbitron {
   font-family: 'Orbitron', monospace;
 }
 
-/* amber glow for active/selected elements */
-.glow-amber {
-  box-shadow: 0 0 8px rgba(217, 119, 6, 0.5);
+/* Amber text glow — applied to all amber text elements */
+.text-amber-600 {
+  text-shadow: 0 0 14px rgba(217, 119, 6, 0.5);
+}
+.text-amber-500 {
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.45);
+}
+.text-amber-400 {
+  text-shadow: 0 0 8px rgba(251, 191, 36, 0.35);
 }
 
+/* ─── Glow utilities ─────────────────────── */
+.glow-amber {
+  box-shadow: 0 0 8px rgba(217, 119, 6, 0.55), 0 0 24px rgba(217, 119, 6, 0.18);
+}
+
+/* Active nav button — inset left glow */
+.nav-active {
+  box-shadow: inset 3px 0 10px rgba(217, 119, 6, 0.25);
+}
+
+/* RecPanel top shadow */
+.rec-panel-shadow {
+  box-shadow: 0 -4px 20px rgba(217, 119, 6, 0.1), 0 -1px 0 rgba(217, 119, 6, 0.15);
+}
+
+/* ─── Section entrance animation ─────────── */
+@keyframes sectionFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.section-enter {
+  animation: sectionFadeIn 0.2s ease-out forwards;
+}
+
+/* ─── Scrollbars ─────────────────────────── */
+::-webkit-scrollbar        { width: 3px; height: 3px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: #1f1f1f; }
+::-webkit-scrollbar-thumb:hover { background: #d97706; }
+
+/* ─── Range slider ───────────────────────── */
 input[type=range] {
   accent-color: #d97706;
+}
+
+/* ─── Number inputs — hide spinners ─────── */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] { -moz-appearance: textfield; }
+
+/* ─── Input focus states ─────────────────── */
+input[type=number]:focus,
+input[type=text]:focus,
+textarea:focus {
+  outline: none;
+  border-color: #d97706 !important;
+  box-shadow: 0 0 0 1px rgba(217, 119, 6, 0.2), inset 0 0 6px rgba(217, 119, 6, 0.06);
 }
