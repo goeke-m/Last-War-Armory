@@ -1024,7 +1024,7 @@ function HeroFormationCard({ heroId, state, heroScores, gearAssignment, alternat
 }
 
 function SquadOptimizer({ state, recommendedSquad, gearAssignment, heroScores }) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false) // must be before early return — hooks must run unconditionally
   if (recommendedSquad.insufficient) {
     return (
       <div className="p-4">
@@ -1086,7 +1086,7 @@ function SquadOptimizer({ state, recommendedSquad, gearAssignment, heroScores })
               onClick={() => setOpen(o => !o)}
               className="w-full flex items-center gap-1 border-t border-dashed border-neutral-700 pt-2 font-orbitron text-xs tracking-widest text-neutral-500 hover:text-neutral-300 transition-colors bg-transparent"
             >
-              <span className={`text-amber-600 transition-transform ${open ? 'rotate-90' : ''}`} style={{ display: 'inline-block' }}>›</span>
+              <span className={`inline-block text-amber-600 transition-transform ${open ? 'rotate-90' : ''}`}>›</span>
               WHY THIS SQUAD
             </button>
             {open && (
