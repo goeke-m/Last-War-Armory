@@ -288,7 +288,7 @@ function computeSquadScore(combo, heroScores, heroes, intent, opponentType) {
   return score
 }
 
-function computeSquadReasoning(combo, heroScores, heroes, intent, opponentType, ownedIds) {
+function computeSquadReasoning(combo, heroes, opponentType, ownedIds) {
   const active = []
   const opportunities = []
 
@@ -1050,25 +1050,29 @@ function SquadOptimizer({ state, recommendedSquad, gearAssignment, heroScores })
         // OPTIMAL SQUAD · SCORE {recommendedSquad.score.toFixed(1)}
       </p>
 
+      {/* Enemy direction label */}
+      <p className="font-orbitron text-xs text-neutral-600 tracking-widest text-center mb-1">▲ ENEMY ▲</p>
 
- {/* Back row — 3 cards side by side */}
-      <div className="mb-3">
-        <p className="font-orbitron text-xs text-neutral-500 tracking-widest mb-1">BACK ROW</p>
-        <div className="grid grid-cols-3 gap-2">
-          {backRow.map(id => <HeroFormationCard key={id} heroId={id} {...cardProps} />)}
-        </div>
-      </div>
-      
-      {/* Divider */}
-      <div className="border-t border-dashed border-neutral-700 my-2" />
-{/* Front row — 2 cards side by side */}
+      {/* Front row — 2 cards side by side */}
       <div className="mb-1">
         <p className="font-orbitron text-xs text-neutral-500 tracking-widest mb-1">FRONT ROW</p>
         <div className="grid grid-cols-2 gap-2">
           {frontRow.map(id => <HeroFormationCard key={id} heroId={id} {...cardProps} />)}
         </div>
       </div>
-     
+
+      {/* Divider */}
+      <div className="border-t border-dashed border-neutral-700 my-2" />
+
+      {/* Back row — 3 cards side by side */}
+      <div className="mb-3">
+        <p className="font-orbitron text-xs text-neutral-500 tracking-widest mb-1">BACK ROW</p>
+        <div className="grid grid-cols-3 gap-2">
+          {backRow.map(id => <HeroFormationCard key={id} heroId={id} {...cardProps} />)}
+        </div>
+      </div>
+
+      <p className="font-orbitron text-xs text-neutral-600 tracking-widest text-center">▼ YOUR BASE ▼</p>
     </div>
   )
 }
