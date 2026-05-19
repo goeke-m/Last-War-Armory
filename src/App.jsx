@@ -910,8 +910,12 @@ function SquadOptimizer({ state, recommendedSquad, gearAssignment, heroScores })
   }
 
   const { squad, alternates } = recommendedSquad
-  const frontRow = squad.filter(id => HEROES[id].defaultRow === 'front')
-  const backRow = squad.filter(id => HEROES[id].defaultRow === 'back')
+  // Always 2 front, 3 back — sort front-row heroes first, then hard-slice
+  const sorted = [...squad].sort((a, b) =>
+    (HEROES[a].defaultRow === 'front' ? 0 : 1) - (HEROES[b].defaultRow === 'front' ? 0 : 1)
+  )
+  const frontRow = sorted.slice(0, 2)
+  const backRow = sorted.slice(2)
   const rows = [{ label: 'FRONT ROW', ids: frontRow }, { label: 'BACK ROW', ids: backRow }]
 
   return (
