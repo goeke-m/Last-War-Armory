@@ -1086,7 +1086,7 @@ function GearEditModal({ piece, onSave, onDelete, onClose }) {
           <p className="font-orbitron text-xs text-neutral-500 mb-1">STARS</p>
           <div className="flex gap-1">
             {[0,1,2,3,4,5].map(s => (
-              <button key={s} onClick={() => setStars(s)}
+              <button key={s} onClick={() => { setStars(s); if (s > 0) setLevel(QUALITY_MAX_LEVEL[quality]) }}
                 className={`flex-1 py-1 font-orbitron text-xs border min-h-[36px] transition-colors
                   ${stars === s ? 'border-amber-600 text-amber-600 bg-amber-600/10' : 'border-neutral-700 text-neutral-500'}`}>
                 {s}★
