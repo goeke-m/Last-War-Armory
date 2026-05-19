@@ -1024,6 +1024,7 @@ function HeroFormationCard({ heroId, state, heroScores, gearAssignment, alternat
 }
 
 function SquadOptimizer({ state, recommendedSquad, gearAssignment, heroScores }) {
+  const [open, setOpen] = useState(false)
   if (recommendedSquad.insufficient) {
     return (
       <div className="p-4">
@@ -1074,6 +1075,56 @@ function SquadOptimizer({ state, recommendedSquad, gearAssignment, heroScores })
       </div>
 
       <p className="font-orbitron text-xs text-neutral-600 tracking-widest text-center">▼ YOUR BASE ▼</p>
+
+      {/* Reasoning toggle */}
+      {(() => {
+        const { active, opportunities } = recommendedSquad.reasoning
+        if (active.length === 0 && opportunities.length === 0) return null
+        return (
+          <div className="mt-3">
+            <button
+              onClick={() => setOpen(o => !o)}
+              className="w-full flex items-center gap-1 border-t border-dashed border-neutral-700 pt-2 font-orbitron text-xs tracking-widest text-neutral-500 hover:text-neutral-300 transition-colors bg-transparent"
+            >
+              <span className={`text-amber-600 transition-transform ${open ? 'rotate-90' : ''}`} style={{ display: 'inline-block' }}>›</span>
+              WHY THIS SQUAD
+            </button>
+            {open && (
+              <div className="mt-2 border-l-2 border-amber-600 bg-neutral-950 px-3 py-2 space-y-1">
+                {active.length > 0 && (
+                  <>
+                    <p className="font-orbitron text-xs text-neutral-600 tracking-widest mb-1">ACTIVE BONUSES</p>
+                    {active.map((line, i) => (
+                      <p key={i} className="font-rajdhani text-xs text-neutral-400">
+                        <span className="text-amber-600 mr-1">›</span>
+                        {line.includes(' — ') ? line.split(' — ')[0] : line}
+                        {line.includes(' — ') && (
+                          <span className="text-green-400"> — {line.split(' — ')[1]}</span>
+                        )}
+                      </p>
+                    ))}
+                  </>
+                )}
+                {opportunities.length > 0 && (
+                  <>
+                    <p className="font-orbitron text-xs text-neutral-600 tracking-widest mt-2 mb-1">OPPORTUNITIES</p>
+                    {opportunities.map((line, i) => (
+                      <p key={i} className="font-rajdhani text-xs text-neutral-400">
+                        <span className="text-amber-600 mr-1">›</span>
+                        {line.includes(' — ') ? line.split(' — ')[0] : line}
+                        {line.includes(' — ') && (
+                          <span className="text-yellow-400"> — {line.split(' — ')[1]}</span>
+                        )}
+                      </p>
+                    ))}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        )
+      })()}
+
     </div>
   )
 }
