@@ -95,7 +95,8 @@ function heroScore(heroId, heroState, season, goal) {
   const { stars, skills, ewLevel } = heroState
   const effectiveRarity = isPromotedUR(heroId, season) ? 'UR' : HEROES[heroId].rarity
   const rarityWeight = RARITY_WEIGHTS[effectiveRarity]
-  const skillMax = effectiveRarity === 'UR' ? 40 : 30
+  // UR skill cap starts at 30 and gains +1 per 3 EW levels (EW 30 = cap 40)
+  const skillMax = effectiveRarity === 'UR' ? Math.min(40, 30 + Math.floor(ewLevel / 3)) : 30
   const avgSkill = skills.reduce((a, b) => a + b, 0) / skills.length
   const base = rarityWeight * (stars / 5) * (avgSkill / skillMax)
   const starBonus = stars >= 4 ? 1.4 : stars >= 3 ? 1.2 : 1.0
@@ -1008,7 +1009,8 @@ function HeroCard({ heroId, heroState, heroScore, season, dispatch }) {
   const colors = UNIT_COLORS[hero.unitType]
   const isEffectiveUR = hero.rarity === 'UR' || isPromotedUR(heroId, season)
   const showEW = isEffectiveUR
-  const skillMax = isEffectiveUR ? 40 : 30
+  // Skill cap scales with EW: base 30, +1 per 3 EW levels, max 40
+  const skillMax = isEffectiveUR ? Math.min(40, 30 + Math.floor(heroState.ewLevel / 3)) : 30
   const nearPromotion = hero.promotionSeason && hero.promotionSeason === season + 1
 
   return (
