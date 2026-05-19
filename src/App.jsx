@@ -68,15 +68,20 @@ const UNIT_COLORS = {
 const GOAL_WEIGHTS = {
   pvp_rally:    { schuyler: 1.3, dva: 1.2, kimberly: 1.2 },
   world_boss:   { mason: 1.3, sarah: 1.25, elsa: 1.2, swift: 1.2 },
-  code_battles: { kimberly: 1.25, stetmann: 1.2, williams: 1.2, murphy: 1.2 },
+  code_battles: {}, // type bonus applied dynamically via codeType selector
   balanced:     {},
 }
 
 // Rock-paper-scissors counter table: key beats value
 const BEATS = { tank: 'missile', missile: 'aircraft', aircraft: 'tank' }
 
-// Returns per-hero goal multiplier; unnamed back-row DPS get 1.15 in pvp/wb
-function getGoalMod(heroId, goal) {
+// Returns per-hero goal multiplier
+// codeType: for code_battles, which unit type gets the in-game +50% damage bonus this code
+function getGoalMod(heroId, goal, codeType) {
+  if (goal === 'code_battles') {
+    if (codeType && HEROES[heroId].unitType === codeType) return 1.5
+    return 1.0
+  }
   const explicit = GOAL_WEIGHTS[goal][heroId]
   if (explicit !== undefined) return explicit
   const hero = HEROES[heroId]
@@ -95,19 +100,21 @@ function isPromotedUR(heroId, season) {
   return h.promotionSeason !== null && h.promotionSeason <= season
 }
 
-function heroScore(heroId, heroState, season, goal) {
+function heroScore(heroId, heroState, season, goal, codeType) {
   const { stars, skills, ewLevel } = heroState
   const effectiveRarity = isPromotedUR(heroId, season) ? 'UR' : HEROES[heroId].rarity
   const rarityWeight = RARITY_WEIGHTS[effectiveRarity]
   // UR skill cap starts at 30 and gains +1 per 3 EW levels (EW 30 = cap 40)
   const skillMax = effectiveRarity === 'UR' ? Math.min(40, 30 + Math.floor(ewLevel / 3)) : 30
-  const avgSkill = skills.reduce((a, b) => a + b, 0) / skills.length
+  // Skills unlock by star: 0-1★=skill1 only, 2★=skills1-2, 3★=skills1-3, 4★+=all4
+  const unlockedCount = stars <= 1 ? 1 : Math.min(stars, 4)
+  const activeSkills = skills.slice(0, unlockedCount)
+  const avgSkill = activeSkills.reduce((a, b) => a + b, 0) / unlockedCount
   const base = rarityWeight * (stars / 5) * (avgSkill / skillMax)
   const starBonus = stars >= 4 ? 1.4 : stars >= 3 ? 1.2 : 1.0
-  // ewBonus applies to native UR and promoted SSRs (both resolve to effectiveRarity==='UR')
-  // 5% per level scales correctly across the 0-30 range (same max bonus as original formula at 0-10)
+  // ewBonus: 5% per level across 0-30 range
   const ewBonus = effectiveRarity === 'UR' && ewLevel > 0 ? 1 + ewLevel * 0.05 : 1.0
-  const goalMod = getGoalMod(heroId, goal)
+  const goalMod = getGoalMod(heroId, goal, codeType)
   return base * starBonus * ewBonus * goalMod
 }
 
@@ -117,10 +124,10 @@ function pieceScore(piece) {
 }
 
 // Returns { [heroId]: score } for all owned heroes
-function computeAllHeroScores(heroes, season, goal) {
+function computeAllHeroScores(heroes, season, goal, codeType) {
   const scores = {}
   for (const [id, state] of Object.entries(heroes)) {
-    if (state.owned) scores[id] = heroScore(id, state, season, goal)
+    if (state.owned) scores[id] = heroScore(id, state, season, goal, codeType)
   }
   return scores
 }
@@ -141,7 +148,18 @@ function getCombinations(arr, k) {
 }
 
 function computeSquadScore(combo, heroScores, heroes, intent, opponentType) {
-  const base = combo.reduce((sum, id) => sum + (heroScores[id] ?? 0), 0)
+  // EW level 20 squad-type buff: each hero with EW≥20 grants +7.5% to all same-type squad members
+  const ewTypeBuff = {}
+  for (const id of combo) {
+    if ((heroes[id]?.ewLevel ?? 0) >= 20) {
+      const t = HEROES[id].unitType
+      ewTypeBuff[t] = (ewTypeBuff[t] || 0) + 1
+    }
+  }
+  const base = combo.reduce((sum, id) => {
+    const buffStacks = ewTypeBuff[HEROES[id].unitType] || 0
+    return sum + (heroScores[id] ?? 0) * (1 + 0.075 * buffStacks)
+  }, 0)
 
   // Graduated mono bonus — actual game mechanic (+20% max, graduated by majority count)
   const typeCounts = {}
@@ -374,6 +392,7 @@ function getProfileData(state) {
     goal: state.goal,
     intent: state.intent,
     opponentType: state.opponentType,
+    codeType: state.codeType,
     heroes: state.heroes,
     gear: state.gear,
   }
@@ -403,6 +422,7 @@ const BLANK_PROFILE = {
   goal: 'pvp_rally',
   intent: 'mono',
   opponentType: null,
+  codeType: null,
   heroes: INITIAL_HEROES_STATE,
   gear: [],
 }
@@ -441,6 +461,8 @@ function reducer(state, action) {
       return syncProfile({ ...state, intent: action.payload })
     case 'SET_OPPONENT_TYPE':
       return syncProfile({ ...state, opponentType: action.payload })
+    case 'SET_CODE_TYPE':
+      return syncProfile({ ...state, codeType: action.payload })
 
     // Hero mutations
     case 'TOGGLE_HERO_OWNED': {
@@ -1118,22 +1140,30 @@ function HeroCard({ heroId, heroState, heroScore, season, dispatch }) {
               className="w-full" />
           </div>
 
-          {/* Skills */}
+          {/* Skills — unlock at each star: SK1@1★ SK2@2★ SK3@3★ SK4@4★ */}
           <div>
             <p className="font-orbitron text-xs text-neutral-500 mb-1">SKILL LEVELS <span className="text-neutral-600">(max {skillMax})</span></p>
             <div className="grid grid-cols-4 gap-1">
-              {heroState.skills.map((lvl, i) => (
-                <div key={i} className="text-center">
-                  <p className="font-orbitron text-xs text-neutral-600 mb-0.5">SK{i+1}</p>
-                  <input type="number" min="1" max={skillMax} value={lvl}
-                    onChange={e => {
-                      const skills = [...heroState.skills]
-                      skills[i] = Math.min(skillMax, Math.max(1, Number(e.target.value)))
-                      dispatch({ type: 'UPDATE_HERO', heroId, updates: { skills } })
-                    }}
-                    className="w-full bg-neutral-800 border border-neutral-700 text-center font-mono text-sm text-gray-200 py-1 min-h-[36px]" />
-                </div>
-              ))}
+              {heroState.skills.map((lvl, i) => {
+                const unlocked = i < (heroState.stars <= 1 ? 1 : Math.min(heroState.stars, 4))
+                return (
+                  <div key={i} className="text-center">
+                    <p className={`font-orbitron text-xs mb-0.5 ${unlocked ? 'text-neutral-600' : 'text-neutral-800'}`}>
+                      SK{i+1}{!unlocked && ' 🔒'}
+                    </p>
+                    <input type="number" min="1" max={unlocked ? skillMax : 1} value={unlocked ? lvl : 1}
+                      disabled={!unlocked}
+                      onChange={e => {
+                        if (!unlocked) return
+                        const skills = [...heroState.skills]
+                        skills[i] = Math.min(skillMax, Math.max(1, Number(e.target.value)))
+                        dispatch({ type: 'UPDATE_HERO', heroId, updates: { skills } })
+                      }}
+                      className={`w-full bg-neutral-800 border text-center font-mono text-sm py-1 min-h-[36px]
+                        ${unlocked ? 'border-neutral-700 text-gray-200' : 'border-neutral-800 text-neutral-700 cursor-not-allowed opacity-40'}`} />
+                  </div>
+                )
+              })}
             </div>
           </div>
 
@@ -1279,8 +1309,39 @@ function GoalSelector({ state, dispatch, ownedIds }) {
         )}
       </div>
 
-      {/* Opponent type — counter system (PvP/Code Battles only) */}
-      {(state.goal === 'pvp_rally' || state.goal === 'code_battles') && (
+      {/* Code type — unit type buffed this code (+50% damage) */}
+      {state.goal === 'code_battles' && (
+        <div>
+          <p className="font-orbitron text-xs text-neutral-400 tracking-widest mb-1">
+            CODE TYPE <span className="text-neutral-600 normal-case font-rajdhani">(+50% damage to buffed type)</span>
+          </p>
+          <p className="font-rajdhani text-xs text-neutral-600 mb-2">Which unit type does the current code buff?</p>
+          <div className="grid grid-cols-2 gap-1">
+            {[
+              { value: null,       label: 'Unknown',  sub: 'No type modifier' },
+              { value: 'tank',     label: 'Tank',     sub: '+50% tank hero damage' },
+              { value: 'aircraft', label: 'Aircraft', sub: '+50% aircraft hero damage' },
+              { value: 'missile',  label: 'Missile',  sub: '+50% missile hero damage' },
+            ].map(({ value, label, sub }) => (
+              <button
+                key={String(value)}
+                onClick={() => dispatch({ type: 'SET_CODE_TYPE', payload: value })}
+                className={`flex flex-col items-start px-3 py-2 border text-left min-h-[44px] transition-colors
+                  ${state.codeType === value
+                    ? 'border-amber-600 text-amber-600 bg-amber-600/10'
+                    : 'border-neutral-700 text-neutral-400 hover:border-neutral-500'
+                  }`}
+              >
+                <span className="font-orbitron text-xs">{label}</span>
+                <span className="font-rajdhani text-xs text-neutral-500">{sub}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Opponent type — counter system (PvP only) */}
+      {state.goal === 'pvp_rally' && (
         <div>
           <p className="font-orbitron text-xs text-neutral-400 tracking-widest mb-2">
             OPPONENT TYPE <span className="text-neutral-600 normal-case font-rajdhani">(+20% counter bonus)</span>
@@ -1332,8 +1393,8 @@ export default function App() {
   )
 
   const heroScores = useMemo(
-    () => computeAllHeroScores(state.heroes, state.season, state.goal),
-    [state.heroes, state.season, state.goal]
+    () => computeAllHeroScores(state.heroes, state.season, state.goal, state.codeType),
+    [state.heroes, state.season, state.goal, state.codeType]
   )
 
   const recommendedSquad = useMemo(
