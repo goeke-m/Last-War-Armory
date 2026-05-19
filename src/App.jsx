@@ -297,11 +297,11 @@ function computeSquadReasoning(combo, heroes, opponentType, ownedIds) {
     if ((heroes[id]?.ewLevel ?? 0) >= 20) {
       const t = HEROES[id].unitType
       const buffedCount = combo.filter(cid => HEROES[cid].unitType === t).length
-      active.push(`${HEROES[id].name} EW20 buffs ${buffedCount} ${UNIT_COLORS[t].label} allies — +7.5% each`)
+      active.push(`${HEROES[id].name} EW20 buffs ${buffedCount} ${UNIT_COLORS[t].label} squad members — +7.5% each`)
     }
   }
 
-  // EW near-miss: squad hero with EW 15–19 (one level push away from buff)
+  // EW near-miss: squad hero with EW 15–19 (within striking distance of EW20 buff)
   for (const id of combo) {
     const ew = heroes[id]?.ewLevel ?? 0
     if (ew >= 15 && ew < 20) {
