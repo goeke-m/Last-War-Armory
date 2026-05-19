@@ -1328,7 +1328,7 @@ function HeroCard({ heroId, heroState: heroStateProp, heroScore, season, dispatc
   const hero = HEROES[heroId]
   const colors = UNIT_COLORS[hero.unitType]
   const isEffectiveUR = hero.rarity === 'UR' || isPromotedUR(heroId, heroState, season)
-  const showEW = isEffectiveUR
+  const showEW = hero.rarity === 'UR'
   // Skill cap scales with EW: base 30, +1 per 3 EW levels, max 40
   const skillMax = isEffectiveUR ? Math.min(40, 30 + Math.floor(heroState.ewLevel / 3)) : 30
   const nearPromotion = hero.promotionSeason && hero.promotionSeason === season + 1
@@ -1395,6 +1395,19 @@ function HeroCard({ heroId, heroState: heroStateProp, heroScore, season, dispatc
               className="w-full" />
           </div>
 
+          {/* Promotion toggle — SSR heroes eligible in current or past season */}
+          {hero.rarity === 'SSR' && hero.promotionSeason !== null && hero.promotionSeason <= season && (
+            <div className="flex items-center justify-between py-0.5">
+              <p className="font-rajdhani text-sm text-neutral-300">Promoted to UR</p>
+              <button
+                onClick={() => dispatch({ type: 'UPDATE_HERO', heroId, updates: { promoted: !heroState.promoted } })}
+                className={`relative inline-flex h-5 w-10 flex-none items-center rounded-full transition-colors ${heroState.promoted ? 'bg-amber-600' : 'bg-neutral-700'}`}
+              >
+                <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${heroState.promoted ? 'translate-x-5' : 'translate-x-0.5'}`} />
+              </button>
+            </div>
+          )}
+
           {/* Skills — unlock at each star: SK1@1★ SK2@2★ SK3@3★ SK4@4★ */}
           <div>
             <p className="font-orbitron text-xs text-neutral-500 mb-1">SKILL LEVELS <span className="text-neutral-600">(max {skillMax})</span></p>
@@ -1433,24 +1446,7 @@ function HeroCard({ heroId, heroState: heroStateProp, heroScore, season, dispatc
           </div>
 
           {/* Promotion toggle — SSR heroes eligible in current or past season */}
-          {hero.rarity === 'SSR' && hero.promotionSeason !== null && hero.promotionSeason <= season && (
-            <div>
-              <p className="font-orbitron text-xs text-neutral-500 mb-1">PROMOTION</p>
-              <button
-                onClick={() => dispatch({ type: 'UPDATE_HERO', heroId, updates: { promoted: !heroState.promoted } })}
-                className={`w-full flex items-center justify-between px-3 py-2 border text-left min-h-[40px] transition-colors
-                  ${heroState.promoted
-                    ? 'border-amber-600 text-amber-600 bg-amber-600/10'
-                    : 'border-neutral-700 text-neutral-400 hover:border-neutral-500'
-                  }`}
-              >
-                <span className="font-orbitron text-xs">PROMOTED TO UR</span>
-                <span className="font-mono text-xs">{heroState.promoted ? '✓ YES' : 'NO'}</span>
-              </button>
-            </div>
-          )}
-
-          {/* EW Level (UR / promoted SSR only) */}
+          {/* EW Level (native UR only) */}
           {showEW && (
             <div>
               <p className="font-orbitron text-xs text-neutral-500 mb-1">EW LEVEL: <span className="text-amber-600">{heroState.ewLevel}</span> <span className="text-neutral-600">/ 30</span></p>
