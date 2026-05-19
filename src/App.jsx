@@ -25,8 +25,8 @@ const HEROES = {
   // SSR heroes
   mason:    { id: 'mason',    name: 'Mason',    rarity: 'SSR', unitType: 'tank', role: 'dps', defaultRow: 'back', promotionSeason: 1 },
   violet:   { id: 'violet',   name: 'Violet',   rarity: 'SSR', unitType: 'tank', role: 'tank', defaultRow: 'front', promotionSeason: 2 },
-  scarlett: { id: 'scarlett', name: 'Scarlett', rarity: 'SSR', unitType: 'aircraft', role: 'dps', defaultRow: 'back', promotionSeason: 3 },
-  venom:    { id: 'venom',    name: 'Venom',    rarity: 'SSR', unitType: 'missile', role: 'dps', defaultRow: 'back', promotionSeason: 4 },
+  scarlett: { id: 'scarlett', name: 'Scarlett', rarity: 'SSR', unitType: 'tank', role: 'tank', defaultRow: 'front', promotionSeason: 3 },
+  venom:    { id: 'venom',    name: 'Venom',    rarity: 'SSR', unitType: 'missile', role: 'dps', defaultRow: 'back', promotionSeason: 5 },
   sarah:    { id: 'sarah',    name: 'Sarah',    rarity: 'SSR', unitType: 'aircraft', role: 'support', defaultRow: 'back', promotionSeason: null },
   richard:  { id: 'richard',  name: 'Richard',  rarity: 'SSR', unitType: 'tank', role: 'tank', defaultRow: 'front', promotionSeason: null },
   elsa:     { id: 'elsa',     name: 'Elsa',     rarity: 'SSR', unitType: 'missile', role: 'support', defaultRow: 'back', promotionSeason: null },
@@ -114,6 +114,21 @@ const HERO_SKILL_WEIGHTS = {
   ambolt:   [3, 2, 4, 1], // priority: 3>1>2>4
 }
 
+// Skill names that change when an SSR hero promotes to UR — overrides HERO_SKILLS when promoted
+const HERO_SKILLS_PROMOTED = {
+  violet:   ['Frost Spray',      'Ice Armor',          'Chill Corrosion',    'Frost Buff'],
+  venom:    ['Corrosive Shot',   'Promotion Synergy',  'Corrosive Barrage',  'Super Sensing'],
+  // Mason and Scarlett keep the same skill names post-promotion
+}
+
+// Skill priority weights that change post-promotion — overrides HERO_SKILL_WEIGHTS when promoted
+const HERO_SKILL_WEIGHTS_PROMOTED = {
+  // Venom UR: Corrosive Barrage (SK3) > Promotion Synergy (SK2) > Corrosive Shot (SK1, applies stacks) > Super Sensing (SK4)
+  venom: [2, 3, 4, 1],
+  // Violet UR: Ice Armor (SK2) remains dominant, Frost Buff (SK4) gains value as squad-wide DR
+  // priority unchanged: 2>3>4>1 → [1,4,3,2] same as SSR
+}
+
 const SLOTS = ['gun', 'chip', 'armor', 'radar']
 const QUALITIES = ['legendary', 'epic', 'rare', 'common']
 const QUALITY_WEIGHTS = { legendary: 4, epic: 2, rare: 1, common: 0.5 }
@@ -178,7 +193,10 @@ function heroScore(heroId, heroState, season, goal, codeType) {
   const skillMax = effectiveRarity === 'UR' ? Math.min(40, 30 + Math.floor(ewLevel / 3)) : 30
   // Skills unlock by star: 0-1★=skill1 only, 2★=skills1-2, 3★=skills1-3, 4★+=all4
   const unlockedCount = stars <= 1 ? 1 : Math.min(stars, 4)
-  const weights = HERO_SKILL_WEIGHTS[heroId] ?? [1, 2, 3, 2]
+  const promoted = effectiveRarity === 'UR' && HEROES[heroId].rarity !== 'UR'
+  const weights = (promoted && HERO_SKILL_WEIGHTS_PROMOTED[heroId])
+    ? HERO_SKILL_WEIGHTS_PROMOTED[heroId]
+    : (HERO_SKILL_WEIGHTS[heroId] ?? [1, 2, 3, 2])
   const activeWeights = weights.slice(0, unlockedCount)
   const weightSum = activeWeights.reduce((a, b) => a + b, 0)
   const weightedSkillSum = skills.slice(0, unlockedCount).reduce((sum, lvl, i) => sum + lvl * activeWeights[i], 0)
@@ -1226,9 +1244,15 @@ function HeroCard({ heroId, heroState: heroStateProp, heroScore, season, dispatc
             <div className="grid grid-cols-4 gap-1">
               {heroState.skills.map((lvl, i) => {
                 const unlocked = i < (heroState.stars <= 1 ? 1 : Math.min(heroState.stars, 4))
-                const weights = HERO_SKILL_WEIGHTS[heroId] ?? [1, 2, 3, 2]
+                const promoted = isEffectiveUR && HEROES[heroId].rarity !== 'UR'
+                const weights = (promoted && HERO_SKILL_WEIGHTS_PROMOTED[heroId])
+                  ? HERO_SKILL_WEIGHTS_PROMOTED[heroId]
+                  : (HERO_SKILL_WEIGHTS[heroId] ?? [1, 2, 3, 2])
+                const skillNames = (promoted && HERO_SKILLS_PROMOTED[heroId])
+                  ? HERO_SKILLS_PROMOTED[heroId]
+                  : (HERO_SKILLS[heroId] ?? ['Skill 1', 'Skill 2', 'Skill 3', 'Skill 4'])
                 const isPriority = weights[i] === Math.max(...weights)
-                const skillName = HERO_SKILLS[heroId]?.[i] ?? `Skill ${i + 1}`
+                const skillName = skillNames[i] ?? `Skill ${i + 1}`
                 return (
                   <div key={i} className="text-center">
                     <p className={`font-orbitron text-xs mb-0.5 truncate ${unlocked ? (isPriority ? 'text-amber-500' : 'text-neutral-600') : 'text-neutral-800'}`}
