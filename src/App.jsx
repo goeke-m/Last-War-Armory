@@ -948,14 +948,14 @@ function SquadOptimizer({ state, recommendedSquad, gearAssignment, heroScores })
                   <div className="grid grid-cols-4 gap-1 mb-2">
                     {SLOTS.map(slot => {
                       const piece = slots[slot]
+                      const qualityTextColor = piece ? QUALITY_META[piece.quality]?.rowColor.split(' ')[0] : 'text-neutral-700'
                       return (
                         <div key={slot} className={`border ${piece ? 'border-neutral-700' : 'border-neutral-800 opacity-40'} p-1 text-center`}>
-                          <p className="font-orbitron text-xs text-neutral-500">{slot.toUpperCase()}</p>
+                          <p className={`font-orbitron text-xs ${piece ? qualityTextColor : 'text-neutral-500'}`}>{slot.toUpperCase()}</p>
                           {piece ? (
                             <>
-                              <p className="font-mono text-xs text-amber-600">Lv{piece.level}</p>
+                              <p className="font-mono text-xs text-gray-300">Lv{piece.level}</p>
                               <p className="font-mono text-xs text-neutral-400">{piece.stars}★</p>
-                              <p className="font-orbitron text-xs text-neutral-600">{piece.quality.slice(0,3).toUpperCase()}</p>
                             </>
                           ) : (
                             <p className="font-orbitron text-xs text-neutral-700">—</p>
