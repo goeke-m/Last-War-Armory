@@ -398,7 +398,8 @@ function findRecommendedSquad(ownedIds, heroScores, heroes, intent, opponentType
     if (bestAlt) alternates[heroId] = { heroId: bestAlt, scoreDiff: bestAltScore - best.score }
   }
 
-  return { squad: best.combo, alternates, score: best.score, insufficient: false }
+  const reasoning = computeSquadReasoning(best.combo, heroes, opponentType, ownedIds)
+  return { squad: best.combo, alternates, score: best.score, reasoning, insufficient: false }
 }
 
 // Returns { assigned: {[heroId]: {gun,chip,armor,radar}}, unassigned: piece[] }
