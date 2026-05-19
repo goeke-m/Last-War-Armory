@@ -288,6 +288,85 @@ function computeSquadScore(combo, heroScores, heroes, intent, opponentType) {
   return score
 }
 
+function computeSquadReasoning(combo, heroScores, heroes, intent, opponentType, ownedIds) {
+  const active = []
+  const opportunities = []
+
+  // EW type buffs — one entry per EW≥20 hero in the squad
+  for (const id of combo) {
+    if ((heroes[id]?.ewLevel ?? 0) >= 20) {
+      const t = HEROES[id].unitType
+      const buffedCount = combo.filter(cid => HEROES[cid].unitType === t).length
+      active.push(`${HEROES[id].name} EW20 buffs ${buffedCount} ${UNIT_COLORS[t].label} allies — +7.5% each`)
+    }
+  }
+
+  // EW near-miss: squad hero with EW 15–19 (one level push away from buff)
+  for (const id of combo) {
+    const ew = heroes[id]?.ewLevel ?? 0
+    if (ew >= 15 && ew < 20) {
+      const t = HEROES[id].unitType
+      const buffedCount = combo.filter(cid => HEROES[cid].unitType === t).length
+      opportunities.push(`Level ${HEROES[id].name} EW to 20 — buff ${buffedCount} ${UNIT_COLORS[t].label} allies +7.5%`)
+    }
+  }
+
+  // Mono bonus
+  const typeCounts = {}
+  for (const id of combo) {
+    const t = HEROES[id].unitType
+    typeCounts[t] = (typeCounts[t] || 0) + 1
+  }
+  const entries = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])
+  const [dominantType, dominantCount] = entries[0]
+  const secondCount = entries[1]?.[1] ?? 0
+  let monoMult = 1.0
+  const counts = entries.map(e => e[1])
+  if (counts[0] === 5) monoMult = 1.20
+  else if (counts[0] === 4) monoMult = 1.15
+  else if (counts[0] === 3 && counts[1] === 2) monoMult = 1.10
+  else if (counts[0] === 3) monoMult = 1.05
+  const typeLabel = UNIT_COLORS[dominantType].label
+  if (monoMult > 1.0) {
+    active.push(`${dominantCount}/5 ${typeLabel} — +${Math.round((monoMult - 1) * 100)}% mono bonus`)
+  }
+
+  // Mono near-miss: 4/5 or 3+2 split — only if spare hero of dominant type is owned
+  if (dominantCount === 4 || (dominantCount === 3 && secondCount === 2)) {
+    const spareExists = ownedIds.some(id => !combo.includes(id) && HEROES[id].unitType === dominantType)
+    if (spareExists) {
+      const currentBonus = Math.round((monoMult - 1) * 100)
+      const nextBonus = dominantCount === 4 ? 20 : 15
+      opportunities.push(`Swap 1 hero for ${dominantCount + 1}/5 ${typeLabel} — unlock +${nextBonus - currentBonus}% more mono bonus`)
+    }
+  }
+
+  // Counter advantage
+  if (opponentType && BEATS[opponentType] !== undefined) {
+    const counterType = Object.keys(BEATS).find(t => BEATS[t] === opponentType)
+    const counterCount = combo.filter(id => HEROES[id].unitType === counterType).length
+    const opponentLabel = UNIT_COLORS[opponentType].label
+    const counterLabel = UNIT_COLORS[counterType].label
+    let counterPct = 0
+    if (counterCount >= 4) counterPct = 20
+    else if (counterCount >= 3) counterPct = 15
+    else if (counterCount >= 1) counterPct = 8
+    if (counterPct > 0) {
+      active.push(`${counterCount}/5 ${counterLabel} counter ${opponentLabel} enemy — +${counterPct}% counter bonus`)
+    }
+    // Near-miss: 1–2 counter heroes and a spare exists
+    if (counterCount >= 1 && counterCount < 3) {
+      const spareCount = ownedIds.filter(id => !combo.includes(id) && HEROES[id].unitType === counterType).length
+      if (spareCount > 0) {
+        const need = 3 - counterCount
+        opportunities.push(`Add ${need} more ${counterLabel} hero${need > 1 ? 'es' : ''} — improve counter bonus to +15%`)
+      }
+    }
+  }
+
+  return { active, opportunities }
+}
+
 function hasFrontTank(combo) {
   return combo.some(id => HEROES[id].role === 'tank' && HEROES[id].defaultRow === 'front')
 }
@@ -971,29 +1050,25 @@ function SquadOptimizer({ state, recommendedSquad, gearAssignment, heroScores })
         // OPTIMAL SQUAD · SCORE {recommendedSquad.score.toFixed(1)}
       </p>
 
-      {/* Enemy direction label */}
-      <p className="font-orbitron text-xs text-neutral-600 tracking-widest text-center mb-1">▲ ENEMY ▲</p>
 
-      {/* Front row — 2 cards side by side */}
-      <div className="mb-1">
-        <p className="font-orbitron text-xs text-neutral-500 tracking-widest mb-1">FRONT ROW</p>
-        <div className="grid grid-cols-2 gap-2">
-          {frontRow.map(id => <HeroFormationCard key={id} heroId={id} {...cardProps} />)}
-        </div>
-      </div>
-
-      {/* Divider */}
-      <div className="border-t border-dashed border-neutral-700 my-2" />
-
-      {/* Back row — 3 cards side by side */}
+ {/* Back row — 3 cards side by side */}
       <div className="mb-3">
         <p className="font-orbitron text-xs text-neutral-500 tracking-widest mb-1">BACK ROW</p>
         <div className="grid grid-cols-3 gap-2">
           {backRow.map(id => <HeroFormationCard key={id} heroId={id} {...cardProps} />)}
         </div>
       </div>
-
-      <p className="font-orbitron text-xs text-neutral-600 tracking-widest text-center">▼ YOUR BASE ▼</p>
+      
+      {/* Divider */}
+      <div className="border-t border-dashed border-neutral-700 my-2" />
+{/* Front row — 2 cards side by side */}
+      <div className="mb-1">
+        <p className="font-orbitron text-xs text-neutral-500 tracking-widest mb-1">FRONT ROW</p>
+        <div className="grid grid-cols-2 gap-2">
+          {frontRow.map(id => <HeroFormationCard key={id} heroId={id} {...cardProps} />)}
+        </div>
+      </div>
+     
     </div>
   )
 }
