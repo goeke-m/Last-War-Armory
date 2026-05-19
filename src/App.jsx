@@ -9,7 +9,7 @@ const HEROES = {
   kimberly: { id: 'kimberly', name: 'Kimberly', rarity: 'UR', unitType: 'tank', role: 'dps', defaultRow: 'front', promotionSeason: null },
   dva:      { id: 'dva',      name: 'DVA',      rarity: 'UR', unitType: 'missile', role: 'dps', defaultRow: 'back', promotionSeason: null },
   williams: { id: 'williams', name: 'Williams', rarity: 'UR', unitType: 'tank', role: 'tank', defaultRow: 'front', promotionSeason: null },
-  murphy:   { id: 'murphy',   name: 'Murphy',   rarity: 'UR', unitType: 'tank', role: 'tank', defaultRow: 'back', promotionSeason: null },
+  murphy:   { id: 'murphy',   name: 'Murphy',   rarity: 'UR', unitType: 'tank', role: 'tank', defaultRow: 'front', promotionSeason: null },
   marshall: { id: 'marshall', name: 'Marshall', rarity: 'UR', unitType: 'tank', role: 'support', defaultRow: 'back', promotionSeason: null },
   tesla:    { id: 'tesla',    name: 'Tesla',    rarity: 'UR', unitType: 'missile', role: 'dps', defaultRow: 'back', promotionSeason: null },
   morrison: { id: 'morrison', name: 'Morrison', rarity: 'UR', unitType: 'aircraft', role: 'dps', defaultRow: 'back', promotionSeason: null },
@@ -23,7 +23,7 @@ const HEROES = {
   sarah:    { id: 'sarah',    name: 'Sarah',    rarity: 'SSR', unitType: 'aircraft', role: 'support', defaultRow: 'back', promotionSeason: null },
   lucius:   { id: 'lucius',   name: 'Lucius',   rarity: 'SSR', unitType: 'aircraft', role: 'tank', defaultRow: 'front', promotionSeason: null },
   carlie:   { id: 'carlie',   name: 'Carlie',   rarity: 'SSR', unitType: 'aircraft', role: 'tank', defaultRow: 'front', promotionSeason: null },
-  stetmann: { id: 'stetmann', name: 'Stetmann', rarity: 'SSR', unitType: 'tank', role: 'dps', defaultRow: 'front', promotionSeason: null },
+  stetmann: { id: 'stetmann', name: 'Stetmann', rarity: 'SSR', unitType: 'tank', role: 'dps', defaultRow: 'back', promotionSeason: null },
   mcgregor: { id: 'mcgregor', name: 'McGregor', rarity: 'SSR', unitType: 'missile', role: 'tank', defaultRow: 'front', promotionSeason: null },
   adam:     { id: 'adam',     name: 'Adam',     rarity: 'SSR', unitType: 'missile', role: 'tank', defaultRow: 'front', promotionSeason: null },
   swift:    { id: 'swift',    name: 'Swift',    rarity: 'SSR', unitType: 'missile', role: 'dps', defaultRow: 'back', promotionSeason: null },
@@ -47,6 +47,7 @@ const HERO_ORDER = [
 const SLOTS = ['gun', 'chip', 'armor', 'radar']
 const QUALITIES = ['legendary', 'epic', 'rare', 'common']
 const QUALITY_WEIGHTS = { legendary: 4, epic: 2, rare: 1, common: 0.5 }
+const QUALITY_MAX_LEVEL = { legendary: 40, epic: 30, rare: 15, common: 10 }
 const RARITY_WEIGHTS = { UR: 3, SSR: 2, SR: 1 }
 
 // Slot priority order by hero role for gear assignment
@@ -111,7 +112,8 @@ function heroScore(heroId, heroState, season, goal) {
 }
 
 function pieceScore(piece) {
-  return QUALITY_WEIGHTS[piece.quality] * (piece.level / 40) * (1 + piece.stars * 0.2)
+  const maxLevel = QUALITY_MAX_LEVEL[piece.quality] ?? 40
+  return QUALITY_WEIGHTS[piece.quality] * (piece.level / maxLevel) * (1 + piece.stars * 0.2)
 }
 
 // Returns { [heroId]: score } for all owned heroes
@@ -234,10 +236,13 @@ function maxEfficiencyUpgrades(assigned, heroScores) {
     const hScore = heroScores[heroId] ?? 1
     for (const [slot, piece] of Object.entries(slots)) {
       if (!piece) continue
-      if (piece.level < 40) {
+      const maxLevel = QUALITY_MAX_LEVEL[piece.quality] ?? 40
+      if (piece.level < maxLevel) {
         const next = piece.level + 1
-        const mult = (next === 10 || next === 20 || next === 30 || next === 40) ? 2 : 1
-        const reason = next === 40 ? 'Hits Lv 40 milestone' : next === 30 ? 'Hits Lv 30 milestone'
+        const isMilestone = next % 10 === 0 || next === maxLevel
+        const mult = isMilestone ? 2 : 1
+        const reason = next === maxLevel && next % 10 !== 0 ? `Hits quality max (Lv ${maxLevel})`
+          : next === 40 ? 'Hits Lv 40 milestone' : next === 30 ? 'Hits Lv 30 milestone'
           : next === 20 ? 'Hits Lv 20 milestone' : next === 10 ? 'Hits Lv 10 milestone' : 'Max efficiency'
         upgrades.push({ type: 'level', slot, heroId, from: piece.level, to: next, blueprintWarning: false, reason,
           score: pieceScore({ ...piece, level: next }) * mult * hScore })
@@ -901,6 +906,12 @@ function GearEditModal({ piece, onSave, onDelete, onClose }) {
   const [quality, setQuality] = useState(piece?.quality ?? 'legendary')
   const [level, setLevel] = useState(piece?.level ?? 0)
   const [stars, setStars] = useState(piece?.stars ?? 0)
+
+  // Clamp level when quality changes
+  const handleQualityChange = (q) => {
+    setQuality(q)
+    setLevel(l => Math.min(l, QUALITY_MAX_LEVEL[q]))
+  }
   const isNew = !piece?.id
 
   return (
@@ -927,7 +938,7 @@ function GearEditModal({ piece, onSave, onDelete, onClose }) {
           <p className="font-orbitron text-xs text-neutral-500 mb-1">QUALITY</p>
           <div className="flex gap-1">
             {QUALITIES.map(q => (
-              <button key={q} onClick={() => setQuality(q)}
+              <button key={q} onClick={() => handleQualityChange(q)}
                 className={`flex-1 py-2 font-orbitron text-xs border min-h-[40px] transition-colors
                   ${quality === q ? 'border-amber-600 text-amber-600 bg-amber-600/10' : 'border-neutral-700 text-neutral-500'}`}>
                 {q.slice(0,3).toUpperCase()}
@@ -938,8 +949,12 @@ function GearEditModal({ piece, onSave, onDelete, onClose }) {
 
         {/* Level */}
         <div>
-          <p className="font-orbitron text-xs text-neutral-500 mb-1">LEVEL: <span className="text-amber-600">{level}</span></p>
-          <input type="range" min="0" max="40" value={level} onChange={e => setLevel(Number(e.target.value))} className="w-full" />
+          <p className="font-orbitron text-xs text-neutral-500 mb-1">
+            LEVEL: <span className="text-amber-600">{level}</span>
+            <span className="text-neutral-600 ml-1">/ {QUALITY_MAX_LEVEL[quality]}</span>
+          </p>
+          <input type="range" min="0" max={QUALITY_MAX_LEVEL[quality]} value={Math.min(level, QUALITY_MAX_LEVEL[quality])}
+            onChange={e => setLevel(Number(e.target.value))} className="w-full" />
         </div>
 
         {/* Stars */}
