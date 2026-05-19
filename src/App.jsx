@@ -1490,6 +1490,72 @@ function GoalSelector({ state, dispatch, ownedIds }) {
   )
 }
 
+function HelpGuide() {
+  const Section = ({ title, children }) => (
+    <div className="mb-6">
+      <p className="font-orbitron text-amber-600 text-xs tracking-widest border-b border-dashed border-neutral-700 pb-1 mb-3">{title}</p>
+      <div className="space-y-2 font-rajdhani text-sm text-neutral-300">{children}</div>
+    </div>
+  )
+  const Row = ({ label, children }) => (
+    <div className="flex gap-2">
+      <span className="font-orbitron text-xs text-neutral-500 w-24 flex-none pt-0.5">{label}</span>
+      <span className="flex-1">{children}</span>
+    </div>
+  )
+
+  return (
+    <div className="p-4 max-w-lg pb-8">
+      <p className="font-orbitron text-amber-600 text-xs tracking-widest border-b border-dashed border-neutral-700 pb-2 mb-5">
+        // FIELD MANUAL
+      </p>
+
+      <Section title="// QUICK START">
+        <Row label="1. GOAL">Set your current season, optimization goal (PvP / World Boss / Code Battles), and squad intent (Mono or Hybrid).</Row>
+        <Row label="2. ROSTER">Tap any hero to mark them as owned. Tap again to expand and enter their stars, hero level, skill levels, and EW level.</Row>
+        <Row label="3. GEAR">Tap + ADD GEAR and enter each piece of gear you own. Select the color (Gold / Purple / Blue / Green) that matches the gear in-game.</Row>
+        <Row label="4. SQUAD">The optimizer picks your best 5 heroes and assigns your gear. Check the bottom panel for your loadout, upgrade list, and warnings.</Row>
+      </Section>
+
+      <Section title="// ROSTER">
+        <Row label="STARS">Each star unlocks a new skill. Starring up is usually more impactful than gear upgrades at low star counts.</Row>
+        <Row label="SKILLS">Skills unlock by star: SK1 at 1★, SK2 at 2★, SK3 at 3★, SK4 at 4★. The ★ highlight shows the highest-priority skill to upgrade first.</Row>
+        <Row label="EW LEVEL">Exclusive Weapon — only available to UR heroes and promoted SSRs. Every 3 EW levels raises the skill cap by 1 (base 30, max 40 at EW 30).</Row>
+        <Row label="HERO LEVEL">Affects march size (how many troops a hero leads). Leveling heroes directly increases damage output and survivability.</Row>
+      </Section>
+
+      <Section title="// GEAR">
+        <Row label="QUALITY">Match the color of your gear in-game — Gold (Legendary, max Lv40), Purple (Epic, max Lv30), Blue (Rare, max Lv15), Green (Common, max Lv10).</Row>
+        <Row label="STARS">Gear must be at max level before it can be starred. Selecting any star automatically sets the level to max. Blueprints required for 1–4★, Mythic Blueprints for 5★.</Row>
+        <Row label="NO HERO LOCK">Gear is never assigned to a specific hero. The optimizer re-solves the full assignment every time — just enter what you own.</Row>
+        <Row label="INVEST">Focus all investment on Legendary (Gold) gear. Dismantle Epic and below for crafting materials.</Row>
+      </Section>
+
+      <Section title="// SQUAD OPTIMIZER">
+        <Row label="FORMATION">Always 2 front row (tanks absorb damage), 3 back row (DPS and support deal damage from safety).</Row>
+        <Row label="MONO BONUS">All 5 heroes same unit type: +20% HP/ATK/DEF. 4 same: +15%. 3+2 split: +10%. 3 same: +5%.</Row>
+        <Row label="EW TYPE BUFF">Each hero with EW ≥ 20 grants +7.5% to all same-type squad members. Stack multiple EW 20+ heroes of the same type for compounding benefit.</Row>
+        <Row label="COUNTER">In PvP, set Opponent Type to apply the +20% counter damage bonus. Tanks beat Missiles, Missiles beat Aircraft, Aircraft beat Tanks.</Row>
+        <Row label="ALT HERO">Each hero slot shows the next-best swap and how many points you lose by using it.</Row>
+      </Section>
+
+      <Section title="// UPGRADE PRIORITY">
+        <Row label="MAX EFF">Scores every possible next upgrade globally. Best absolute return on resources. Milestone levels (10/20/30/40) and star breakpoints (2★/4★) are weighted 2×.</Row>
+        <Row label="ROLE">Flags misalignment between gear levels and hero role. DPS: Gun should lead. Tank: Armor should lead. Support: Radar should lead.</Row>
+        <Row label="W-LINK">Finds the weakest gear piece in the squad and prioritizes closing the gap to squad average before pushing any leader higher.</Row>
+        <Row label="BLUEPRINTS">Any star promotion shows a ⚠ Blueprint cost warning. Confirm you have the resources before spending — Blueprints are scarce.</Row>
+      </Section>
+
+      <Section title="// PROFILES & SHARING">
+        <Row label="PROFILES">Tap your profile name (top right) to create, rename, duplicate, or delete profiles. Data saves automatically to your browser.</Row>
+        <Row label="EXPORT">Tap EXPORT JSON to copy the current profile to your clipboard. Share it with alliance members so they can import it.</Row>
+        <Row label="IMPORT">Tap IMPORT JSON and paste a shared profile string to load it as a new profile on your device.</Row>
+        <Row label="BACKUP">To back up all profiles at once, open browser DevTools → Application → Local Storage → copy the value of <span className="font-mono text-xs text-amber-600">lastwar_optimizer_v1</span>.</Row>
+      </Section>
+    </div>
+  )
+}
+
 export default function App() {
   const [state, dispatch] = useReducer(reducer, null, buildInitialState)
 
@@ -1545,6 +1611,7 @@ export default function App() {
     gear:     <GearInventory state={state} dispatch={dispatch} />,
     squad:    <SquadOptimizer state={state} recommendedSquad={recommendedSquad} gearAssignment={gearAssignment} heroScores={heroScores} />,
     upgrades: <UpgradePriority state={state} dispatch={dispatch} upgradePriority={upgradePriority} />,
+    help:     <HelpGuide />,
   }
 
   return (
@@ -1565,6 +1632,7 @@ export default function App() {
             { key: 'gear',     icon: '⚙️', label: 'GEAR'     },
             { key: 'squad',    icon: '📊', label: 'SQUAD'    },
             { key: 'upgrades', icon: '📈', label: 'UPGRADES' },
+            { key: 'help',     icon: '❓', label: 'HELP'     },
           ].map(({ key, icon, label }) => (
             <button
               key={key}
