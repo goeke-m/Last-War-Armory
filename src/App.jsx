@@ -116,9 +116,10 @@ const HERO_SKILL_WEIGHTS = {
 
 // Skill names that change when an SSR hero promotes to UR — overrides HERO_SKILLS when promoted
 const HERO_SKILLS_PROMOTED = {
+  mason:    ['Rampage Shot',     'Zombie Cleaner',     'Firepower Overload', 'Super Sensing'],
   violet:   ['Frost Spray',      'Ice Armor',          'Chill Corrosion',    'Frost Buff'],
+  scarlett: ['Inferno Strike',   'Armored Shell',      'Flame Barrier',      'Super Sensing'],
   venom:    ['Corrosive Shot',   'Promotion Synergy',  'Corrosive Barrage',  'Super Sensing'],
-  // Mason and Scarlett keep the same skill names post-promotion
 }
 
 // Skill priority weights that change post-promotion — overrides HERO_SKILL_WEIGHTS when promoted
