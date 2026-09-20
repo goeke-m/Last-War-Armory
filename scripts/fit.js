@@ -1,15 +1,11 @@
 import { nnls } from './nnls.js'
 import { STAT_KEYS } from '../src/gear/power.js'
 
-export function buildDesign(lineups, getStats, border) {
+export function buildDesign(lineups, getStats) {
   const rows = [], y = [], ids = [], dropped = []
   for (const l of lineups) {
     if (l.pieces.length !== 20) throw new Error(`lineup ${l.id}: expected 20 pieces, got ${l.pieces.length}`)
     if (!(l.power > 0)) throw new Error(`lineup ${l.id}: power must be a positive number`)
-    if (l.pieces.some(p => p.border !== border)) {
-      dropped.push({ id: l.id, reason: `has a piece whose border is not "${border}"` })
-      continue
-    }
     const sum = Object.fromEntries(STAT_KEYS.map(k => [k, 0]))
     let missing = null
     for (const p of l.pieces) {

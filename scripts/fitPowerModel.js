@@ -2,18 +2,11 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { buildDesign, fitPowerModel } from './fit.js'
 import { piecePower } from '../src/gear/power.js'
 
-const flag = process.argv.indexOf('--border')
-const border = flag > -1 ? process.argv[flag + 1] : null
-if (!border) {
-  console.error('Usage: node scripts/fitPowerModel.js --border <color>   (the gear border color the CSV stats were measured on)')
-  process.exit(2)
-}
-
 const GEAR = JSON.parse(readFileSync('src/data/gearStats.json', 'utf8'))
 const getStats = (slot, level, stars) => GEAR[slot]?.[`${level}:${stars}`] ?? null
 const lineups = JSON.parse(readFileSync('data/raw/battleReports.json', 'utf8'))
 
-const design = buildDesign(lineups, getStats, border)
+const design = buildDesign(lineups, getStats)
 console.log(`${lineups.length} lineups transcribed, ${design.ids.length} usable.`)
 for (const d of design.dropped) console.log(`  dropped ${d.id}: ${d.reason}`)
 
@@ -29,7 +22,7 @@ if (!fit.ok) {
 const model = {
   weights: fit.weights,
   merged: fit.merged,
-  fit: { border, lineups: design.ids.length, maxResidualPct: fit.maxResidualPct, rmsResidualPct: fit.rmsResidualPct },
+  fit: { lineups: design.ids.length, maxResidualPct: fit.maxResidualPct, rmsResidualPct: fit.rmsResidualPct },
 }
 writeFileSync('src/data/powerModel.json', JSON.stringify(model, null, 1) + '\n')
 console.log(`Wrote src/data/powerModel.json (max residual ${(fit.maxResidualPct * 100).toFixed(2)}%).`)
