@@ -1,0 +1,1486 @@
+[
+ {
+  "id": "attack1-left",
+  "power": 6400000,
+  "pieces": [
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 3
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 2
+   }
+  ]
+ },
+ {
+  "id": "attack1-right",
+  "power": 6400000,
+  "pieces": [
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 2
+   }
+  ]
+ },
+ {
+  "id": "attack2-left",
+  "power": 2900000,
+  "pieces": [
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 0
+   }
+  ]
+ },
+ {
+  "id": "attack2-right",
+  "power": 6400000,
+  "pieces": [
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 2
+   }
+  ]
+ },
+ {
+  "id": "attack3-left",
+  "power": 2900000,
+  "pieces": [
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 0
+   }
+  ]
+ },
+ {
+  "id": "attack3-right",
+  "power": 5100000,
+  "pieces": [
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 1
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 3
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 1
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 1
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 1
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 1
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 1
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 1
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 1
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 1
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 1
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   }
+  ]
+ },
+ {
+  "id": "attack4-left",
+  "power": 2900000,
+  "pieces": [
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 0
+   }
+  ]
+ },
+ {
+  "id": "attack4-right",
+  "power": 2000000,
+  "pieces": [
+   {
+    "slot": "radar",
+    "level": 30,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 10,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 30,
+    "stars": 0
+   },
+   {
+    "slot": "gun",
+    "level": 10,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 30,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 10,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 30,
+    "stars": 0
+   },
+   {
+    "slot": "gun",
+    "level": 10,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "radar",
+    "level": 10,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 10,
+    "stars": 0
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 10,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 10,
+    "stars": 0
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   }
+  ]
+ },
+ {
+  "id": "defense1-left",
+  "power": 5900000,
+  "pieces": [
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 3
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 0
+   }
+  ]
+ },
+ {
+  "id": "defense1-right",
+  "power": 6400000,
+  "pieces": [
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 3
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 2
+   }
+  ]
+ },
+ {
+  "id": "defense2-left",
+  "power": 8400000,
+  "pieces": [
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   }
+  ]
+ },
+ {
+  "id": "defense2-right",
+  "power": 6400000,
+  "pieces": [
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 3
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 2
+   }
+  ]
+ },
+ {
+  "id": "defense3-left",
+  "power": 8100000,
+  "pieces": [
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 1
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   }
+  ]
+ },
+ {
+  "id": "defense3-right",
+  "power": 6400000,
+  "pieces": [
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 3
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 5
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 4
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "radar",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "chip",
+    "level": 40,
+    "stars": 0
+   },
+   {
+    "slot": "armor",
+    "level": 40,
+    "stars": 2
+   },
+   {
+    "slot": "gun",
+    "level": 40,
+    "stars": 2
+   }
+  ]
+ }
+]
