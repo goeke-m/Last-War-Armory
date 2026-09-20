@@ -1,0 +1,1127 @@
+{
+ "armor": {
+  "0:0": {
+   "heroDefense": 59,
+   "heroHp": 31355,
+   "boostHp": 0.025,
+   "boostDefense": 0.025
+  },
+  "1:0": {
+   "heroDefense": 62,
+   "heroHp": 32922,
+   "boostHp": 0.0262,
+   "boostDefense": 0.0262
+  },
+  "2:0": {
+   "heroDefense": 65,
+   "heroHp": 34490,
+   "boostHp": 0.0275,
+   "boostDefense": 0.0275
+  },
+  "3:0": {
+   "heroDefense": 68,
+   "heroHp": 36058,
+   "boostHp": 0.0288,
+   "boostDefense": 0.0288
+  },
+  "4:0": {
+   "heroDefense": 71,
+   "heroHp": 37626,
+   "boostHp": 0.03,
+   "boostDefense": 0.03
+  },
+  "5:0": {
+   "heroDefense": 74,
+   "heroHp": 39193,
+   "boostHp": 0.0312,
+   "boostDefense": 0.0312
+  },
+  "6:0": {
+   "heroDefense": 77,
+   "heroHp": 40761,
+   "boostHp": 0.0325,
+   "boostDefense": 0.0325
+  },
+  "7:0": {
+   "heroDefense": 80,
+   "heroHp": 42329,
+   "boostHp": 0.0338,
+   "boostDefense": 0.0338
+  },
+  "8:0": {
+   "heroDefense": 83,
+   "heroHp": 43897,
+   "boostHp": 0.035,
+   "boostDefense": 0.035
+  },
+  "9:0": {
+   "heroDefense": 86,
+   "heroHp": 45465,
+   "boostHp": 0.0362,
+   "boostDefense": 0.0362
+  },
+  "10:0": {
+   "heroDefense": 89,
+   "heroHp": 68032,
+   "boostHp": 0.0375,
+   "boostDefense": 0.0375
+  },
+  "11:0": {
+   "heroDefense": 92,
+   "heroHp": 69600,
+   "boostHp": 0.0388,
+   "boostDefense": 0.0388
+  },
+  "12:0": {
+   "heroDefense": 95,
+   "heroHp": 71168,
+   "boostHp": 0.04,
+   "boostDefense": 0.04
+  },
+  "13:0": {
+   "heroDefense": 98,
+   "heroHp": 72736,
+   "boostHp": 0.0412,
+   "boostDefense": 0.0412
+  },
+  "14:0": {
+   "heroDefense": 101,
+   "heroHp": 74304,
+   "boostHp": 0.0425,
+   "boostDefense": 0.0425
+  },
+  "15:0": {
+   "heroDefense": 104,
+   "heroHp": 75871,
+   "boostHp": 0.0438,
+   "boostDefense": 0.0438
+  },
+  "16:0": {
+   "heroDefense": 107,
+   "heroHp": 77439,
+   "boostHp": 0.045,
+   "boostDefense": 0.045
+  },
+  "17:0": {
+   "heroDefense": 110,
+   "heroHp": 79007,
+   "boostHp": 0.0462,
+   "boostDefense": 0.0462
+  },
+  "18:0": {
+   "heroDefense": 113,
+   "heroHp": 80574,
+   "boostHp": 0.0475,
+   "boostDefense": 0.0475
+  },
+  "19:0": {
+   "heroDefense": 116,
+   "heroHp": 82142,
+   "boostHp": 0.0488,
+   "boostDefense": 0.0488
+  },
+  "20:0": {
+   "heroDefense": 119,
+   "heroHp": 83710,
+   "boostHp": 0.05,
+   "boostDefense": 0.05,
+   "resistPhysical": 0.1
+  },
+  "21:0": {
+   "heroDefense": 122,
+   "heroHp": 85278,
+   "boostHp": 0.0512,
+   "boostDefense": 0.0512,
+   "resistPhysical": 0.1
+  },
+  "22:0": {
+   "heroDefense": 125,
+   "heroHp": 86846,
+   "boostHp": 0.0525,
+   "boostDefense": 0.0525,
+   "resistPhysical": 0.1
+  },
+  "23:0": {
+   "heroDefense": 128,
+   "heroHp": 88413,
+   "boostHp": 0.0538,
+   "boostDefense": 0.0538,
+   "resistPhysical": 0.1
+  },
+  "24:0": {
+   "heroDefense": 131,
+   "heroHp": 89981,
+   "boostHp": 0.055,
+   "boostDefense": 0.055,
+   "resistPhysical": 0.1
+  },
+  "25:0": {
+   "heroDefense": 134,
+   "heroHp": 91549,
+   "boostHp": 0.0562,
+   "boostDefense": 0.0562,
+   "resistPhysical": 0.1
+  },
+  "26:0": {
+   "heroDefense": 137,
+   "heroHp": 93116,
+   "boostHp": 0.0575,
+   "boostDefense": 0.0575,
+   "resistPhysical": 0.1
+  },
+  "27:0": {
+   "heroDefense": 140,
+   "heroHp": 94684,
+   "boostHp": 0.0588,
+   "boostDefense": 0.0588,
+   "resistPhysical": 0.1
+  },
+  "28:0": {
+   "heroDefense": 143,
+   "heroHp": 96252,
+   "boostHp": 0.06,
+   "boostDefense": 0.06,
+   "resistPhysical": 0.1
+  },
+  "29:0": {
+   "heroDefense": 146,
+   "heroHp": 97820,
+   "boostHp": 0.0612,
+   "boostDefense": 0.0612,
+   "resistPhysical": 0.1
+  },
+  "30:0": {
+   "heroDefense": 149,
+   "heroHp": 120388,
+   "boostHp": 0.0625,
+   "boostDefense": 0.0625,
+   "resistPhysical": 0.1
+  },
+  "31:0": {
+   "heroDefense": 152,
+   "heroHp": 121955,
+   "boostHp": 0.0638,
+   "boostDefense": 0.0638,
+   "resistPhysical": 0.1
+  },
+  "32:0": {
+   "heroDefense": 155,
+   "heroHp": 123523,
+   "boostHp": 0.065,
+   "boostDefense": 0.065,
+   "resistPhysical": 0.1
+  },
+  "33:0": {
+   "heroDefense": 158,
+   "heroHp": 125091,
+   "boostHp": 0.0662,
+   "boostDefense": 0.0662,
+   "resistPhysical": 0.1
+  },
+  "34:0": {
+   "heroDefense": 161,
+   "heroHp": 126658,
+   "boostHp": 0.0675,
+   "boostDefense": 0.0675,
+   "resistPhysical": 0.1
+  },
+  "35:0": {
+   "heroDefense": 164,
+   "heroHp": 128226,
+   "boostHp": 0.0688,
+   "boostDefense": 0.0688,
+   "resistPhysical": 0.1
+  },
+  "36:0": {
+   "heroDefense": 167,
+   "heroHp": 129794,
+   "boostHp": 0.07,
+   "boostDefense": 0.07,
+   "resistPhysical": 0.1
+  },
+  "37:0": {
+   "heroDefense": 170,
+   "heroHp": 131362,
+   "boostHp": 0.0712,
+   "boostDefense": 0.0712,
+   "resistPhysical": 0.1
+  },
+  "38:0": {
+   "heroDefense": 173,
+   "heroHp": 132930,
+   "boostHp": 0.0725,
+   "boostDefense": 0.0725,
+   "resistPhysical": 0.1
+  },
+  "39:0": {
+   "heroDefense": 176,
+   "heroHp": 134497,
+   "boostHp": 0.0738,
+   "boostDefense": 0.0738,
+   "resistPhysical": 0.1
+  },
+  "40:0": {
+   "heroDefense": 179,
+   "heroHp": 136065,
+   "boostHp": 0.075,
+   "boostDefense": 0.075,
+   "resistPhysical": 0.2
+  },
+  "40:2": {
+   "heroDefense": 412,
+   "heroHp": 300531,
+   "boostHp": 0.115,
+   "boostDefense": 0.115,
+   "resistPhysical": 0.3
+  },
+  "40:3": {
+   "heroDefense": 529,
+   "heroHp": 319719,
+   "boostHp": 0.12,
+   "boostDefense": 0.12,
+   "resistPhysical": 0.3
+  },
+  "40:4": {
+   "heroDefense": 669,
+   "heroHp": 477413,
+   "boostHp": 0.145,
+   "boostDefense": 0.145,
+   "resistPhysical": 0.4
+  },
+  "40:5": {
+   "heroDefense": 716,
+   "heroHp": 502245,
+   "boostHp": 0.15,
+   "boostDefense": 0.15,
+   "resistPhysical": 0.4
+  }
+ },
+ "chip": {
+  "0:0": {
+   "heroAttack": 597,
+   "heroHp": 12542,
+   "boostAttack": 0.025,
+   "resistAll": 0.02
+  },
+  "1:0": {
+   "heroAttack": 627,
+   "heroHp": 13169,
+   "boostAttack": 0.0262,
+   "resistAll": 0.021
+  },
+  "2:0": {
+   "heroAttack": 656,
+   "heroHp": 13796,
+   "boostAttack": 0.0275,
+   "resistAll": 0.022
+  },
+  "3:0": {
+   "heroAttack": 686,
+   "heroHp": 14423,
+   "boostAttack": 0.0288,
+   "resistAll": 0.023
+  },
+  "4:0": {
+   "heroAttack": 716,
+   "heroHp": 15050,
+   "boostAttack": 0.03,
+   "resistAll": 0.024
+  },
+  "5:0": {
+   "heroAttack": 746,
+   "heroHp": 15677,
+   "boostAttack": 0.0312,
+   "resistAll": 0.025
+  },
+  "6:0": {
+   "heroAttack": 776,
+   "heroHp": 16304,
+   "boostAttack": 0.0325,
+   "resistAll": 0.026
+  },
+  "7:0": {
+   "heroAttack": 806,
+   "heroHp": 16931,
+   "boostAttack": 0.0338,
+   "resistAll": 0.027
+  },
+  "8:0": {
+   "heroAttack": 836,
+   "heroHp": 17558,
+   "boostAttack": 0.035,
+   "resistAll": 0.028
+  },
+  "9:0": {
+   "heroAttack": 866,
+   "heroHp": 18186,
+   "boostAttack": 0.0362,
+   "resistAll": 0.029
+  },
+  "10:0": {
+   "heroAttack": 1145,
+   "heroHp": 18813,
+   "boostAttack": 0.0375,
+   "resistAll": 0.03
+  },
+  "11:0": {
+   "heroAttack": 1175,
+   "heroHp": 19440,
+   "boostAttack": 0.0388,
+   "resistAll": 0.031
+  },
+  "12:0": {
+   "heroAttack": 1205,
+   "heroHp": 20067,
+   "boostAttack": 0.04,
+   "resistAll": 0.032
+  },
+  "13:0": {
+   "heroAttack": 1235,
+   "heroHp": 20694,
+   "boostAttack": 0.0412,
+   "resistAll": 0.033
+  },
+  "14:0": {
+   "heroAttack": 1265,
+   "heroHp": 21321,
+   "boostAttack": 0.0425,
+   "resistAll": 0.034
+  },
+  "15:0": {
+   "heroAttack": 1295,
+   "heroHp": 21948,
+   "boostAttack": 0.0438,
+   "resistAll": 0.035
+  },
+  "16:0": {
+   "heroAttack": 1325,
+   "heroHp": 22575,
+   "boostAttack": 0.045,
+   "resistAll": 0.036
+  },
+  "17:0": {
+   "heroAttack": 1354,
+   "heroHp": 23202,
+   "boostAttack": 0.0462,
+   "resistAll": 0.037
+  },
+  "18:0": {
+   "heroAttack": 1384,
+   "heroHp": 23830,
+   "boostAttack": 0.0475,
+   "resistAll": 0.038
+  },
+  "19:0": {
+   "heroAttack": 1414,
+   "heroHp": 24457,
+   "boostAttack": 0.0488,
+   "resistAll": 0.039
+  },
+  "20:0": {
+   "heroAttack": 1444,
+   "heroHp": 25084,
+   "boostAttack": 0.05,
+   "resistAll": 0.06
+  },
+  "21:0": {
+   "heroAttack": 1474,
+   "heroHp": 25711,
+   "boostAttack": 0.0512,
+   "resistAll": 0.061
+  },
+  "22:0": {
+   "heroAttack": 1504,
+   "heroHp": 26338,
+   "boostAttack": 0.0525,
+   "resistAll": 0.062
+  },
+  "23:0": {
+   "heroAttack": 1534,
+   "heroHp": 26965,
+   "boostAttack": 0.0538,
+   "resistAll": 0.063
+  },
+  "24:0": {
+   "heroAttack": 1563,
+   "heroHp": 27592,
+   "boostAttack": 0.055,
+   "resistAll": 0.064
+  },
+  "25:0": {
+   "heroAttack": 1593,
+   "heroHp": 28219,
+   "boostAttack": 0.0562,
+   "resistAll": 0.065
+  },
+  "26:0": {
+   "heroAttack": 1623,
+   "heroHp": 28846,
+   "boostAttack": 0.0575,
+   "resistAll": 0.066
+  },
+  "27:0": {
+   "heroAttack": 1653,
+   "heroHp": 29474,
+   "boostAttack": 0.0588,
+   "resistAll": 0.067
+  },
+  "28:0": {
+   "heroAttack": 1683,
+   "heroHp": 30101,
+   "boostAttack": 0.06,
+   "resistAll": 0.068
+  },
+  "29:0": {
+   "heroAttack": 1707,
+   "heroHp": 30728,
+   "boostAttack": 0.0612,
+   "resistAll": 0.069
+  },
+  "30:0": {
+   "heroAttack": 1993,
+   "heroHp": 31355,
+   "boostAttack": 0.0625,
+   "resistAll": 0.07
+  },
+  "31:0": {
+   "heroAttack": 2022,
+   "heroHp": 31982,
+   "boostAttack": 0.0638,
+   "resistAll": 0.071
+  },
+  "32:0": {
+   "heroAttack": 2052,
+   "heroHp": 32609,
+   "boostAttack": 0.065,
+   "resistAll": 0.072
+  },
+  "33:0": {
+   "heroAttack": 2082,
+   "heroHp": 33236,
+   "boostAttack": 0.0662,
+   "resistAll": 0.073
+  },
+  "34:0": {
+   "heroAttack": 2112,
+   "heroHp": 33863,
+   "boostAttack": 0.0675,
+   "resistAll": 0.074
+  },
+  "35:0": {
+   "heroAttack": 2142,
+   "heroHp": 34490,
+   "boostAttack": 0.0688,
+   "resistAll": 0.075
+  },
+  "36:0": {
+   "heroAttack": 2172,
+   "heroHp": 35118,
+   "boostAttack": 0.07,
+   "resistAll": 0.076
+  },
+  "37:0": {
+   "heroAttack": 2201,
+   "heroHp": 35745,
+   "boostAttack": 0.0712,
+   "resistAll": 0.077
+  },
+  "38:0": {
+   "heroAttack": 2231,
+   "heroHp": 36372,
+   "boostAttack": 0.0725,
+   "resistAll": 0.078
+  },
+  "39:0": {
+   "heroAttack": 2261,
+   "heroHp": 36999,
+   "boostAttack": 0.0738,
+   "resistAll": 0.079
+  },
+  "40:0": {
+   "heroAttack": 2291,
+   "heroHp": 37626,
+   "boostAttack": 0.075,
+   "resistAll": 0.1
+  },
+  "40:2": {
+   "heroAttack": 5125,
+   "heroHp": 86612,
+   "boostAttack": 0.115,
+   "resistAll": 0.152
+  },
+  "40:3": {
+   "heroAttack": 6828,
+   "heroHp": 111895,
+   "boostAttack": 0.13,
+   "resistAll": 0.164
+  },
+  "40:4": {
+   "heroAttack": 8193,
+   "heroHp": 140565,
+   "boostAttack": 0.145,
+   "resistAll": 0.196
+  },
+  "40:5": {
+   "heroAttack": 8666,
+   "heroHp": 150498,
+   "boostAttack": 0.15,
+   "resistAll": 0.2
+  }
+ },
+ "radar": {
+  "0:0": {
+   "heroDefense": 119,
+   "heroHp": 18813,
+   "boostHp": 0.025,
+   "boostDefense": 0.025
+  },
+  "1:0": {
+   "heroDefense": 125,
+   "heroHp": 19754,
+   "boostHp": 0.0262,
+   "boostDefense": 0.0262
+  },
+  "2:0": {
+   "heroDefense": 131,
+   "heroHp": 20694,
+   "boostHp": 0.0275,
+   "boostDefense": 0.0275
+  },
+  "3:0": {
+   "heroDefense": 137,
+   "heroHp": 21635,
+   "boostHp": 0.0288,
+   "boostDefense": 0.0288
+  },
+  "4:0": {
+   "heroDefense": 143,
+   "heroHp": 22576,
+   "boostHp": 0.03,
+   "boostDefense": 0.03
+  },
+  "5:0": {
+   "heroDefense": 149,
+   "heroHp": 23516,
+   "boostHp": 0.0312,
+   "boostDefense": 0.0312
+  },
+  "6:0": {
+   "heroDefense": 155,
+   "heroHp": 24457,
+   "boostHp": 0.0325,
+   "boostDefense": 0.0325
+  },
+  "7:0": {
+   "heroDefense": 161,
+   "heroHp": 25398,
+   "boostHp": 0.0338,
+   "boostDefense": 0.0338
+  },
+  "8:0": {
+   "heroDefense": 167,
+   "heroHp": 26338,
+   "boostHp": 0.035,
+   "boostDefense": 0.035
+  },
+  "9:0": {
+   "heroDefense": 173,
+   "heroHp": 27279,
+   "boostHp": 0.0362,
+   "boostDefense": 0.0362
+  },
+  "10:0": {
+   "heroDefense": 279,
+   "heroHp": 28220,
+   "boostHp": 0.0375,
+   "boostDefense": 0.0375
+  },
+  "11:0": {
+   "heroDefense": 285,
+   "heroHp": 29160,
+   "boostHp": 0.0388,
+   "boostDefense": 0.0388
+  },
+  "12:0": {
+   "heroDefense": 291,
+   "heroHp": 30101,
+   "boostHp": 0.04,
+   "boostDefense": 0.04
+  },
+  "13:0": {
+   "heroDefense": 297,
+   "heroHp": 31041,
+   "boostHp": 0.0412,
+   "boostDefense": 0.0412
+  },
+  "14:0": {
+   "heroDefense": 303,
+   "heroHp": 31982,
+   "boostHp": 0.0425,
+   "boostDefense": 0.0425
+  },
+  "15:0": {
+   "heroDefense": 309,
+   "heroHp": 32923,
+   "boostHp": 0.0438,
+   "boostDefense": 0.0438
+  },
+  "16:0": {
+   "heroDefense": 315,
+   "heroHp": 33863,
+   "boostHp": 0.045,
+   "boostDefense": 0.045
+  },
+  "17:0": {
+   "heroDefense": 321,
+   "heroHp": 34804,
+   "boostHp": 0.0462,
+   "boostDefense": 0.0462
+  },
+  "18:0": {
+   "heroDefense": 327,
+   "heroHp": 35745,
+   "boostHp": 0.0475,
+   "boostDefense": 0.0475
+  },
+  "19:0": {
+   "heroDefense": 333,
+   "heroHp": 36685,
+   "boostHp": 0.0488,
+   "boostDefense": 0.0488
+  },
+  "20:0": {
+   "heroDefense": 339,
+   "heroHp": 37626,
+   "boostHp": 0.05,
+   "boostDefense": 0.05,
+   "resistEnergy": 0.1
+  },
+  "21:0": {
+   "heroDefense": 345,
+   "heroHp": 38567,
+   "boostHp": 0.0512,
+   "boostDefense": 0.0512,
+   "resistEnergy": 0.1
+  },
+  "22:0": {
+   "heroDefense": 351,
+   "heroHp": 39507,
+   "boostHp": 0.0525,
+   "boostDefense": 0.0525,
+   "resistEnergy": 0.1
+  },
+  "23:0": {
+   "heroDefense": 357,
+   "heroHp": 40448,
+   "boostHp": 0.0538,
+   "boostDefense": 0.0538,
+   "resistEnergy": 0.1
+  },
+  "24:0": {
+   "heroDefense": 363,
+   "heroHp": 41389,
+   "boostHp": 0.055,
+   "boostDefense": 0.055,
+   "resistEnergy": 0.1
+  },
+  "25:0": {
+   "heroDefense": 369,
+   "heroHp": 42329,
+   "boostHp": 0.0562,
+   "boostDefense": 0.0562,
+   "resistEnergy": 0.1
+  },
+  "26:0": {
+   "heroDefense": 375,
+   "heroHp": 43270,
+   "boostHp": 0.0575,
+   "boostDefense": 0.0575,
+   "resistEnergy": 0.1
+  },
+  "27:0": {
+   "heroDefense": 381,
+   "heroHp": 44211,
+   "boostHp": 0.0588,
+   "boostDefense": 0.0588,
+   "resistEnergy": 0.1
+  },
+  "28:0": {
+   "heroDefense": 387,
+   "heroHp": 45151,
+   "boostHp": 0.06,
+   "boostDefense": 0.06,
+   "resistEnergy": 0.1
+  },
+  "29:0": {
+   "heroDefense": 393,
+   "heroHp": 46092,
+   "boostHp": 0.0612,
+   "boostDefense": 0.0612,
+   "resistEnergy": 0.1
+  },
+  "30:0": {
+   "heroDefense": 499,
+   "heroHp": 47032,
+   "boostHp": 0.0625,
+   "boostDefense": 0.0625,
+   "resistEnergy": 0.1
+  },
+  "31:0": {
+   "heroDefense": 505,
+   "heroHp": 47973,
+   "boostHp": 0.0638,
+   "boostDefense": 0.0638,
+   "resistEnergy": 0.1
+  },
+  "32:0": {
+   "heroDefense": 511,
+   "heroHp": 48914,
+   "boostHp": 0.065,
+   "boostDefense": 0.065,
+   "resistEnergy": 0.1
+  },
+  "33:0": {
+   "heroDefense": 517,
+   "heroHp": 49854,
+   "boostHp": 0.0662,
+   "boostDefense": 0.0662,
+   "resistEnergy": 0.1
+  },
+  "34:0": {
+   "heroDefense": 523,
+   "heroHp": 50795,
+   "boostHp": 0.0675,
+   "boostDefense": 0.0675,
+   "resistEnergy": 0.1
+  },
+  "35:0": {
+   "heroDefense": 529,
+   "heroHp": 51736,
+   "boostHp": 0.0688,
+   "boostDefense": 0.0688,
+   "resistEnergy": 0.1
+  },
+  "36:0": {
+   "heroDefense": 535,
+   "heroHp": 52676,
+   "boostHp": 0.07,
+   "boostDefense": 0.07,
+   "resistEnergy": 0.1
+  },
+  "37:0": {
+   "heroDefense": 541,
+   "heroHp": 53617,
+   "boostHp": 0.0712,
+   "boostDefense": 0.0712,
+   "resistEnergy": 0.1
+  },
+  "38:0": {
+   "heroDefense": 547,
+   "heroHp": 54558,
+   "boostHp": 0.0725,
+   "boostDefense": 0.0725,
+   "resistEnergy": 0.1
+  },
+  "39:0": {
+   "heroDefense": 553,
+   "heroHp": 55498,
+   "boostHp": 0.0738,
+   "boostDefense": 0.0738,
+   "resistEnergy": 0.1
+  },
+  "40:0": {
+   "heroDefense": 559,
+   "heroHp": 56439,
+   "boostHp": 0.075,
+   "boostDefense": 0.075,
+   "resistEnergy": 0.2
+  },
+  "40:2": {
+   "heroDefense": 1224,
+   "heroHp": 129918,
+   "boostHp": 0.115,
+   "boostDefense": 0.115,
+   "resistEnergy": 0.3
+  },
+  "40:5": {
+   "heroDefense": 2033,
+   "heroHp": 225747,
+   "boostAttack": 0.15,
+   "boostDefense": 0.15,
+   "resistEnergy": 0.4
+  }
+ },
+ "gun": {
+  "0:0": {
+   "heroAttack": 895,
+   "critRate": 0.05,
+   "heroDefense": 119,
+   "boostAttack": 0.025
+  },
+  "1:0": {
+   "heroAttack": 940,
+   "critRate": 0.0525,
+   "heroDefense": 125,
+   "boostAttack": 0.0262
+  },
+  "2:0": {
+   "heroAttack": 985,
+   "critRate": 0.055,
+   "heroDefense": 131,
+   "boostAttack": 0.0275
+  },
+  "3:0": {
+   "heroAttack": 1030,
+   "critRate": 0.0575,
+   "heroDefense": 137,
+   "boostAttack": 0.0288
+  },
+  "4:0": {
+   "heroAttack": 1075,
+   "critRate": 0.06,
+   "heroDefense": 143,
+   "boostAttack": 0.03
+  },
+  "5:0": {
+   "heroAttack": 1119,
+   "critRate": 0.0625,
+   "heroDefense": 149,
+   "boostAttack": 0.0312
+  },
+  "6:0": {
+   "heroAttack": 1164,
+   "critRate": 0.065,
+   "heroDefense": 155,
+   "boostAttack": 0.0325
+  },
+  "7:0": {
+   "heroAttack": 1209,
+   "critRate": 0.0675,
+   "heroDefense": 161,
+   "boostAttack": 0.0338
+  },
+  "8:0": {
+   "heroAttack": 1254,
+   "critRate": 0.07,
+   "heroDefense": 167,
+   "boostAttack": 0.035
+  },
+  "9:0": {
+   "heroAttack": 1299,
+   "critRate": 0.0725,
+   "heroDefense": 173,
+   "boostAttack": 0.0362
+  },
+  "10:0": {
+   "heroAttack": 1593,
+   "critRate": 0.075,
+   "heroDefense": 179,
+   "boostAttack": 0.0375
+  },
+  "11:0": {
+   "heroAttack": 1638,
+   "critRate": 0.0775,
+   "heroDefense": 185,
+   "boostAttack": 0.0388
+  },
+  "12:0": {
+   "heroAttack": 1683,
+   "critRate": 0.08,
+   "heroDefense": 191,
+   "boostAttack": 0.04
+  },
+  "13:0": {
+   "heroAttack": 1728,
+   "critRate": 0.0825,
+   "heroDefense": 197,
+   "boostAttack": 0.0412
+  },
+  "14:0": {
+   "heroAttack": 1773,
+   "critRate": 0.085,
+   "heroDefense": 203,
+   "boostAttack": 0.0425
+  },
+  "15:0": {
+   "heroAttack": 1817,
+   "critRate": 0.0875,
+   "heroDefense": 209,
+   "boostAttack": 0.0438
+  },
+  "16:0": {
+   "heroAttack": 1862,
+   "critRate": 0.09,
+   "heroDefense": 215,
+   "boostAttack": 0.045
+  },
+  "17:0": {
+   "heroAttack": 1907,
+   "critRate": 0.0925,
+   "heroDefense": 221,
+   "boostAttack": 0.0462
+  },
+  "18:0": {
+   "heroAttack": 1952,
+   "critRate": 0.095,
+   "heroDefense": 227,
+   "boostAttack": 0.0475
+  },
+  "19:0": {
+   "heroAttack": 1997,
+   "critRate": 0.0975,
+   "heroDefense": 233,
+   "boostAttack": 0.0488
+  },
+  "20:0": {
+   "heroAttack": 2041,
+   "critRate": 0.125,
+   "heroDefense": 239,
+   "boostAttack": 0.05
+  },
+  "21:0": {
+   "heroAttack": 2086,
+   "critRate": 0.1275,
+   "heroDefense": 245,
+   "boostAttack": 0.0512
+  },
+  "22:0": {
+   "heroAttack": 2131,
+   "critRate": 0.13,
+   "heroDefense": 251,
+   "boostAttack": 0.0525
+  },
+  "23:0": {
+   "heroAttack": 2176,
+   "critRate": 0.1325,
+   "heroDefense": 257,
+   "boostAttack": 0.0538
+  },
+  "24:0": {
+   "heroAttack": 2221,
+   "critRate": 0.135,
+   "heroDefense": 263,
+   "boostAttack": 0.055
+  },
+  "25:0": {
+   "heroAttack": 2265,
+   "critRate": 0.1375,
+   "heroDefense": 269,
+   "boostAttack": 0.0562
+  },
+  "26:0": {
+   "heroAttack": 2310,
+   "critRate": 0.14,
+   "heroDefense": 275,
+   "boostAttack": 0.0575
+  },
+  "27:0": {
+   "heroAttack": 2355,
+   "critRate": 0.1425,
+   "heroDefense": 281,
+   "boostAttack": 0.0588
+  },
+  "28:0": {
+   "heroAttack": 2400,
+   "critRate": 0.145,
+   "heroDefense": 287,
+   "boostAttack": 0.06
+  },
+  "29:0": {
+   "heroAttack": 2445,
+   "critRate": 0.1475,
+   "heroDefense": 293,
+   "boostAttack": 0.0612
+  },
+  "30:0": {
+   "heroAttack": 2739,
+   "critRate": 0.15,
+   "heroDefense": 299,
+   "boostAttack": 0.0625
+  },
+  "31:0": {
+   "heroAttack": 2784,
+   "critRate": 0.1525,
+   "heroDefense": 305,
+   "boostAttack": 0.0638
+  },
+  "32:0": {
+   "heroAttack": 2829,
+   "critRate": 0.155,
+   "heroDefense": 311,
+   "boostAttack": 0.065
+  },
+  "33:0": {
+   "heroAttack": 2874,
+   "critRate": 0.1575,
+   "heroDefense": 317,
+   "boostAttack": 0.0662
+  },
+  "34:0": {
+   "heroAttack": 2919,
+   "critRate": 0.16,
+   "heroDefense": 323,
+   "boostAttack": 0.0675
+  },
+  "35:0": {
+   "heroAttack": 2963,
+   "critRate": 0.1625,
+   "heroDefense": 329,
+   "boostAttack": 0.0688
+  },
+  "36:0": {
+   "heroAttack": 3008,
+   "critRate": 0.165,
+   "heroDefense": 335,
+   "boostAttack": 0.07
+  },
+  "37:0": {
+   "heroAttack": 3053,
+   "critRate": 0.1675,
+   "heroDefense": 341,
+   "boostAttack": 0.0712
+  },
+  "38:0": {
+   "heroAttack": 3098,
+   "critRate": 0.17,
+   "heroDefense": 347,
+   "boostAttack": 0.0725
+  },
+  "39:0": {
+   "heroAttack": 3143,
+   "critRate": 0.1725,
+   "heroDefense": 353,
+   "boostAttack": 0.0738
+  },
+  "40:0": {
+   "heroAttack": 3187,
+   "critRate": 0.2,
+   "heroDefense": 359,
+   "boostAttack": 0.075
+  },
+  "40:1": {
+   "heroAttack": 5703,
+   "critRate": 0.25,
+   "heroDefense": 627,
+   "boostAttack": 0.1
+  },
+  "40:2": {
+   "heroAttack": 7186,
+   "critRate": 0.305,
+   "heroDefense": 824,
+   "boostAttack": 0.115
+  },
+  "40:4": {
+   "heroAttack": 11540,
+   "critRate": 0.39,
+   "heroDefense": 1338,
+   "boostAttack": 0.145,
+   "resistAll": 0.196
+  },
+  "40:5": {
+   "heroAttack": 12249,
+   "critRate": 0.4,
+   "heroDefense": 1433,
+   "boostAttack": 0.15
+  }
+ }
+}
