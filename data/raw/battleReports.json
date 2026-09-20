@@ -1,6 +1,8 @@
 [
  {
   "id": "attack1-left",
+  "reportType": "attack",
+  "owner": "me",
   "power": 6400000,
   "pieces": [
    {
@@ -107,6 +109,8 @@
  },
  {
   "id": "attack1-right",
+  "reportType": "attack",
+  "owner": "enemy",
   "power": 6400000,
   "pieces": [
    {
@@ -213,6 +217,8 @@
  },
  {
   "id": "attack2-left",
+  "reportType": "attack",
+  "owner": "me",
   "power": 2900000,
   "pieces": [
    {
@@ -319,6 +325,8 @@
  },
  {
   "id": "attack2-right",
+  "reportType": "attack",
+  "owner": "enemy",
   "power": 6400000,
   "pieces": [
    {
@@ -425,6 +433,8 @@
  },
  {
   "id": "attack3-left",
+  "reportType": "attack",
+  "owner": "me",
   "power": 2900000,
   "pieces": [
    {
@@ -531,6 +541,8 @@
  },
  {
   "id": "attack3-right",
+  "reportType": "attack",
+  "owner": "enemy",
   "power": 5100000,
   "pieces": [
    {
@@ -637,6 +649,8 @@
  },
  {
   "id": "attack4-left",
+  "reportType": "attack",
+  "owner": "me",
   "power": 2900000,
   "pieces": [
    {
@@ -743,6 +757,8 @@
  },
  {
   "id": "attack4-right",
+  "reportType": "attack",
+  "owner": "enemy",
   "power": 2000000,
   "pieces": [
    {
@@ -849,6 +865,8 @@
  },
  {
   "id": "defense1-left",
+  "reportType": "defense",
+  "owner": "enemy",
   "power": 5900000,
   "pieces": [
    {
@@ -955,6 +973,8 @@
  },
  {
   "id": "defense1-right",
+  "reportType": "defense",
+  "owner": "me",
   "power": 6400000,
   "pieces": [
    {
@@ -1061,6 +1081,8 @@
  },
  {
   "id": "defense2-left",
+  "reportType": "defense",
+  "owner": "enemy",
   "power": 8400000,
   "pieces": [
    {
@@ -1167,6 +1189,8 @@
  },
  {
   "id": "defense2-right",
+  "reportType": "defense",
+  "owner": "me",
   "power": 6400000,
   "pieces": [
    {
@@ -1273,6 +1297,8 @@
  },
  {
   "id": "defense3-left",
+  "reportType": "defense",
+  "owner": "enemy",
   "power": 8100000,
   "pieces": [
    {
@@ -1379,6 +1405,8 @@
  },
  {
   "id": "defense3-right",
+  "reportType": "defense",
+  "owner": "me",
   "power": 6400000,
   "pieces": [
    {
