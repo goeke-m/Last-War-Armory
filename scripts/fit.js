@@ -5,6 +5,7 @@ export function buildDesign(lineups, getStats, border) {
   const rows = [], y = [], ids = [], dropped = []
   for (const l of lineups) {
     if (l.pieces.length !== 20) throw new Error(`lineup ${l.id}: expected 20 pieces, got ${l.pieces.length}`)
+    if (!(l.power > 0)) throw new Error(`lineup ${l.id}: power must be a positive number`)
     if (l.pieces.some(p => p.border !== border)) {
       dropped.push({ id: l.id, reason: `has a piece whose border is not "${border}"` })
       continue
@@ -17,7 +18,6 @@ export function buildDesign(lineups, getStats, border) {
       for (const k of STAT_KEYS) sum[k] += s[k] ?? 0
     }
     if (missing) { dropped.push({ id: l.id, reason: `no stats for ${missing}` }); continue }
-    if (!(l.power > 0)) throw new Error(`lineup ${l.id}: power must be a positive number`)
     rows.push(STAT_KEYS.map(k => sum[k]))
     y.push(l.power)
     ids.push(l.id)

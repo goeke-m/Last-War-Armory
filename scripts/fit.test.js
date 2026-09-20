@@ -31,7 +31,7 @@ function makeLineup(id, seed, border = 'orange', level = null) {
 describe('buildDesign', () => {
   it('drops lineups with the wrong border or with a piece that has no stats', () => {
     const wrongBorder = makeLineup('red', 1, 'red')
-    const noStats = makeLineup('nostats', 2, 'orange', 99)
+    const noStats = { ...makeLineup('nostats', 2, 'orange', 99), power: 1 }
     const ok = makeLineup('ok', 3)
     const d = buildDesign([wrongBorder, noStats, ok], fakeStats, 'orange')
     expect(d.ids).toEqual(['ok'])
@@ -42,6 +42,10 @@ describe('buildDesign', () => {
     expect(() => buildDesign([bad], fakeStats, 'orange')).toThrow(/20 pieces/)
     const noPower = { ...makeLineup('p', 1), power: 0 }
     expect(() => buildDesign([noPower], fakeStats, 'orange')).toThrow(/power/)
+  })
+  it('throws on bad power even if the lineup also has missing stats', () => {
+    const badPowerAndNoStats = { ...makeLineup('bad', 1, 'orange', 99), power: 0 }
+    expect(() => buildDesign([badPowerAndNoStats], fakeStats, 'orange')).toThrow(/power/)
   })
 })
 
