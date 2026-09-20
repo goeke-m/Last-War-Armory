@@ -20,6 +20,8 @@
 - CSV facts: CRLF line endings, 14 columns, percentages like `2.50%`, no quoted fields. CSV equipment names map `Railgun→gun`, `Data Chip→chip`, `Armor→armor`, `Radar→radar` (the app's `SLOTS`).
 - Stats exist only for `legendary` quality pieces (max Lv 40). Other qualities have no ROI.
 
+> **2026-09-20 amendment (star tiers):** star promotions only unlock at level 40 (user-confirmed), so pieces below level 40 always have 0 stars and `rankUpgrades` offers a star promotion only when the piece is at max level (Task 5 code and tests below already reflect this).
+
 > **2026-09-20 amendment:** the border filter in Task 3's code below was removed after execution (commit `refactor: drop border filter…`): a border is just the star tier, so `buildDesign(lineups, getStats)` takes no border, pieces have no `border` field, and the CLI takes no `--border` flag. The Task 3 code blocks below show the original version.
 
 ## File Structure
@@ -824,7 +826,7 @@ Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>"
   - `powerGain(piece, upgrade, deps?) → number | null`
   - `upgradeCost(upgrade, resource, deps?) → number | null` (returns `0` when the resource has no table for that upgrade type; `null` when the table exists but lacks that step)
   - `roiOf(gain, cost) → number | null` (`null` if either is `null` or `cost <= 0`)
-  - `rankUpgrades(assigned, resource, deps?) → item[]` where `item = { type: 'level'|'stars', slot, heroId, from, to, blueprintWarning, reason, score, roi, powerGain, cost, resource }`, sorted by `roi` descending with `roi === null` items last
+  - `rankUpgrades(assigned, resource, deps?) → item[]` (a star promotion is offered only when `piece.level >= QUALITY_MAX_LEVEL[piece.quality]`, because promotions unlock at max level) where `item = { type: 'level'|'stars', slot, heroId, from, to, blueprintWarning, reason, score, roi, powerGain, cost, resource }`, sorted by `roi` descending with `roi === null` items last
   - `coverage(gear) → { covered, total }`
   - `piece = { slot, quality, level, stars }`, `upgrade = { type: 'level'|'stars', from, to }`, `deps = { getStats, weights, costs }`, `assigned = { [heroId]: { gun, chip, armor, radar } }` (pieces or `null`).
 
@@ -907,7 +909,8 @@ describe('rankUpgrades', () => {
   })
 
   it('puts items without an ROI last and keeps them in the list', () => {
-    const list = rankUpgrades(assigned, 'gold', deps)
+    const withNoRoi = { ...assigned, h3: { gun: gun(9, 0, 'epic'), chip: null, armor: null, radar: null } }
+    const list = rankUpgrades(withNoRoi, 'gold', deps)
     const firstNull = list.findIndex(i => i.roi === null)
     expect(firstNull).toBeGreaterThan(0)
     expect(list.slice(firstNull).every(i => i.roi === null)).toBe(true)
@@ -918,6 +921,13 @@ describe('rankUpgrades', () => {
     const byBlueprints = rankUpgrades(forty, 'blueprints', deps)
     expect(byBlueprints[0]).toMatchObject({ type: 'stars', to: 1, roi: 1000, resource: 'blueprints' })
     expect(byBlueprints.every(i => i.type !== 'level' || i.roi === null)).toBe(true)
+  })
+
+  it('only offers a star promotion once the piece is at max level', () => {
+    const list = rankUpgrades({ h: { gun: gun(20), chip: null, armor: null, radar: null } }, 'gold', deps)
+    expect(list.every(i => i.type === 'level')).toBe(true)
+    const atMax = rankUpgrades({ h: { gun: gun(40), chip: null, armor: null, radar: null } }, 'gold', deps)
+    expect(atMax.some(i => i.type === 'stars')).toBe(true)
   })
 
   it('does not offer level steps past the quality max or star steps past 5', () => {
@@ -988,8 +998,10 @@ export function rankUpgrades(assigned, resource, deps = DEFAULT_DEPS) {
     for (const [slot, piece] of Object.entries(slots)) {
       if (!piece) continue
       const upgrades = []
-      if (piece.level < (QUALITY_MAX_LEVEL[piece.quality] ?? 40)) upgrades.push({ type: 'level', from: piece.level, to: piece.level + 1 })
-      if (piece.stars < 5) upgrades.push({ type: 'stars', from: piece.stars, to: piece.stars + 1 })
+      const maxLevel = QUALITY_MAX_LEVEL[piece.quality] ?? 40
+      if (piece.level < maxLevel) upgrades.push({ type: 'level', from: piece.level, to: piece.level + 1 })
+      // Star promotions only unlock once a piece is at its max level.
+      if (piece.stars < 5 && piece.level >= maxLevel) upgrades.push({ type: 'stars', from: piece.stars, to: piece.stars + 1 })
       for (const upgrade of upgrades) {
         const gain = powerGain(piece, upgrade, deps)
         const cost = upgradeCost(upgrade, resource, deps)

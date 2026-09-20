@@ -39,12 +39,14 @@ untouched. Role-based and Weakest-link modes are untouched (they use levels only
 
 ## Data coverage
 
-Stats exist densely at 0★ (levels 0–40) and at level 40 for 1★–5★. Gaps as of
-2026-09-20: Armor 1★ (no stats), Radar 3★/4★ (partial), Railgun 3★ (empty).
-Intermediate levels at 1★–4★ are unknown. The calculator therefore ranks only
-what the data supports: level steps at 0★ and star promotions at level 40.
-Rows outside coverage show "no data" and sort last; a banner reports the
-covered share of the user's gear.
+Star promotions only unlock at level 40 (user-confirmed), so the full state space
+is 0★ at levels 0–40 plus level 40 at 1★–5★. Stats exist for all of 0★ and for
+most level-40 star rows. Gaps as of 2026-09-20: 1★ blank for Armor, Data Chip and
+Radar; Radar 3★/4★ missing Hero Defense/HP; Railgun 3★ missing Attack/Crit/Defense.
+Once those six rows are filled the CSV is complete. Until then the calculator
+ranks only what the data supports; rows outside coverage show "no data" and sort
+last, and a banner reports the covered share of the user's gear. A star
+promotion is only offered for a piece already at max level.
 
 ## Power model and fitting
 
