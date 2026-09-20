@@ -51,9 +51,9 @@ covered share of the user's gear.
 - Power(piece) = Σ weight[stat] × value over CSV stat columns. Special
   Attribute text is ignored and reported as unmodeled.
 - `battleReports.json` is hand-transcribed from screenshots: per side, 20 pieces
-  (slot, level, stars, border color/quality) plus the gear-total Power. Border
-  color (red vs orange) is recorded as-is; its meaning (assumed quality tier)
-  is confirmed before it is used as a feature.
+  (slot, level, stars) plus the gear-total Power. Border color is not recorded:
+  the user confirmed it only encodes stars (orange = gold gear below 5★, red =
+  5★ "mythic"), so stars already carry it.
 - Non-negative least squares over all lineups. Columns that move together
   (e.g. Armor's identical Boost HP / Boost Defense) are reported unidentifiable
   and merged, not given arbitrary values.
@@ -98,4 +98,5 @@ weighting of gear, live-game data extraction.
 
 - Does the game show Power on a single piece or on upgrade? (Would give a
   cleaner fit and validation.)
-- Do the red and orange gear borders mean UR and Legendary?
+- Resolved 2026-09-20: red/orange borders are just the star tier (orange = gold below 5★,
+  red = 5★ mythic), not a quality tier. No border field or filter is used.

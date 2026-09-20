@@ -20,6 +20,8 @@
 - CSV facts: CRLF line endings, 14 columns, percentages like `2.50%`, no quoted fields. CSV equipment names map `Railgun→gun`, `Data Chip→chip`, `Armor→armor`, `Radar→radar` (the app's `SLOTS`).
 - Stats exist only for `legendary` quality pieces (max Lv 40). Other qualities have no ROI.
 
+> **2026-09-20 amendment:** the border filter in Task 3's code below was removed after execution (commit `refactor: drop border filter…`): a border is just the star tier, so `buildDesign(lineups, getStats)` takes no border, pieces have no `border` field, and the CLI takes no `--border` flag. The Task 3 code blocks below show the original version.
+
 ## File Structure
 
 | File | Responsibility |
@@ -405,9 +407,9 @@ Pure, testable tooling. The real fit happens in Task 4.
   - `STAT_KEYS: string[]` (the ten keys from Task 1, same order)
   - `piecePower(stats: object, weights: object) → number` (missing stat or weight counts as 0)
   - `nnls(A: number[][], y: number[]) → number[]` (rows × cols; minimises ‖A·w − y‖ with w ≥ 0)
-  - `buildDesign(lineups, getStats, border) → { rows: number[][], y: number[], ids: string[], dropped: {id, reason}[] }`
+  - `buildDesign(lineups, getStats) → { rows: number[][], y: number[], ids: string[], dropped: {id, reason}[] }`
   - `fitPowerModel(design, { maxResidualPct = 0.02 } = {}) → { ok: boolean, reason?: string, weights, merged, activeKeys, residuals: {id, predicted, actual, pct}[], maxResidualPct, rmsResidualPct }`
-- Lineup shape: `{ id: string, power: number, pieces: { slot, level, stars, border }[20] }`.
+- Lineup shape: `{ id: string, power: number, pieces: { slot, level, stars }[20] }`.
 
 - [ ] **Step 1: Write failing tests for `piecePower`**
 
@@ -753,7 +755,7 @@ This task cannot be finished by an agent alone: the screenshots live in `~/Downl
 
 - [ ] **Step 1: Confirm the two open questions with the user**
 
-Ask: (a) do the red and orange gear-page borders mean different quality tiers, and which one do the CSV stats belong to (the tier of the user's own gear when the CSV was captured)? (b) does the game show a Power number on a single piece or upgrade screen? Record the answers at the end of the spec's "Open questions" section. The border answer becomes the `--border` value in Step 4.
+(a) Resolved 2026-09-20: red/orange borders are just the star tier (orange = gold gear below 5★, red = 5★ mythic); there is no border field or filter. (b) Still open: does the game show a Power number on a single piece or upgrade screen? Record the answer at the end of the spec's "Open questions" section.
 
 - [ ] **Step 2: Transcribe one lineup per side per report**
 
@@ -764,7 +766,7 @@ Each report's Gear page has two sides. For each side, one object in `data/raw/ba
   "id": "attack1-me",
   "power": 6400000,
   "pieces": [
-    { "slot": "gun", "level": 40, "stars": 5, "border": "orange" }
+    { "slot": "gun", "level": 40, "stars": 5 }
   ]
 }
 ```
@@ -783,7 +785,7 @@ For 3–5 real upgrades the user performs, note total-power-before/after on any 
 
 - [ ] **Step 4: Run the fit**
 
-Run: `node scripts/fitPowerModel.js --border <color from Step 1>`
+Run: `node scripts/fitPowerModel.js`
 Expected: usable-lineup count, per-lineup residuals, and either `Wrote src/data/powerModel.json` or `FAILED quality gate` with the reason.
 
 - [ ] **Step 5: Handle a failure honestly**
@@ -1162,7 +1164,7 @@ Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>"
 | `gearStats` from CSV, unknown → null, fails on duplicates/unparsable | 1 |
 | `upgradeCosts` per resource, sourced | 2 |
 | Fitter, NNLS, proportional-column merge, quality gate, lineups dropped when stats missing | 3 |
-| Transcription, in-game validation, open questions (border colors, per-piece Power) | 4 |
+| Transcription, in-game validation, open question (per-piece Power) | 4 |
 | `roi.js`: gain ÷ cost, `null` on missing data, resource selection, milestone > smooth | 5 |
 | UI selector, coverage banner, no-data rows last, max-efficiency only | 6 |
 | Role-based / Weakest-link / `heroScore` untouched | 6 (Global Constraints) |
