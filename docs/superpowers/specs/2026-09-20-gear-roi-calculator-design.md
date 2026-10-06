@@ -146,9 +146,14 @@ weighting of gear, live-game data extraction.
   Power (e.g. 344410 for a 5★ M6-A cannon). The same piece state shows the
   same Power on every hero. These are now the primary fit data
   (`data/raw/piecePower.json`: hero, slot, level, stars, sub, power, screenshot).
-  A first look at the 9 non-5★ pieces fits a linear model exactly (attack ≈ 12.5,
-  defense ≈ 35, HP ≈ 0.5 per point; boost % weights near 0), but that is 9 rows
-  for 8 weights, so it is not yet proof.
+  Fitted 2026-10-06 from 41 pieces (20 distinct exact rows incl. two low-level
+  battle-report lineups, 9 unknowns): **max residual 0.03%**. Weights per point:
+  attack 12.51, defense 34.89, HP 0.500; per 100%: crit 313,505, all-damage
+  resistance 1,048,599, physical 524,583 and energy 524,979 (each half of
+  all-damage), boost attack 1,158 and boost HP/defense 922 (negligible). Each
+  piece's recorded `stats` (read off the same screen as its Power) are used over
+  the table. 5★ pieces sit above the model by about 15.7K (gun), 23.5K (armor)
+  and 23.6K (radar), the Power of their special attribute.
 - Does 5★ have sub-upgrades? Nothing follows it, so the CSV's 5★ row is treated
   as the final state until confirmed.
 - Resolved 2026-10-06: 0★ has 4 sub-upgrades too.

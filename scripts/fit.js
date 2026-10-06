@@ -42,7 +42,8 @@ export function buildDesign(lineups, getStats, { checks = [], pieces = [] } = {}
   }
   for (const p of pieces) {
     if (!(p.power > 0)) throw new Error(`piece ${p.id}: power must be a positive number`)
-    const r = stateStats(getStats, p.slot, p)
+    // Stats read off the same screen as the Power beat a table lookup (which can be off by one).
+    const r = p.stats && p.stars !== 5 ? { stats: p.stats } : stateStats(getStats, p.slot, p)
     if (!r.stats) { dropped.push({ id: p.id, reason: r.reason }); continue }
     rows.push(STAT_KEYS.map(k => r.stats[k] ?? 0))
     y.push(p.power)

@@ -64,6 +64,12 @@ describe('buildDesign', () => {
     expect(d.rows[0][0]).toBe(fakeStats('gun', 40, 2, 4).heroAttack)
     expect(() => buildDesign([], fakeStats, { pieces: [{ ...piece, power: 0 }] })).toThrow(/power/)
   })
+  it("uses a piece's own recorded stats (read off its Gear Details screen) over the stat table", () => {
+    const piece = { id: 'p2', slot: 'gun', level: 40, stars: 2, sub: 4, power: 5000, stats: { heroAttack: 1234, heroHp: 7 } }
+    const d = buildDesign([], fakeStats, { pieces: [piece] })
+    expect(d.rows[0][0]).toBe(1234)
+    expect(d.rows[0][3]).toBe(7)
+  })
   it('drops any row with a 5★ piece: its special attribute adds Power the stats do not model', () => {
     const piece = { id: 'p5', slot: 'gun', level: 40, stars: 5, sub: 4, power: 5000 }
     expect(buildDesign([], fakeStats, { pieces: [piece] }).dropped).toEqual([{ id: 'p5', reason: expect.stringMatching(/5★/) }])
