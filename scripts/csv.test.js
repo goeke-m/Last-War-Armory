@@ -70,14 +70,14 @@ describe('parseGearCsv', () => {
     expect(() => parseGearCsv(csv(['Armor,1,0,,,62,32922,,,,,,,']))).toThrow(/0:0/)
   })
 
-  it('parses the real CSV: 5-star Armor present, 1-star Armor absent, partial Radar dropped', () => {
+  it('parses the real CSV: 5-star Armor present, 1-star Armor absent, partial Radar 4★ dropped', () => {
     const { stats, dropped } = parseGearCsv(readFileSync('data/raw/gear-stats.csv', 'utf8'))
     expect(stats.armor['40:5:4'].heroHp).toBe(502245)
     expect(stats.armor['40:1:4']).toBeUndefined()
-    expect(stats.radar['40:3:4']).toBeUndefined()
-    expect(dropped.some(d => d.slot === 'radar' && d.key === '40:3:4')).toBe(true)
-    // 0★: levels 0-39, then level 40 at sub 0 and sub 1 (the sub-1 Railgun row is from an upgrade preview)
-    expect(Object.keys(stats.gun).filter(k => k.split(':')[1] === '0').length).toBe(42)
+    expect(stats.radar['40:4:4']).toBeUndefined()
+    expect(dropped.some(d => d.slot === 'radar' && d.key === '40:4:4')).toBe(true)
+    // 0★: levels 0-39, then level 40 at sub 0, 1 and 4 (from upgrade previews and Gear Details screens)
+    expect(Object.keys(stats.gun).filter(k => k.split(':')[1] === '0').length).toBe(43)
     expect(stats.gun['40:0:1']).toEqual({ heroAttack: 3381, critRate: 0.205, heroDefense: 384, boostAttack: 0.0775 })
   })
 })

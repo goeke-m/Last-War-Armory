@@ -98,7 +98,9 @@ promotion is only offered for a piece already at max level.
   (slot, level, stars) plus the gear-total Power. Border color is not recorded:
   the user confirmed it only encodes stars (orange = gold gear below 5★, red =
   5★ "mythic"), so stars already carry it.
-- Non-negative least squares over all exact rows (power checks and exact lineups). Columns that move together
+- Non-negative least squares over all exact rows (piece Powers, power checks and
+  exact lineups), on relative error (each row scaled by its target) to match the
+  gate. The 2×-unknowns minimum counts distinct rows only. Columns that move together
   (e.g. Armor's identical Boost HP / Boost Defense) are reported unidentifiable
   and merged, not given arbitrary values.
 - **Quality gate:** the script prints per-lineup residuals and refuses to write
@@ -140,10 +142,19 @@ weighting of gear, live-game data extraction.
 
 ## Open questions
 
-- Does the game show Power on a single piece or on upgrade? (Would give a
-  cleaner fit and validation.) Power checks currently use the hero screen's Power.
+- Resolved 2026-10-06: yes. A piece's **Gear Details** screen shows its own
+  Power (e.g. 344410 for a 5★ M6-A cannon). The same piece state shows the
+  same Power on every hero. These are now the primary fit data
+  (`data/raw/piecePower.json`: hero, slot, level, stars, sub, power, screenshot).
+  A first look at the 9 non-5★ pieces fits a linear model exactly (attack ≈ 12.5,
+  defense ≈ 35, HP ≈ 0.5 per point; boost % weights near 0), but that is 9 rows
+  for 8 weights, so it is not yet proof.
 - Does 5★ have sub-upgrades? Nothing follows it, so the CSV's 5★ row is treated
   as the final state until confirmed.
 - Resolved 2026-10-06: 0★ has 4 sub-upgrades too.
+- 5★ pieces carry a special attribute (e.g. "10% Damage Boost when Countering
+  Enemies") whose Power the stat columns miss: 5★ pieces read 2–3% above a
+  stats-only fit. Rows with a 5★ piece are left out of the fit until it is
+  modeled (likely one weight per slot).
 - Resolved 2026-09-20: red/orange borders are just the star tier (orange = gold below 5★,
   red = 5★ mythic), not a quality tier. No border field or filter is used.

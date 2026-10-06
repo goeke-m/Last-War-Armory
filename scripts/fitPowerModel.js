@@ -6,11 +6,12 @@ const GEAR = JSON.parse(readFileSync('src/data/gearStats.json', 'utf8'))
 const getStats = (slot, level, stars, sub) => GEAR[slot]?.[stateKey(level, stars, sub)] ?? null
 const lineups = JSON.parse(readFileSync('data/raw/battleReports.json', 'utf8'))
 const checks = existsSync('data/raw/powerChecks.json') ? JSON.parse(readFileSync('data/raw/powerChecks.json', 'utf8')) : []
+const pieces = existsSync('data/raw/piecePower.json') ? JSON.parse(readFileSync('data/raw/piecePower.json', 'utf8')) : []
 
-const design = buildDesign(lineups, getStats, checks)
-console.log(`${lineups.length} lineups and ${checks.length} power checks; ${design.ids.length} exact rows usable.`)
+const design = buildDesign(lineups, getStats, { checks, pieces })
+console.log(`${lineups.length} lineups, ${checks.length} power checks, ${pieces.length} piece Powers; ${design.ids.length} exact rows usable.`)
 const byReason = {}
-for (const d of design.dropped) (byReason[d.reason.replace(/^\w+ 40:\d: sub-upgrade step unknown$/, 'sub-upgrade step unknown')] ??= []).push(d.id)
+for (const d of design.dropped) (byReason[d.reason.replace(/^\w+ (?=40:\d: sub|5★)/, '').replace(/^40:\d: /, '')] ??= []).push(d.id)
 for (const [reason, ids] of Object.entries(byReason)) console.log(`  dropped ${ids.length} (${reason}): ${ids.slice(0, 4).join(', ')}${ids.length > 4 ? ', …' : ''}`)
 
 const fit = fitPowerModel(design)

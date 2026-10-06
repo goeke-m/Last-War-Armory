@@ -1,0 +1,222 @@
+[
+ {
+  "id": "2026-10-06-kimberly-gun",
+  "hero": "Kimberly",
+  "slot": "gun",
+  "level": 40,
+  "stars": 5,
+  "sub": 4,
+  "power": 344410,
+  "subFrom": "5★",
+  "screenshot": "Screenshot 2026-10-06 145501.png"
+ },
+ {
+  "id": "2026-10-06-kimberly-armor",
+  "hero": "Kimberly",
+  "slot": "armor",
+  "level": 40,
+  "stars": 5,
+  "sub": 4,
+  "power": 509726,
+  "subFrom": "5★",
+  "screenshot": "Screenshot 2026-10-06 145510.png"
+ },
+ {
+  "id": "2026-10-06-kimberly-chip",
+  "hero": "Kimberly",
+  "slot": "chip",
+  "level": 40,
+  "stars": 4,
+  "sub": 4,
+  "power": 378502,
+  "subFrom": "stats equal the CSV 4★ row (top of tier)",
+  "screenshot": "Screenshot 2026-10-06 145520.png"
+ },
+ {
+  "id": "2026-10-06-kimberly-radar",
+  "hero": "Kimberly",
+  "slot": "radar",
+  "level": 40,
+  "stars": 5,
+  "sub": 4,
+  "power": 417560,
+  "subFrom": "5★",
+  "screenshot": "Screenshot 2026-10-06 145529.png"
+ },
+ {
+  "id": "2026-10-06-murphy-gun",
+  "hero": "Murphy",
+  "slot": "gun",
+  "level": 40,
+  "stars": 0,
+  "sub": 4,
+  "power": 134665,
+  "subFrom": "stats = 0★ sub 0 + 4 equal steps",
+  "screenshot": "Screenshot 2026-10-06 145539.png"
+ },
+ {
+  "id": "2026-10-06-murphy-armor",
+  "hero": "Murphy",
+  "slot": "armor",
+  "level": 40,
+  "stars": 3,
+  "sub": 4,
+  "power": 379019,
+  "subFrom": "boost 13% = 3★ sub 0 (12%) + 4 × 0.25%",
+  "screenshot": "Screenshot 2026-10-06 145548.png"
+ },
+ {
+  "id": "2026-10-06-murphy-chip",
+  "hero": "Murphy",
+  "slot": "chip",
+  "level": 40,
+  "stars": 0,
+  "sub": 4,
+  "power": 172727,
+  "subFrom": "stats = 0★ sub 0 + 4 equal steps",
+  "screenshot": "Screenshot 2026-10-06 145557.png"
+ },
+ {
+  "id": "2026-10-06-murphy-radar",
+  "hero": "Murphy",
+  "slot": "radar",
+  "level": 40,
+  "stars": 5,
+  "sub": 4,
+  "power": 417560,
+  "subFrom": "5★",
+  "screenshot": "Screenshot 2026-10-06 145605.png"
+ },
+ {
+  "id": "2026-10-06-adam-gun",
+  "hero": "Adam",
+  "slot": "gun",
+  "level": 40,
+  "stars": 0,
+  "sub": 4,
+  "power": 134665,
+  "subFrom": "stats = 0★ sub 0 + 4 equal steps",
+  "screenshot": "Screenshot 2026-10-06 145613.png"
+ },
+ {
+  "id": "2026-10-06-adam-armor",
+  "hero": "Adam",
+  "slot": "armor",
+  "level": 40,
+  "stars": 4,
+  "sub": 4,
+  "power": 472134,
+  "subFrom": "stats equal the CSV 4★ row (top of tier)",
+  "screenshot": "Screenshot 2026-10-06 145620.png"
+ },
+ {
+  "id": "2026-10-06-adam-chip",
+  "hero": "Adam",
+  "slot": "chip",
+  "level": 40,
+  "stars": 0,
+  "sub": 4,
+  "power": 172727,
+  "subFrom": "stats = 0★ sub 0 + 4 equal steps",
+  "screenshot": "Screenshot 2026-10-06 145629.png"
+ },
+ {
+  "id": "2026-10-06-adam-radar",
+  "hero": "Adam",
+  "slot": "radar",
+  "level": 40,
+  "stars": 5,
+  "sub": 4,
+  "power": 417560,
+  "subFrom": "5★",
+  "screenshot": "Screenshot 2026-10-06 145637.png"
+ },
+ {
+  "id": "2026-10-06-marshall-gun",
+  "hero": "Marshall",
+  "slot": "gun",
+  "level": 40,
+  "stars": 2,
+  "sub": 4,
+  "power": 214352,
+  "subFrom": "stats equal the CSV 2★ row (top of tier)",
+  "screenshot": "Screenshot 2026-10-06 145645.png"
+ },
+ {
+  "id": "2026-10-06-marshall-armor",
+  "hero": "Marshall",
+  "slot": "armor",
+  "level": 40,
+  "stars": 3,
+  "sub": 0,
+  "power": 354074,
+  "subFrom": "stats equal the 2★→3★ promote preview",
+  "screenshot": "Screenshot 2026-10-06 145654.png"
+ },
+ {
+  "id": "2026-10-06-marshall-chip",
+  "hero": "Marshall",
+  "slot": "chip",
+  "level": 40,
+  "stars": 0,
+  "sub": 4,
+  "power": 172727,
+  "subFrom": "stats = 0★ sub 0 + 4 equal steps",
+  "screenshot": "Screenshot 2026-10-06 145702.png"
+ },
+ {
+  "id": "2026-10-06-marshall-radar",
+  "hero": "Marshall",
+  "slot": "radar",
+  "level": 40,
+  "stars": 3,
+  "sub": 4,
+  "power": 299721,
+  "subFrom": "assumed top of tier: boost 13% like 3★ armor at sub 4",
+  "screenshot": "Screenshot 2026-10-06 145711.png"
+ },
+ {
+  "id": "2026-10-06-scarlett-gun",
+  "hero": "Scarlett",
+  "slot": "gun",
+  "level": 40,
+  "stars": 5,
+  "sub": 4,
+  "power": 344410,
+  "subFrom": "5★",
+  "screenshot": "Screenshot 2026-10-06 145719.png"
+ },
+ {
+  "id": "2026-10-06-scarlett-armor",
+  "hero": "Scarlett",
+  "slot": "armor",
+  "level": 40,
+  "stars": 5,
+  "sub": 4,
+  "power": 509726,
+  "subFrom": "5★",
+  "screenshot": "Screenshot 2026-10-06 145727.png"
+ },
+ {
+  "id": "2026-10-06-scarlett-chip",
+  "hero": "Scarlett",
+  "slot": "chip",
+  "level": 40,
+  "stars": 3,
+  "sub": 4,
+  "power": 313502,
+  "subFrom": "stats equal the CSV 3★ row (top of tier)",
+  "screenshot": "Screenshot 2026-10-06 145735.png"
+ },
+ {
+  "id": "2026-10-06-scarlett-radar",
+  "hero": "Scarlett",
+  "slot": "radar",
+  "level": 40,
+  "stars": 5,
+  "sub": 4,
+  "power": 417560,
+  "subFrom": "5★",
+  "screenshot": "Screenshot 2026-10-06 145742.png"
+ }
+]

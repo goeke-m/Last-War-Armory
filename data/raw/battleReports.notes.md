@@ -49,3 +49,18 @@ build came out differently in each file and 10 reports were missing.
   count, never the sub-progress, and `gear-stats.csv` records each tier after its 4th sub-upgrade (the
   top of the tier). So a battle-report side only bounds its stats: somewhere between the tier's floor
   and its top. Only lineups whose sub-progress is known (my own, checked piece by piece) are exact.
+
+# 2026-10-06: per-piece Power and CSV corrections
+
+Source: `~/Desktop/Photos-1-001/` (24 screenshots): Gear Details for all 20 pieces of the 6.4M lineup
+(each shows the piece's own Power) and the upgrade screen of 0★ sub-0 gun, chip, armor and radar.
+Recorded in `piecePower.json`; how each piece's sub step was determined is in its `subFrom`.
+The lineup has changed since 2026-09-25 (e.g. Murphy and Marshall armor 2★ → 3★).
+
+`gear-stats.csv` changes (copy into the source spreadsheet):
+- `Armor,40,3` was 529 / 319719 / 12% (matches no screen). Now 3★ sub 4 = 532 / 405739 / 13% / 13% / 30%
+  (Murphy), plus a `Sub 0` row 449 / 361719 / 12% / 12% / 30% (Marshall).
+- `Radar,40,3` was boosts 14.5% with no Defense/HP. Now 1665 / 167843 / 13% / 13% / 30% energy (Marshall).
+- New sub rows: 0★ sub 1 for Armor, Data Chip, Radar (upgrade previews); 0★ sub 4 for Railgun and Data Chip.
+- Not changed, worth checking: `Radar,40,4` boosts 15.00% equal 5★ (armor 4★ is 14.50%, so the radar 3★/4★
+  boosts may have been shifted one tier); 0★ Railgun/Radar Defense 359/559 vs 358/558 on screen.

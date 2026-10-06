@@ -18,7 +18,7 @@ function makeLineup(id, seed, level = null) {
   const pieces = Array.from({ length: 20 }, (_, i) => ({
     slot: SLOTS[i % 4],
     level: level ?? ((seed * 7 + i * 3) % 41),
-    stars: (seed + i) % 6,
+    stars: (seed + i) % 5,
     sub: 4,
   }))
   const power = pieces.reduce((sum, p) => {
@@ -45,16 +45,28 @@ describe('buildDesign', () => {
   })
   it('turns a power check into a stat-delta row against the power delta', () => {
     const check = { id: 'c1', slot: 'gun', from: { level: 40, stars: 2, sub: 1 }, to: { level: 40, stars: 2, sub: 2 }, powerBefore: 1000, powerAfter: 1060 }
-    const d = buildDesign([], fakeStats, [check])
+    const d = buildDesign([], fakeStats, { checks: [check] })
     expect(d.ids).toEqual(['c1'])
     expect(d.y).toEqual([60])
     expect(d.rows[0][0]).toBe(20) // heroAttack column: one sub step
   })
   it('drops a power check whose states have no stats, and throws on a missing or non-positive power delta', () => {
     const base = { slot: 'gun', from: { level: 98, stars: 0 }, to: { level: 99, stars: 0 }, powerBefore: 1, powerAfter: 2 }
-    expect(buildDesign([], fakeStats, [{ ...base, id: 'x' }]).dropped.map(d => d.id)).toEqual(['x'])
-    expect(() => buildDesign([], fakeStats, [{ ...base, id: 'y', powerAfter: 1 }])).toThrow(/power/)
-    expect(() => buildDesign([], fakeStats, [{ ...base, id: 'z', powerAfter: undefined }])).toThrow(/power/)
+    expect(buildDesign([], fakeStats, { checks: [{ ...base, id: 'x' }] }).dropped.map(d => d.id)).toEqual(['x'])
+    expect(() => buildDesign([], fakeStats, { checks: [{ ...base, id: 'y', powerAfter: 1 }] })).toThrow(/power/)
+    expect(() => buildDesign([], fakeStats, { checks: [{ ...base, id: 'z', powerAfter: undefined }] })).toThrow(/power/)
+  })
+  it("turns a piece's own Power (Gear Details screen) into a single-piece row", () => {
+    const piece = { id: 'p1', slot: 'gun', level: 40, stars: 2, sub: 4, power: 5000 }
+    const d = buildDesign([], fakeStats, { pieces: [piece] })
+    expect(d.ids).toEqual(['p1'])
+    expect(d.y).toEqual([5000])
+    expect(d.rows[0][0]).toBe(fakeStats('gun', 40, 2, 4).heroAttack)
+    expect(() => buildDesign([], fakeStats, { pieces: [{ ...piece, power: 0 }] })).toThrow(/power/)
+  })
+  it('drops any row with a 5★ piece: its special attribute adds Power the stats do not model', () => {
+    const piece = { id: 'p5', slot: 'gun', level: 40, stars: 5, sub: 4, power: 5000 }
+    expect(buildDesign([], fakeStats, { pieces: [piece] }).dropped).toEqual([{ id: 'p5', reason: expect.stringMatching(/5★/) }])
   })
 
   it('drops lineups with a piece that has no stats', () => {
@@ -98,16 +110,30 @@ describe('fitPowerModel', () => {
   })
 
   it('fits power checks and lineups together', () => {
-    const checks = Array.from({ length: 12 }, (_, i) => {
-      const from = { level: 40, stars: i % 5, sub: i % 4 }, to = { ...from, sub: from.sub + 1 }
-      const delta = weigh(fakeStats('armor', 40, to.stars, to.sub)) - weigh(fakeStats('armor', 40, from.stars, from.sub))
-      return { id: `c${i}`, slot: 'armor', from, to, powerBefore: 5000, powerAfter: 5000 + delta }
+    // Four kinds of step with different stat deltas: a sub-upgrade, armor and gun level-ups, a promotion.
+    const steps = [
+      ['armor', { level: 40, stars: 1, sub: 2 }, { level: 40, stars: 1, sub: 3 }],
+      ['armor', { level: 20, stars: 0 }, { level: 21, stars: 0 }],
+      ['gun', { level: 20, stars: 0 }, { level: 21, stars: 0 }],
+      ['gun', { level: 40, stars: 1, sub: 4 }, { level: 40, stars: 2, sub: 0 }],
+    ]
+    const checks = steps.map(([slot, from, to], i) => {
+      const delta = weigh(fakeStats(slot, to.level, to.stars, to.sub)) - weigh(fakeStats(slot, from.level, from.stars, from.sub))
+      return { id: `c${i}`, slot, from, to, powerBefore: 5000, powerAfter: 5000 + delta }
     })
     expect(fitPowerModel(buildDesign(lineups.slice(0, 3), fakeStats)).ok).toBe(false)
-    const fit = fitPowerModel(buildDesign(lineups.slice(0, 3), fakeStats, checks))
-    expect(fit.residuals).toHaveLength(15)
+    const fit = fitPowerModel(buildDesign(lineups.slice(0, 3), fakeStats, { checks }))
+    expect(fit.residuals).toHaveLength(7)
     expect(fit.ok).toBe(true)
     expect(fit.weights.heroAttack).toBeCloseTo(3, 3)
+  })
+
+  it('counts only distinct rows toward the minimum, so repeated identical pieces do not fake coverage', () => {
+    const d = buildDesign(lineups.slice(0, 2), fakeStats)
+    const repeated = { rows: [...d.rows, ...d.rows, ...d.rows, ...d.rows], y: [...d.y, ...d.y, ...d.y, ...d.y], ids: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] }
+    const fit = fitPowerModel(repeated)
+    expect(fit.ok).toBe(false)
+    expect(fit.reason).toMatch(/underdetermined: 2 distinct/)
   })
 
   it('refuses an underdetermined fit', () => {
