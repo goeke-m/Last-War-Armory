@@ -1,14 +1,17 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { buildDesign, fitPowerModel } from './fit.js'
-import { piecePower } from '../src/gear/power.js'
+import { stateKey } from '../src/gear/state.js'
 
 const GEAR = JSON.parse(readFileSync('src/data/gearStats.json', 'utf8'))
-const getStats = (slot, level, stars) => GEAR[slot]?.[`${level}:${stars}`] ?? null
+const getStats = (slot, level, stars, sub) => GEAR[slot]?.[stateKey(level, stars, sub)] ?? null
 const lineups = JSON.parse(readFileSync('data/raw/battleReports.json', 'utf8'))
+const checks = existsSync('data/raw/powerChecks.json') ? JSON.parse(readFileSync('data/raw/powerChecks.json', 'utf8')) : []
 
-const design = buildDesign(lineups, getStats)
-console.log(`${lineups.length} lineups transcribed, ${design.ids.length} usable.`)
-for (const d of design.dropped) console.log(`  dropped ${d.id}: ${d.reason}`)
+const design = buildDesign(lineups, getStats, checks)
+console.log(`${lineups.length} lineups and ${checks.length} power checks; ${design.ids.length} exact rows usable.`)
+const byReason = {}
+for (const d of design.dropped) (byReason[d.reason.replace(/^\w+ 40:\d: sub-upgrade step unknown$/, 'sub-upgrade step unknown')] ??= []).push(d.id)
+for (const [reason, ids] of Object.entries(byReason)) console.log(`  dropped ${ids.length} (${reason}): ${ids.slice(0, 4).join(', ')}${ids.length > 4 ? ', …' : ''}`)
 
 const fit = fitPowerModel(design)
 console.log('Fitted keys:', fit.activeKeys.join(', '))
@@ -22,18 +25,7 @@ if (!fit.ok) {
 const model = {
   weights: fit.weights,
   merged: fit.merged,
-  fit: { lineups: design.ids.length, maxResidualPct: fit.maxResidualPct, rmsResidualPct: fit.rmsResidualPct },
+  fit: { rows: design.ids.length, maxResidualPct: fit.maxResidualPct, rmsResidualPct: fit.rmsResidualPct },
 }
 writeFileSync('src/data/powerModel.json', JSON.stringify(model, null, 1) + '\n')
 console.log(`Wrote src/data/powerModel.json (max residual ${(fit.maxResidualPct * 100).toFixed(2)}%).`)
-
-if (existsSync('data/raw/powerChecks.json')) {
-  console.log('In-game checks (predicted vs measured Power delta):')
-  for (const c of JSON.parse(readFileSync('data/raw/powerChecks.json', 'utf8'))) {
-    const before = getStats(c.slot, c.from.level, c.from.stars)
-    const after = getStats(c.slot, c.to.level, c.to.stars)
-    if (!before || !after) { console.log(`  ${c.slot} ${JSON.stringify(c.from)}→${JSON.stringify(c.to)}: no stats, skipped`); continue }
-    const predicted = piecePower(after, fit.weights) - piecePower(before, fit.weights)
-    console.log(`  ${c.slot} ${JSON.stringify(c.from)}→${JSON.stringify(c.to)}: predicted ${Math.round(predicted)} vs measured ${c.powerAfter - c.powerBefore}`)
-  }
-}

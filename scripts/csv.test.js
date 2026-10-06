@@ -34,6 +34,23 @@ describe('parseGearCsv', () => {
     expect(dropped.map(d => d.key).sort()).toEqual(['40:1', '40:3'])
   })
 
+  it('accepts an optional Sub column: blank or 4 is the top of the tier, 0-3 get their own key', () => {
+    const withSub = lines => [HEADER.replace('Stars,', 'Stars,Sub,'), ...lines].join('\r\n')
+    const { stats } = parseGearCsv(withSub([
+      'Armor,0,0,,,,59,31355,,,,,,,',
+      'Armor,40,2,,,,412,300531,,11.50%,11.50%,,30.00%,,',
+      'Armor,40,3,0,,,449,361719,,12.00%,12.00%,,30.00%,,',
+    ]))
+    expect(stats.armor['40:2'].heroDefense).toBe(412)
+    expect(stats.armor['40:3:0'].heroDefense).toBe(449)
+    expect(() => parseGearCsv(withSub([
+      'Armor,0,0,,,,59,31355,,,,,,,',
+      'Armor,40,2,,,,412,300531,,,,,,,',
+      'Armor,40,2,4,,,412,300531,,,,,,,',
+    ]))).toThrow(/duplicate/i)
+    expect(() => parseGearCsv(withSub(['Armor,0,0,2,,,59,31355,,,,,,,']))).toThrow(/sub/i)
+  })
+
   it('throws on duplicate (slot, level, stars)', () => {
     expect(() => parseGearCsv(csv([
       'Armor,0,0,,,59,31355,,,,,,,',

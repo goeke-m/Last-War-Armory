@@ -1,22 +1,41 @@
 import { nnls } from './nnls.js'
 import { STAT_KEYS } from '../src/gear/power.js'
 
-export function buildDesign(lineups, getStats) {
+// Stats of one piece state, or a reason it cannot be used. A level-40 piece needs its sub-upgrade
+// step: battle reports show only stars, so without it the stats are a range, not a value.
+function stateStats(getStats, slot, { level, stars, sub }) {
+  if (level === 40 && sub == null) return { reason: `${slot} 40:${stars}: sub-upgrade step unknown` }
+  const s = getStats(slot, level, stars, level === 40 ? sub : undefined)
+  return s ? { stats: s } : { reason: `no stats for ${slot} ${level}:${stars}${level === 40 ? `:${sub}` : ''}` }
+}
+
+// Rows of the fit: a lineup is Σ piece stats against its gear Power; a power check
+// (one upgrade measured in-game) is stats(to) − stats(from) against the Power it added.
+export function buildDesign(lineups, getStats, checks = []) {
   const rows = [], y = [], ids = [], dropped = []
   for (const l of lineups) {
     if (l.pieces.length !== 20) throw new Error(`lineup ${l.id}: expected 20 pieces, got ${l.pieces.length}`)
     if (!(l.power > 0)) throw new Error(`lineup ${l.id}: power must be a positive number`)
     const sum = Object.fromEntries(STAT_KEYS.map(k => [k, 0]))
-    let missing = null
+    let reason = null
     for (const p of l.pieces) {
-      const s = getStats(p.slot, p.level, p.stars)
-      if (!s) { missing = `${p.slot} ${p.level}:${p.stars}`; break }
-      for (const k of STAT_KEYS) sum[k] += s[k] ?? 0
+      const r = stateStats(getStats, p.slot, p)
+      if (!r.stats) { reason = r.reason; break }
+      for (const k of STAT_KEYS) sum[k] += r.stats[k] ?? 0
     }
-    if (missing) { dropped.push({ id: l.id, reason: `no stats for ${missing}` }); continue }
+    if (reason) { dropped.push({ id: l.id, reason }); continue }
     rows.push(STAT_KEYS.map(k => sum[k]))
     y.push(l.power)
     ids.push(l.id)
+  }
+  for (const c of checks) {
+    const delta = c.powerAfter - c.powerBefore
+    if (!(delta > 0)) throw new Error(`power check ${c.id}: powerAfter must exceed powerBefore`)
+    const from = stateStats(getStats, c.slot, c.from), to = stateStats(getStats, c.slot, c.to)
+    if (!from.stats || !to.stats) { dropped.push({ id: c.id, reason: (from.reason ?? to.reason) }); continue }
+    rows.push(STAT_KEYS.map(k => (to.stats[k] ?? 0) - (from.stats[k] ?? 0)))
+    y.push(delta)
+    ids.push(c.id)
   }
   return { rows, y, ids, dropped }
 }
@@ -43,7 +62,7 @@ export function fitPowerModel({ rows, y, ids }, { maxResidualPct = 0.02 } = {}) 
   const base = { weights, merged, activeKeys, residuals: [], maxResidualPct: null, rmsResidualPct: null }
 
   if (rows.length < 2 * active.length) {
-    return { ...base, ok: false, reason: `underdetermined: ${rows.length} usable lineups for ${active.length} unknowns (need at least ${2 * active.length})` }
+    return { ...base, ok: false, reason: `underdetermined: ${rows.length} exact rows for ${active.length} unknowns (need at least ${2 * active.length})` }
   }
   const A = rows.map(r => active.map(j => r[j]))
   const w = nnls(A, y)
