@@ -57,8 +57,9 @@ export function parseGearCsv(text) {
     if (!Number.isInteger(level) || !Number.isInteger(stars)) throw new Error(`Line ${lineNo}: bad level/stars`)
     const subRaw = hasSub ? f[3].trim() : ''
     // A blank Sub is how the sheet was recorded: 0★ right after reaching level 40 (sub 0),
-    // 1★-5★ after the tier's 4th sub-upgrade (sub 4).
-    const sub = subRaw !== '' ? Number(subRaw) : level < 40 ? undefined : stars === 0 ? 0 : 4
+    // 1★-4★ after the tier's 4th sub-upgrade (sub 4). 5★ has no sub-upgrades, so it is always sub 0.
+    const sub = subRaw !== '' ? Number(subRaw) : level < 40 ? undefined : stars === 0 || stars === 5 ? 0 : 4
+    if (stars === 5 && sub !== 0) throw new Error(`Line ${lineNo}: 5★ has no sub-upgrades (Sub must be blank or 0)`)
     if (subRaw !== '' && level < 40) throw new Error(`Line ${lineNo}: sub-upgrades only exist at level 40`)
     let key
     try { key = stateKey(level, stars, sub) } catch (e) { throw new Error(`Line ${lineNo}: ${e.message}`) }

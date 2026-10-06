@@ -8,13 +8,15 @@ export const RESOURCES = UPGRADE_COSTS.resources
 
 const DEFAULT_DEPS = { getStats: defaultGetStats, weights: POWER_MODEL.weights, specials: POWER_MODEL.specials, costs: UPGRADE_COSTS }
 
-// piece = { slot, quality, level, stars, sub? }: sub (0-4) is the sub-upgrade step, only at level 40.
+// piece = { slot, quality, level, stars, sub? }: sub (0-4) is the sub-upgrade step, only at level 40
+// below 5★ (5★ has no sub-upgrades).
 // Only legendary gear has stat data. Sub steps 1-3 that were not recorded are filled in linearly
 // between the tier's sub 0 and sub 4 (in-game steps are equal: 0★ Railgun and Data Chip, 2026-10-06).
 export function stateStats(piece, deps = DEFAULT_DEPS) {
   if (piece.quality !== 'legendary') return null
   const { slot, level, stars, sub } = piece
   if (level < 40) return deps.getStats(slot, level, 0)
+  if (stars === 5) return deps.getStats(slot, level, 5, 0) // 5★ has no sub-upgrades
   if (sub == null) return null
   const row = deps.getStats(slot, level, stars, sub)
   if (row || sub === 0 || sub === 4) return row

@@ -5,7 +5,7 @@
   "slot": "gun",
   "level": 40,
   "stars": 5,
-  "sub": 4,
+  "sub": 0,
   "power": 344410,
   "stats": {
    "heroAttack": 12249,
@@ -13,7 +13,7 @@
    "heroDefense": 1433,
    "boostAttack": 0.15
   },
-  "subFrom": "5★",
+  "subFrom": "5★ has no sub-upgrades",
   "screenshot": "Screenshot 2026-10-06 145501.png"
  },
  {
@@ -22,7 +22,7 @@
   "slot": "armor",
   "level": 40,
   "stars": 5,
-  "sub": 4,
+  "sub": 0,
   "power": 509726,
   "stats": {
    "heroDefense": 716,
@@ -31,7 +31,7 @@
    "boostDefense": 0.15,
    "resistPhysical": 0.4
   },
-  "subFrom": "5★",
+  "subFrom": "5★ has no sub-upgrades",
   "screenshot": "Screenshot 2026-10-06 145510.png"
  },
  {
@@ -57,7 +57,7 @@
   "slot": "radar",
   "level": 40,
   "stars": 5,
-  "sub": 4,
+  "sub": 0,
   "power": 417560,
   "stats": {
    "heroDefense": 2033,
@@ -66,7 +66,7 @@
    "boostDefense": 0.15,
    "resistEnergy": 0.4
   },
-  "subFrom": "5★",
+  "subFrom": "5★ has no sub-upgrades",
   "screenshot": "Screenshot 2026-10-06 145529.png"
  },
  {
@@ -127,7 +127,7 @@
   "slot": "radar",
   "level": 40,
   "stars": 5,
-  "sub": 4,
+  "sub": 0,
   "power": 417560,
   "stats": {
    "heroDefense": 2033,
@@ -136,7 +136,7 @@
    "boostDefense": 0.15,
    "resistEnergy": 0.4
   },
-  "subFrom": "5★",
+  "subFrom": "5★ has no sub-upgrades",
   "screenshot": "Screenshot 2026-10-06 145605.png"
  },
  {
@@ -197,7 +197,7 @@
   "slot": "radar",
   "level": 40,
   "stars": 5,
-  "sub": 4,
+  "sub": 0,
   "power": 417560,
   "stats": {
    "heroDefense": 2033,
@@ -206,7 +206,7 @@
    "boostDefense": 0.15,
    "resistEnergy": 0.4
   },
-  "subFrom": "5★",
+  "subFrom": "5★ has no sub-upgrades",
   "screenshot": "Screenshot 2026-10-06 145637.png"
  },
  {
@@ -285,7 +285,7 @@
   "slot": "gun",
   "level": 40,
   "stars": 5,
-  "sub": 4,
+  "sub": 0,
   "power": 344410,
   "stats": {
    "heroAttack": 12249,
@@ -293,7 +293,7 @@
    "heroDefense": 1433,
    "boostAttack": 0.15
   },
-  "subFrom": "5★",
+  "subFrom": "5★ has no sub-upgrades",
   "screenshot": "Screenshot 2026-10-06 145719.png"
  },
  {
@@ -302,7 +302,7 @@
   "slot": "armor",
   "level": 40,
   "stars": 5,
-  "sub": 4,
+  "sub": 0,
   "power": 509726,
   "stats": {
    "heroDefense": 716,
@@ -311,7 +311,7 @@
    "boostDefense": 0.15,
    "resistPhysical": 0.4
   },
-  "subFrom": "5★",
+  "subFrom": "5★ has no sub-upgrades",
   "screenshot": "Screenshot 2026-10-06 145727.png"
  },
  {
@@ -337,7 +337,7 @@
   "slot": "radar",
   "level": 40,
   "stars": 5,
-  "sub": 4,
+  "sub": 0,
   "power": 417560,
   "stats": {
    "heroDefense": 2033,
@@ -346,7 +346,7 @@
    "boostDefense": 0.15,
    "resistEnergy": 0.4
   },
-  "subFrom": "5★",
+  "subFrom": "5★ has no sub-upgrades",
   "screenshot": "Screenshot 2026-10-06 145742.png"
  },
  {
@@ -700,5 +700,22 @@
   },
   "subFrom": "below level 40",
   "screenshot": "Screenshot 2026-10-06 151235.png"
+ },
+ {
+  "id": "2026-10-06-chip5-pasted",
+  "hero": "unknown (aircraft UR)",
+  "slot": "chip",
+  "level": 40,
+  "stars": 5,
+  "sub": 0,
+  "power": 411146,
+  "stats": {
+   "heroAttack": 8666,
+   "heroHp": 150498,
+   "boostAttack": 0.15,
+   "resistAll": 0.2
+  },
+  "subFrom": "5★ has no sub-upgrades",
+  "screenshot": "pasted into chat 2026-10-06 (no file)"
  }
 ]

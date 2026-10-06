@@ -1301,7 +1301,7 @@ function GearEditModal({ piece, onSave, onDelete, onClose }) {
 
         {/* Actions */}
         <div className="flex gap-2 pt-2">
-          <button onClick={() => onSave({ slot, quality, level, stars, sub: hasSub ? sub : stars === 5 ? 4 : null })}
+          <button onClick={() => onSave({ slot, quality, level, stars, sub: hasSub ? sub : stars === 5 ? 0 : null })}
             className="flex-1 py-2 font-orbitron text-xs bg-amber-600 text-black hover:bg-amber-500 min-h-[44px]">
             {isNew ? 'ADD' : 'SAVE'}
           </button>

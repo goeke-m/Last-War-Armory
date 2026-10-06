@@ -127,7 +127,8 @@ Spec: `docs/superpowers/specs/2026-09-20-gear-roi-calculator-design.md`; plan:
   promotion) by in-game Power gained per unit of a chosen limiting resource (`src/gear/roi.js`).
   The invented `maxEfficiencyUpgrades` scoring is gone; ROLE and W-LINK are unchanged.
 - Power comes from `src/data/powerModel.json`, fitted to 41 Gear Details screens (max residual
-  0.03%), plus a fitted Power per slot for 5★ special attributes (gun, armor, radar; chip unknown).
+  0.03%), plus a fitted Power per slot for 5★ special attributes (gun 15652, chip 17585,
+  armor 23522, radar 23572).
 - The gear editor records the sub-upgrade step (0–4) of level-40 pieces.
 
 What still limits coverage (steps show "no stat data" and sort last):
@@ -136,5 +137,3 @@ What still limits coverage (steps show "no stat data" and sort last):
 - **Sub-0 rows of tiers 1★–4★**, needed for sub-upgrade steps inside those tiers (sub 1–3 are filled
   linearly between sub 0 and sub 4).
 - **CSV gaps** (generator output): Armor/Data Chip/Radar 1★ empty; Radar 4★ and Railgun 3★ partial.
-- **5★ Data Chip special attribute** (no 5★ chip screen yet).
-- Whether 5★ has sub-upgrades (the 5★ row is treated as final).

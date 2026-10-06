@@ -30,11 +30,11 @@ describe('parseGearCsv', () => {
     ]))
     expect(stats.radar['40:1:4']).toBeUndefined()
     expect(stats.radar['40:3:4']).toBeUndefined()
-    expect(stats.radar['40:5:4'].heroDefense).toBe(2033)
+    expect(stats.radar['40:5:0'].heroDefense).toBe(2033)
     expect(dropped.map(d => d.key).sort()).toEqual(['40:1:4', '40:3:4'])
   })
 
-  it('accepts an optional Sub column; a blank Sub at level 40 is sub 0 for 0★ and sub 4 (top of tier) for 1★-5★', () => {
+  it('accepts an optional Sub column; a blank Sub at level 40 is sub 0 for 0★ and 5★, sub 4 (top of tier) for 1★-4★', () => {
     const withSub = lines => [HEADER.replace('Stars,', 'Stars,Sub,'), ...lines].join('\r\n')
     const { stats } = parseGearCsv(withSub([
       'Armor,0,0,,,,59,31355,,,,,,,',
@@ -51,6 +51,8 @@ describe('parseGearCsv', () => {
       'Armor,40,2,4,,,412,300531,,,,,,,',
     ]))).toThrow(/duplicate/i)
     expect(() => parseGearCsv(withSub(['Armor,0,0,2,,,59,31355,,,,,,,']))).toThrow(/sub/i)
+    // 5★ has no sub-upgrades: its row is sub 0, and a Sub of 1-4 is an error
+    expect(() => parseGearCsv(withSub(['Armor,0,0,,,,59,31355,,,,,,,', 'Armor,40,5,4,,,716,502245,,,,,,,']))).toThrow(/5★/)
   })
 
   it('throws on duplicate (slot, level, stars)', () => {
@@ -72,7 +74,7 @@ describe('parseGearCsv', () => {
 
   it('parses the real CSV: 5-star Armor present, 1-star Armor absent, partial Radar 4★ dropped', () => {
     const { stats, dropped } = parseGearCsv(readFileSync('data/raw/gear-stats.csv', 'utf8'))
-    expect(stats.armor['40:5:4'].heroHp).toBe(502245)
+    expect(stats.armor['40:5:0'].heroHp).toBe(502245)
     expect(stats.armor['40:1:4']).toBeUndefined()
     expect(stats.radar['40:4:4']).toBeUndefined()
     expect(dropped.some(d => d.slot === 'radar' && d.key === '40:4:4')).toBe(true)

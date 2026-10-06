@@ -6,7 +6,7 @@ import { stateKey } from './state.js'
 // 1000 and each sub step 100. 2★ has only its top (sub 4) recorded, so its sub steps are unknown.
 const ROWS = {}
 for (let l = 0; l < 40; l++) ROWS[stateKey(l, 0)] = { heroAttack: l * 10 + (l >= 10 ? 100 : 0) }
-for (const [s, subs] of [[0, [0, 4]], [1, [0, 1, 2, 3, 4]], [2, [4]], [3, [0, 4]], [5, [4]]]) {
+for (const [s, subs] of [[0, [0, 4]], [1, [0, 1, 2, 3, 4]], [2, [4]], [3, [0, 4]], [4, [4]], [5, [0]]]) {
   for (const k of subs) ROWS[stateKey(40, s, k)] = { heroAttack: 500 + s * 1000 + k * 100 }
 }
 const getStats = (slot, level, stars, sub) => (slot === 'gun' ? ROWS[stateKey(level, stars, sub)] ?? null : null)
@@ -38,7 +38,9 @@ describe('stateStats', () => {
 
 describe('piecePowerOf', () => {
   it("adds the slot's 5★ special attribute, and is null when it is unknown", () => {
-    expect(piecePowerOf(gun(40, 5, 4), deps)).toBe(5900 + 7000)
+    expect(piecePowerOf(gun(40, 5, 0), deps)).toBe(5500 + 7000)
+    // 5★ has no sub-upgrades, so a stale sub on a 5★ piece is ignored
+    expect(piecePowerOf(gun(40, 5, 4), deps)).toBe(5500 + 7000)
     expect(piecePowerOf({ ...gun(40, 5, 4), slot: 'chip' }, { ...deps, getStats: () => ({ heroAttack: 1 }) })).toBeNull()
   })
 })
@@ -93,6 +95,11 @@ describe('rankUpgrades', () => {
     expect(list[0].heroId).toBe('h1')
     expect(list.slice(1).every(i => i.roi === null)).toBe(true)
     expect(list.find(i => i.heroId === 'h2').reason).toMatch(/sub-upgrade step/)
+  })
+
+  it('ranks the promotion to 5★ onto the 5★ row, which has no sub-upgrades', () => {
+    const [promo] = rankUpgrades({ h: slots(gun(40, 4, 4)) }, 'blueprints', deps)
+    expect(promo).toMatchObject({ type: 'stars', from: 4, to: 5, powerGain: 5500 + 7000 - 4900, cost: 5 })
   })
 
   it('ranks a promotion by blueprints and flags it', () => {

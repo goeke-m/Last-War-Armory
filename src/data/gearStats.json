@@ -302,7 +302,7 @@
    "boostDefense": 0.145,
    "resistPhysical": 0.4
   },
-  "40:5:4": {
+  "40:5:0": {
    "heroDefense": 716,
    "heroHp": 502245,
    "boostHp": 0.15,
@@ -587,7 +587,7 @@
    "boostAttack": 0.145,
    "resistAll": 0.196
   },
-  "40:5:4": {
+  "40:5:0": {
    "heroAttack": 8666,
    "heroHp": 150498,
    "boostAttack": 0.15,
@@ -883,7 +883,7 @@
    "boostDefense": 0.13,
    "resistEnergy": 0.3
   },
-  "40:5:4": {
+  "40:5:0": {
    "heroDefense": 2033,
    "heroHp": 225747,
    "boostAttack": 0.15,
@@ -1169,7 +1169,7 @@
    "boostAttack": 0.145,
    "resistAll": 0.196
   },
-  "40:5:4": {
+  "40:5:0": {
    "heroAttack": 12249,
    "critRate": 0.4,
    "heroDefense": 1433,

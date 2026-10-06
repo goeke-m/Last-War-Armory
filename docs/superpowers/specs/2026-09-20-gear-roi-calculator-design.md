@@ -154,8 +154,8 @@ weighting of gear, live-game data extraction.
   piece's recorded `stats` (read off the same screen as its Power) are used over
   the table. 5★ pieces sit above the model by about 15.7K (gun), 23.5K (armor)
   and 23.6K (radar), the Power of their special attribute.
-- Does 5★ have sub-upgrades? Nothing follows it, so the CSV's 5★ row is treated
-  as the final state until confirmed.
+- Resolved 2026-10-06: 5★ has no sub-upgrades. The 5★ row is sub 0, the state a
+  4★ sub-4 piece is promoted into; a Sub of 1–4 at 5★ is rejected.
 - Resolved 2026-10-06: 0★ has 4 sub-upgrades too.
 - 5★ pieces carry a special attribute (e.g. "10% Damage Boost when Countering
   Enemies") whose Power the stat columns miss: 5★ pieces read 2–3% above a

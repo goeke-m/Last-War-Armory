@@ -4,9 +4,9 @@ import { getStats } from './stats.js'
 describe('getStats', () => {
   it('returns real stats for a known (slot, level, stars, sub)', () => {
     expect(getStats('armor', 0, 0).heroHp).toBe(31355)
-    expect(getStats('armor', 40, 5, 4).heroHp).toBe(502245)
+    expect(getStats('armor', 40, 5, 0).heroHp).toBe(502245)
   })
-  it('keys level-40 rows by sub step: 0★ as recorded is sub 0, 1★-5★ are the top of the tier (sub 4)', () => {
+  it('keys level-40 rows by sub step: 0★ and 5★ as recorded are sub 0, 1★-4★ the top of the tier (sub 4)', () => {
     expect(getStats('gun', 40, 0, 0).heroAttack).toBe(3187)
     expect(getStats('gun', 40, 0, 2)).toBeNull()
     expect(getStats('armor', 40, 2, 4).heroDefense).toBe(412)
