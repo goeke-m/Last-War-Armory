@@ -892,16 +892,22 @@ function RecPanel({ state, dispatch, recommendedSquad, gearAssignment, upgradePr
 
 const RESOURCE_LABELS = { gold: 'GOLD', ore: 'ORE', dielectric_ceramic: 'CERAMIC', blueprints: 'BLUEPRINTS' }
 
+// ROI is shown per a unit that keeps the number readable: per 1M gold, per 1K ore, per ceramic, per blueprint.
+const RESOURCE_PER = { gold: [1e6, '1M'], ore: [1e3, '1K'] }
+
 function RoiLine({ item }) {
   if (!('roi' in item)) return null
-  const res = RESOURCE_LABELS[item.resource]?.toLowerCase() ?? item.resource
+  // The 5th star is paid in mythic blueprints, a different item from the legendary ones for 1★-4★.
+  const mythic = item.resource === 'blueprints' && item.type === 'stars' && item.to === 5
+  const res = mythic ? 'mythic blueprints' : RESOURCE_LABELS[item.resource]?.toLowerCase() ?? item.resource
   if (item.roi === null) {
     const why = item.from === null ? '' : item.powerGain === null ? ' — no stat data for this step yet' : ` — doesn't use ${res}`
     return <p className="font-orbitron text-xs text-neutral-600">No ROI{why}</p>
   }
   return (
     <p className="font-orbitron text-xs text-emerald-600">
-      +{Math.round(item.powerGain).toLocaleString()} power · {Math.round(item.cost).toLocaleString()} {res} · {(item.roi * 1000).toPrecision(3)} per 1K {res}
+      +{Math.round(item.powerGain).toLocaleString()} power · {Math.round(item.cost).toLocaleString()} {res} ·{' '}
+      {Math.round(item.roi * (RESOURCE_PER[item.resource]?.[0] ?? 1)).toLocaleString()} per {RESOURCE_PER[item.resource]?.[1] ?? ''} {RESOURCE_PER[item.resource] ? res : res.replace(/s$/, '')}
     </p>
   )
 }
