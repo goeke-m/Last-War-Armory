@@ -28,20 +28,22 @@ describe('parseGearCsv', () => {
       'Radar,40,3,,,,,,14.50%,14.50%,,,30.00%,',
       'Radar,40,5,,,2033,225747,15.00%,,15.00%,,,40.00%,note',
     ]))
-    expect(stats.radar['40:1']).toBeUndefined()
-    expect(stats.radar['40:3']).toBeUndefined()
-    expect(stats.radar['40:5'].heroDefense).toBe(2033)
-    expect(dropped.map(d => d.key).sort()).toEqual(['40:1', '40:3'])
+    expect(stats.radar['40:1:4']).toBeUndefined()
+    expect(stats.radar['40:3:4']).toBeUndefined()
+    expect(stats.radar['40:5:4'].heroDefense).toBe(2033)
+    expect(dropped.map(d => d.key).sort()).toEqual(['40:1:4', '40:3:4'])
   })
 
-  it('accepts an optional Sub column: blank or 4 is the top of the tier, 0-3 get their own key', () => {
+  it('accepts an optional Sub column; a blank Sub at level 40 is sub 0 for 0★ and sub 4 (top of tier) for 1★-5★', () => {
     const withSub = lines => [HEADER.replace('Stars,', 'Stars,Sub,'), ...lines].join('\r\n')
     const { stats } = parseGearCsv(withSub([
       'Armor,0,0,,,,59,31355,,,,,,,',
+      'Armor,40,0,,,,179,136065,,7.50%,7.50%,,20%,,',
       'Armor,40,2,,,,412,300531,,11.50%,11.50%,,30.00%,,',
       'Armor,40,3,0,,,449,361719,,12.00%,12.00%,,30.00%,,',
     ]))
-    expect(stats.armor['40:2'].heroDefense).toBe(412)
+    expect(stats.armor['40:0:0'].heroDefense).toBe(179)
+    expect(stats.armor['40:2:4'].heroDefense).toBe(412)
     expect(stats.armor['40:3:0'].heroDefense).toBe(449)
     expect(() => parseGearCsv(withSub([
       'Armor,0,0,,,,59,31355,,,,,,,',
@@ -70,10 +72,12 @@ describe('parseGearCsv', () => {
 
   it('parses the real CSV: 5-star Armor present, 1-star Armor absent, partial Radar dropped', () => {
     const { stats, dropped } = parseGearCsv(readFileSync('data/raw/gear-stats.csv', 'utf8'))
-    expect(stats.armor['40:5'].heroHp).toBe(502245)
-    expect(stats.armor['40:1']).toBeUndefined()
-    expect(stats.radar['40:3']).toBeUndefined()
-    expect(dropped.some(d => d.slot === 'radar' && d.key === '40:3')).toBe(true)
-    expect(Object.keys(stats.gun).filter(k => k.endsWith(':0')).length).toBe(41)
+    expect(stats.armor['40:5:4'].heroHp).toBe(502245)
+    expect(stats.armor['40:1:4']).toBeUndefined()
+    expect(stats.radar['40:3:4']).toBeUndefined()
+    expect(dropped.some(d => d.slot === 'radar' && d.key === '40:3:4')).toBe(true)
+    // 0★: levels 0-39, then level 40 at sub 0 and sub 1 (the sub-1 Railgun row is from an upgrade preview)
+    expect(Object.keys(stats.gun).filter(k => k.split(':')[1] === '0').length).toBe(42)
+    expect(stats.gun['40:0:1']).toEqual({ heroAttack: 3381, critRate: 0.205, heroDefense: 384, boostAttack: 0.0775 })
   })
 })

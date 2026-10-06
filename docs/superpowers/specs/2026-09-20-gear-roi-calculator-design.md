@@ -46,10 +46,21 @@ piece's own upgrade screen; user-confirmed). A level-40 piece's state is therefo
 (stars, sub) with sub 0–4; sub-upgrades and promotions only exist at level 40.
 
 - Order: (s, 0) → (s, 1) → … → (s, 4) → promote → (s+1, 0).
-- `gear-stats.csv` rows without a Sub value are the **top of the tier**, (s, 4):
-  the user records each tier after its 4th sub-upgrade. Rows for sub 0–3 are
-  added with an optional `Sub` column (after `Stars`). The upgrade screen
-  previews the next step's stats, so they can be recorded without spending.
+- `gear-stats.csv` has a `Sub` column (after `Stars`). A blank Sub at level 40
+  means how the sheet was recorded: **0★ is sub 0** (just reached level 40;
+  confirmed 2026-10-06 against a 0★ Railgun upgrade screen: base 2687 attack +
+  2 × 250 extra = the CSV's 3187), **1★–5★ are sub 4**, the top of the tier
+  (confirmed against a 2★ Armor promote screen: 216531 base HP + 63000 + 21000
+  extra = the CSV's 300531). Keys always carry the step at level 40:
+  `40:stars:sub`. Extra attributes count toward the totals even while their
+  hexagon is dark. The upgrade screen previews the next step's stats, so sub
+  rows can be recorded without spending.
+- Step costs (2026-10-06, two screenshots): each of the 4 sub-upgrades of tier
+  s−1 costs gold stars[s]/4, ore stars[s]/5 and ceramic stars[s]/5; the
+  promotion into s costs ore stars[s]/5, ceramic stars[s]/5 and the blueprints,
+  and no gold (0★ Railgun sub step: 23.4M / 12.5K / 150 = 93.6M/4, 62.5K/5,
+  750/5; 2★→3★ Armor promotion: 20.0K ore, 240 ceramic, 15 blueprints, no gold).
+  Verified on those two tiers only.
 - Battle reports show only the star count, never sub progress. A side of
   another player is therefore a range (between the tier's floor and its top)
   and cannot be fitted exactly. This is why identical-looking 20× Lv.40 0★
@@ -64,10 +75,9 @@ piece's own upgrade screen; user-confirmed). A level-40 piece's state is therefo
   the game shows it as a full integer (the hero's Power on the hero screen),
   not the rounded gear-page total.
 - The ROI unit is one step: a level, a sub-upgrade, or a promotion.
-  `upgradeCosts.json` currently sums Cpt Hedgehog's per-sub-tier promotion costs
-  into whole-star costs; it must be re-sourced per step (Cpt's sub-tier arrays
-  map directly: tier 1–4 of star s = sub-upgrades of s, tier 0 of s =
-  promotion into s).
+  `upgradeCosts.json` stores whole-star totals; per-step costs follow from the
+  split above (or from Cpt Hedgehog's sub-tier arrays: tier 1–4 of star s =
+  sub-upgrades of s, tier 0 of s = promotion into s).
 
 ## Data coverage
 

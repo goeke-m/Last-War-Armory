@@ -20,7 +20,7 @@ export const STAT_COLUMNS = {
 const PRIMARY_KEYS = ['heroAttack', 'critRate', 'heroDefense', 'heroHp']
 
 const EXPECTED_HEADER = ['Equipment', 'Level', 'Stars', ...Object.keys(STAT_COLUMNS), 'Special Attribute']
-// Same, with an optional Sub column (sub-upgrade step 0-4; blank = 4, the top of the tier).
+// Same, with an optional Sub column (sub-upgrade step 0-4 at level 40).
 const EXPECTED_HEADER_SUB = ['Equipment', 'Level', 'Stars', 'Sub', ...EXPECTED_HEADER.slice(3)]
 
 function parseValue(raw, lineNo) {
@@ -56,7 +56,9 @@ export function parseGearCsv(text) {
     const level = Number(f[1]), stars = Number(f[2])
     if (!Number.isInteger(level) || !Number.isInteger(stars)) throw new Error(`Line ${lineNo}: bad level/stars`)
     const subRaw = hasSub ? f[3].trim() : ''
-    const sub = subRaw === '' ? 4 : Number(subRaw)
+    // A blank Sub is how the sheet was recorded: 0★ right after reaching level 40 (sub 0),
+    // 1★-5★ after the tier's 4th sub-upgrade (sub 4).
+    const sub = subRaw !== '' ? Number(subRaw) : level < 40 ? undefined : stars === 0 ? 0 : 4
     if (subRaw !== '' && level < 40) throw new Error(`Line ${lineNo}: sub-upgrades only exist at level 40`)
     let key
     try { key = stateKey(level, stars, sub) } catch (e) { throw new Error(`Line ${lineNo}: ${e.message}`) }
