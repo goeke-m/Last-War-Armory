@@ -1,4 +1,6 @@
 import { useState, useReducer, useMemo, useEffect } from 'react'
+import { QUALITY_MAX_LEVEL } from './gear/constants.js'
+import { RESOURCES, rankUpgrades, coverage } from './gear/roi.js'
 
 // ═══════════════════════════════════════════════════════════════════
 // SECTION 1: GAME DATA
@@ -133,7 +135,6 @@ const HERO_SKILL_WEIGHTS_PROMOTED = {
 const SLOTS = ['gun', 'chip', 'armor', 'radar']
 const QUALITIES = ['legendary', 'epic', 'rare', 'common']
 const QUALITY_WEIGHTS = { legendary: 4, epic: 2, rare: 1, common: 0.5 }
-const QUALITY_MAX_LEVEL = { legendary: 40, epic: 30, rare: 15, common: 10 }
 const QUALITY_META = {
   legendary: { label: 'Legendary', tag: 'GOLD',   hint: 'Max Lv40 · invest here', rowColor: 'text-amber-400 border-amber-700',   selected: 'border-amber-500 text-amber-400 bg-amber-900/20' },
   epic:      { label: 'Epic',      tag: 'PURPLE', hint: 'Max Lv30 · dismantle for mats', rowColor: 'text-purple-400 border-purple-800', selected: 'border-purple-600 text-purple-400 bg-purple-900/20' },
@@ -426,35 +427,6 @@ function assignGear(squadIds, gear, heroScores) {
   return { assigned, unassigned }
 }
 
-function maxEfficiencyUpgrades(assigned, heroScores) {
-  const upgrades = []
-  for (const [heroId, slots] of Object.entries(assigned)) {
-    const hScore = heroScores[heroId] ?? 1
-    for (const [slot, piece] of Object.entries(slots)) {
-      if (!piece) continue
-      const maxLevel = QUALITY_MAX_LEVEL[piece.quality] ?? 40
-      if (piece.level < maxLevel) {
-        const next = piece.level + 1
-        const isMilestone = next % 10 === 0 || next === maxLevel
-        const mult = isMilestone ? 2 : 1
-        const reason = next === maxLevel && next % 10 !== 0 ? `Hits quality max (Lv ${maxLevel})`
-          : next === 40 ? 'Hits Lv 40 milestone' : next === 30 ? 'Hits Lv 30 milestone'
-          : next === 20 ? 'Hits Lv 20 milestone' : next === 10 ? 'Hits Lv 10 milestone' : 'Max efficiency'
-        upgrades.push({ type: 'level', slot, heroId, from: piece.level, to: next, blueprintWarning: false, reason,
-          score: pieceScore({ ...piece, level: next }) * mult * hScore })
-      }
-      if (piece.stars < 5) {
-        const next = piece.stars + 1
-        const mult = (next === 2 || next === 4) ? 2 : 1
-        const reason = next === 4 ? '4★ breakpoint — major power spike' : next === 2 ? '2★ breakpoint — significant bonus' : 'Blueprint spend justified here'
-        upgrades.push({ type: 'stars', slot, heroId, from: piece.stars, to: next, blueprintWarning: true, reason,
-          score: pieceScore({ ...piece, stars: next }) * mult * hScore })
-      }
-    }
-  }
-  return upgrades.sort((a, b) => b.score - a.score)
-}
-
 function roleBasedUpgrades(assigned) {
   const items = []
   for (const [heroId, slots] of Object.entries(assigned)) {
@@ -503,9 +475,9 @@ function weakestLinkUpgrades(assigned, heroScores) {
 }
 
 // hasEW5: boolean — true if any squad member has ewLevel >= 5
-function computeUpgradePriority(assigned, heroScores, mode, intent, hasEW5) {
+function computeUpgradePriority(assigned, heroScores, mode, intent, hasEW5, resource) {
   let list = []
-  if (mode === 'max_efficiency') list = maxEfficiencyUpgrades(assigned, heroScores)
+  if (mode === 'max_efficiency') list = rankUpgrades(assigned, resource)
   else if (mode === 'role_based') list = roleBasedUpgrades(assigned)
   else list = weakestLinkUpgrades(assigned, heroScores)
 
@@ -622,6 +594,7 @@ function buildInitialState() {
       activeSection: 'roster',
       activeRecTab: 'loadout',
       upgradeMode: 'max_efficiency',
+      limitingResource: RESOURCES[0],
     }
   }
   return {
@@ -631,6 +604,7 @@ function buildInitialState() {
     activeSection: 'roster',
     activeRecTab: 'loadout',
     upgradeMode: 'max_efficiency',
+    limitingResource: RESOURCES[0],
   }
 }
 
@@ -673,6 +647,8 @@ function reducer(state, action) {
       return { ...state, activeRecTab: action.payload }
     case 'SET_UPGRADE_MODE':
       return { ...state, upgradeMode: action.payload }
+    case 'SET_LIMITING_RESOURCE':
+      return { ...state, limitingResource: action.payload }
 
     // Profile management
     case 'NEW_PROFILE': {
@@ -871,7 +847,9 @@ function RecPanel({ state, dispatch, recommendedSquad, gearAssignment, upgradePr
             ? `⚠ ${item.reason}`
             : item.type === 'level'
               ? `${i+1}. ${slotLabels[item.slot]} Lv${item.from}→${item.to} · ${HEROES[item.heroId]?.name}`
-              : `${i+1}. ${slotLabels[item.slot]} → ${item.to}★ · ${HEROES[item.heroId]?.name}`}
+              : item.type === 'sub'
+                ? `${i+1}. ${slotLabels[item.slot]} ${item.stars}★ sub ${item.from ?? '?'}→${item.to ?? '?'} · ${HEROES[item.heroId]?.name}`
+                : `${i+1}. ${slotLabels[item.slot]} → ${item.to}★ · ${HEROES[item.heroId]?.name}`}
         </p>
       ))}
       {upgradePriority.length === 0 && <p className="font-rajdhani text-xs text-neutral-600">No upgrade data — add heroes and gear.</p>}
@@ -912,6 +890,22 @@ function RecPanel({ state, dispatch, recommendedSquad, gearAssignment, upgradePr
   )
 }
 
+const RESOURCE_LABELS = { gold: 'GOLD', ore: 'ORE', dielectric_ceramic: 'CERAMIC', blueprints: 'BLUEPRINTS' }
+
+function RoiLine({ item }) {
+  if (!('roi' in item)) return null
+  const res = RESOURCE_LABELS[item.resource]?.toLowerCase() ?? item.resource
+  if (item.roi === null) {
+    const why = item.from === null ? '' : item.powerGain === null ? ' — no stat data for this step yet' : ` — doesn't use ${res}`
+    return <p className="font-orbitron text-xs text-neutral-600">No ROI{why}</p>
+  }
+  return (
+    <p className="font-orbitron text-xs text-emerald-600">
+      +{Math.round(item.powerGain).toLocaleString()} power · {Math.round(item.cost).toLocaleString()} {res} · {(item.roi * 1000).toPrecision(3)} per 1K {res}
+    </p>
+  )
+}
+
 function UpgradePriority({ state, dispatch, upgradePriority }) {
   const modes = [
     { key: 'max_efficiency', label: 'MAX EFF' },
@@ -936,6 +930,27 @@ function UpgradePriority({ state, dispatch, upgradePriority }) {
         ))}
       </div>
 
+      {state.upgradeMode === 'max_efficiency' && (() => {
+        const cov = coverage(state.gear)
+        return (
+          <div className="mb-4">
+            <p className="font-orbitron text-xs text-neutral-500 mb-1">LIMITING RESOURCE</p>
+            <div className="flex gap-1 flex-wrap">
+              {RESOURCES.map(r => (
+                <button key={r} onClick={() => dispatch({ type: 'SET_LIMITING_RESOURCE', payload: r })}
+                  className={`px-3 py-2 font-orbitron text-xs border min-h-[40px] transition-colors
+                    ${state.limitingResource === r ? 'border-amber-600 text-amber-600 bg-amber-600/10' : 'border-neutral-700 text-neutral-500 hover:border-neutral-500'}`}>
+                  {RESOURCE_LABELS[r] ?? r}
+                </button>
+              ))}
+            </div>
+            <p className="font-rajdhani text-xs text-neutral-600 mt-1">
+              {cov.covered}/{cov.total} gear pieces have stat data. Upgrades without data show no ROI and sort last.
+            </p>
+          </div>
+        )
+      })()}
+
       <div className="space-y-1">
         {upgradePriority.length === 0 && (
           <p className="font-rajdhani text-sm text-neutral-600 py-4 text-center">
@@ -957,6 +972,17 @@ function UpgradePriority({ state, dispatch, upgradePriority }) {
                     <span className="text-neutral-500 ml-1 text-xs">— {HEROES[item.heroId]?.name}</span>
                   </p>
                   <p className="font-orbitron text-xs text-neutral-500">{item.reason}</p>
+                  <RoiLine item={item} />
+                </>
+              ) : item.type === 'sub' ? (
+                <>
+                  <p className="font-rajdhani text-sm text-gray-200">
+                    Sub-upgrade <span className="text-amber-600">{slotLabels[item.slot]}</span> {item.stars}★
+                    {item.from !== null && <> · {item.from} → {item.to} of 4</>}
+                    <span className="text-neutral-500 ml-1 text-xs">— {HEROES[item.heroId]?.name}</span>
+                  </p>
+                  <p className="font-orbitron text-xs text-neutral-500">{item.reason}</p>
+                  <RoiLine item={item} />
                 </>
               ) : (
                 <>
@@ -965,6 +991,7 @@ function UpgradePriority({ state, dispatch, upgradePriority }) {
                     <span className="text-neutral-500 ml-1 text-xs">— {HEROES[item.heroId]?.name}</span>
                   </p>
                   <p className="font-orbitron text-xs text-neutral-500">{item.reason}</p>
+                  <RoiLine item={item} />
                   {item.blueprintWarning && <p className="font-orbitron text-xs text-amber-700">⚠ Blueprint cost — confirm availability</p>}
                 </>
               )}
@@ -1168,6 +1195,11 @@ function GearPieceRow({ piece, onEdit }) {
         <p className="font-mono text-xs text-gray-300">Lv {piece.level}</p>
         <GearSegBar level={piece.level} />
         <StarPips stars={piece.stars} />
+        {piece.quality === 'legendary' && piece.level === 40 && piece.stars < 5 && (
+          <p className={`font-mono text-xs ${piece.sub == null ? 'text-amber-700' : 'text-neutral-500'}`}>
+            {piece.sub == null ? 'sub-upgrade ?/4 — tap to set' : `sub-upgrade ${piece.sub}/4`}
+          </p>
+        )}
       </div>
       <span className="font-mono text-xs text-amber-600 flex-none">{pieceScore(piece).toFixed(2)}</span>
     </div>
@@ -1179,6 +1211,9 @@ function GearEditModal({ piece, onSave, onDelete, onClose }) {
   const [quality, setQuality] = useState(piece?.quality ?? 'legendary')
   const [level, setLevel] = useState(piece?.level ?? 0)
   const [stars, setStars] = useState(piece?.stars ?? 0)
+  const [sub, setSub] = useState(piece?.sub ?? null)
+  // Sub-upgrades (4 per star tier) only exist on legendary gear at level 40.
+  const hasSub = quality === 'legendary' && level === QUALITY_MAX_LEVEL[quality] && stars < 5
 
   // Clamp level when quality changes
   const handleQualityChange = (q) => {
@@ -1248,9 +1283,25 @@ function GearEditModal({ piece, onSave, onDelete, onClose }) {
           </div>
         </div>
 
+        {/* Sub-upgrade step */}
+        {hasSub && (
+          <div>
+            <p className="font-orbitron text-xs text-neutral-500 mb-1">SUB-UPGRADE — <span className="font-rajdhani normal-case text-neutral-600">filled segments of the bar on the upgrade screen</span></p>
+            <div className="flex gap-1">
+              {[0,1,2,3,4].map(k => (
+                <button key={k} onClick={() => setSub(k)}
+                  className={`flex-1 py-1 font-orbitron text-xs border min-h-[36px] transition-colors
+                    ${sub === k ? 'border-amber-600 text-amber-600 bg-amber-600/10' : 'border-neutral-700 text-neutral-500'}`}>
+                  {k}/4
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Actions */}
         <div className="flex gap-2 pt-2">
-          <button onClick={() => onSave({ slot, quality, level, stars })}
+          <button onClick={() => onSave({ slot, quality, level, stars, sub: hasSub ? sub : stars === 5 ? 4 : null })}
             className="flex-1 py-2 font-orbitron text-xs bg-amber-600 text-black hover:bg-amber-500 min-h-[44px]">
             {isNew ? 'ADD' : 'SAVE'}
           </button>
@@ -1703,7 +1754,7 @@ function HelpGuide() {
       </Section>
 
       <Section title="// UPGRADE PRIORITY">
-        <Row label="MAX EFF">Scores every possible next upgrade globally. Best absolute return on resources. Milestone levels (10/20/30/40) and star breakpoints (2★/4★) are weighted 2×.</Row>
+        <Row label="MAX EFF">Ranks the next step of every piece (level, sub-upgrade or star promotion) by in-game Power gained per unit of the limiting resource you pick. Power comes from a model fitted to real Gear Details screens; steps without stat data show no ROI and sort last.</Row>
         <Row label="ROLE">Flags misalignment between gear levels and hero role. DPS: Gun should lead. Tank: Armor should lead. Support: Radar should lead.</Row>
         <Row label="W-LINK">Finds the weakest gear piece in the squad and prioritizes closing the gap to squad average before pushing any leader higher.</Row>
         <Row label="BLUEPRINTS">Any star promotion shows a ⚠ Blueprint cost warning. Confirm you have the resources before spending — Blueprints are scarce.</Row>
@@ -1808,8 +1859,8 @@ export default function App() {
   )
 
   const upgradePriority = useMemo(
-    () => computeUpgradePriority(gearAssignment.assigned, heroScores, state.upgradeMode, state.intent, hasSquadEW5),
-    [gearAssignment.assigned, heroScores, state.upgradeMode, state.intent, hasSquadEW5]
+    () => computeUpgradePriority(gearAssignment.assigned, heroScores, state.upgradeMode, state.intent, hasSquadEW5, state.limitingResource),
+    [gearAssignment.assigned, heroScores, state.upgradeMode, state.intent, hasSquadEW5, state.limitingResource]
   )
 
   const warnings = useMemo(
