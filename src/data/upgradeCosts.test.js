@@ -24,4 +24,10 @@ describe('upgradeCosts.json', () => {
       expect(allPositive(table), res).toBe(true)
     }
   })
+  it('splits every star resource into 4 sub-upgrades plus the promotion, adding up to the star total', () => {
+    expect(Object.keys(COSTS.stepSplit).sort()).toEqual(Object.keys(COSTS.stars).sort())
+    for (const [res, { sub, promotion }] of Object.entries(COSTS.stepSplit)) {
+      expect(4 * sub + promotion, res).toBeCloseTo(1, 10)
+    }
+  })
 })

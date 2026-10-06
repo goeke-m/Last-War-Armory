@@ -127,5 +127,24 @@
       "4": 20,
       "5": 10
     }
-  }
+  },
+  "stepSplit": {
+    "gold": {
+      "sub": 0.25,
+      "promotion": 0
+    },
+    "ore": {
+      "sub": 0.2,
+      "promotion": 0.2
+    },
+    "dielectric_ceramic": {
+      "sub": 0.2,
+      "promotion": 0.2
+    },
+    "blueprints": {
+      "sub": 0,
+      "promotion": 1
+    }
+  },
+  "stepSplitNotes": "stars[res][n] is the total for one star: the 4 sub-upgrades of tier n-1 plus the promotion into n. stepSplit gives each step's share. In-game 2026-10-06: a 0★ Railgun sub-upgrade cost 23.4M gold / 12.5K ore / 150 ceramic (= stars[1] 93.6M/4, 62.5K/5, 750/5) and the 2★→3★ Armor promotion cost 20.0K ore / 240 ceramic / 15 blueprints and no gold (= stars[3] 100K/5, 1200/5, 15). Verified on those two tiers only; the other tiers are assumed to split the same way."
 }
