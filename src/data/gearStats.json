@@ -295,11 +295,25 @@
    "boostDefense": 0.12,
    "resistPhysical": 0.3
   },
+  "40:3:1": {
+   "heroDefense": 469,
+   "heroHp": 372724,
+   "boostHp": 0.1225,
+   "boostDefense": 0.1225,
+   "resistPhysical": 0.3
+  },
   "40:4:4": {
    "heroDefense": 669,
    "heroHp": 477413,
    "boostHp": 0.145,
    "boostDefense": 0.145,
+   "resistPhysical": 0.4
+  },
+  "40:4:0": {
+   "heroDefense": 574,
+   "heroHp": 427749,
+   "boostHp": 0.135,
+   "boostDefense": 0.135,
    "resistPhysical": 0.4
   },
   "40:5:0": {
@@ -569,6 +583,12 @@
    "boostAttack": 0.085,
    "resistAll": 0.108
   },
+  "40:1:0": {
+   "heroAttack": 3511,
+   "heroHp": 52751,
+   "boostAttack": 0.09,
+   "resistAll": 0.112
+  },
   "40:2:4": {
    "heroAttack": 5125,
    "heroHp": 86612,
@@ -586,6 +606,12 @@
    "heroHp": 140565,
    "boostAttack": 0.145,
    "resistAll": 0.196
+  },
+  "40:4:0": {
+   "heroAttack": 7247,
+   "heroHp": 120700,
+   "boostAttack": 0.135,
+   "resistAll": 0.188
   },
   "40:5:0": {
    "heroAttack": 8666,
@@ -883,6 +909,13 @@
    "boostDefense": 0.13,
    "resistEnergy": 0.3
   },
+  "40:4:0": {
+   "heroDefense": 1749,
+   "heroHp": 181049,
+   "boostHp": 0.135,
+   "boostDefense": 0.135,
+   "resistEnergy": 0.4
+  },
   "40:5:0": {
    "heroDefense": 2033,
    "heroHp": 225747,
@@ -1156,11 +1189,23 @@
    "heroDefense": 627,
    "boostAttack": 0.1
   },
+  "40:1:0": {
+   "heroAttack": 4767,
+   "critRate": 0.23,
+   "heroDefense": 502,
+   "boostAttack": 0.09
+  },
   "40:2:4": {
    "heroAttack": 7186,
    "critRate": 0.305,
    "heroDefense": 824,
    "boostAttack": 0.115
+  },
+  "40:3:0": {
+   "heroAttack": 8234,
+   "critRate": 0.315,
+   "heroDefense": 897,
+   "boostAttack": 0.12
   },
   "40:4:4": {
    "heroAttack": 11540,

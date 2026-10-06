@@ -64,3 +64,11 @@ The lineup has changed since 2026-09-25 (e.g. Murphy and Marshall armor 2★ →
 - New sub rows: 0★ sub 1 for Armor, Data Chip, Radar (upgrade previews); 0★ sub 4 for Railgun and Data Chip.
 - Not changed, worth checking: `Radar,40,4` boosts 15.00% equal 5★ (armor 4★ is 14.50%, so the radar 3★/4★
   boosts may have been shifted one tier); 0★ Railgun/Radar Defense 359/559 vs 358/558 on screen.
+
+# 2026-10-06: promote previews
+
+Source: `~/Desktop/Photos-1-001 (1).zip` (8 upgrade screens). Added to `gear-stats.csv` as `Sub 0` rows (the stats
+right after promotion, extra attributes included): Railgun 1★ and 3★, Data Chip 1★ and 4★, Armor 4★, Radar 4★;
+plus Armor 3★ sub 1. `Radar,40,4` boosts corrected 15.00% → 14.50% (4★ sub 0 is 13.50%, + 4 × 0.25%).
+Every preview's cost matched `upgradeCosts.stepSplit`. In-game sub values are floored (3★ Armor sub 1 Defense
+469 vs 469.75 by linear interpolation; < 1 Power).
