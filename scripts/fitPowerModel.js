@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
-import { buildDesign, fitPowerModel } from './fit.js'
+import { buildDesign, fitPowerModel, fitSpecials } from './fit.js'
 import { stateKey } from '../src/gear/state.js'
 
 const GEAR = JSON.parse(readFileSync('src/data/gearStats.json', 'utf8'))
@@ -23,9 +23,14 @@ if (!fit.ok) {
   process.exit(1)
 }
 
+const { specials, rejected } = fitSpecials(pieces, fit.weights, getStats)
+for (const [slot, v] of Object.entries(specials)) console.log(`  5★ ${slot} special attribute: ${Math.round(v)} Power`)
+for (const r of rejected) console.log(`  5★ ${r.slot} special attribute not set: ${r.reason}`)
+
 const model = {
   weights: fit.weights,
   merged: fit.merged,
+  specials,
   fit: { rows: design.ids.length, maxResidualPct: fit.maxResidualPct, rmsResidualPct: fit.rmsResidualPct },
 }
 writeFileSync('src/data/powerModel.json', JSON.stringify(model, null, 1) + '\n')

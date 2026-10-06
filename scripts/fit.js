@@ -1,5 +1,5 @@
 import { nnls } from './nnls.js'
-import { STAT_KEYS } from '../src/gear/power.js'
+import { STAT_KEYS, piecePower } from '../src/gear/power.js'
 
 // Stats of one piece state, or a reason it cannot be used. A level-40 piece needs its sub-upgrade
 // step: battle reports show only stars, so without it the stats are a range, not a value.
@@ -94,4 +94,24 @@ export function fitPowerModel({ rows, y, ids }, { maxResidualPct = 0.02 } = {}) 
     ...base, ok, residuals, maxResidualPct: maxPct, rmsResidualPct: rms,
     reason: ok ? undefined : `max residual ${(maxPct * 100).toFixed(2)}% exceeds the ${(maxResidualPct * 100).toFixed(0)}% gate`,
   }
+}
+
+// A 5★ piece's special attribute adds Power its stats do not explain. Per slot it is the observed
+// Power minus the stats' Power under the fitted weights, kept only if every 5★ piece of that slot
+// agrees within 1%. Pieces need recorded stats or a getStats lookup.
+export function fitSpecials(pieces, weights, getStats = () => null) {
+  const bySlot = {}
+  for (const p of pieces) {
+    if (p.stars !== 5) continue
+    const stats = p.stats ?? getStats(p.slot, p.level, p.stars, p.sub)
+    if (stats) (bySlot[p.slot] ??= []).push(p.power - piecePower(stats, weights))
+  }
+  const specials = {}, rejected = []
+  for (const [slot, gaps] of Object.entries(bySlot)) {
+    const mean = gaps.reduce((a, b) => a + b, 0) / gaps.length
+    const worst = Math.max(...gaps.map(g => Math.abs(g - mean)))
+    if (worst > 0.01 * Math.abs(mean)) rejected.push({ slot, reason: `5★ observations disagree by up to ${Math.round(worst)} Power` })
+    else specials[slot] = mean
+  }
+  return { specials, rejected }
 }

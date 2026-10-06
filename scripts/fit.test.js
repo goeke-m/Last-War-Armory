@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { buildDesign, fitPowerModel } from './fit.js'
+import { buildDesign, fitPowerModel, fitSpecials } from './fit.js'
 
 // Fake stats: attack scales with level and sub step; hp depends on slot; boostHp and boostDefense always equal.
 const fakeStats = (slot, level, stars, sub = 4) => {
@@ -147,5 +147,24 @@ describe('fitPowerModel', () => {
     const fit = fitPowerModel(buildDesign(few, fakeStats))
     expect(fit.ok).toBe(false)
     expect(fit.reason).toMatch(/underdetermined/i)
+  })
+})
+
+describe('fitSpecials', () => {
+  const weights = { heroAttack: 2 }
+  const five = (id, slot, power) => ({ id, slot, level: 40, stars: 5, sub: 4, power, stats: { heroAttack: 100 } })
+
+  it("is each slot's 5★ Power above what its stats predict, when every observation agrees", () => {
+    const r = fitSpecials([five('a', 'gun', 1200), five('b', 'gun', 1200), five('c', 'armor', 700)], weights)
+    expect(r.specials).toEqual({ gun: 1000, armor: 500 })
+    expect(r.rejected).toEqual([])
+  })
+  it('rejects a slot whose observations disagree by more than 1%', () => {
+    const r = fitSpecials([five('a', 'gun', 1200), five('b', 'gun', 1500)], weights)
+    expect(r.specials).toEqual({})
+    expect(r.rejected).toEqual([{ slot: 'gun', reason: expect.stringMatching(/disagree/) }])
+  })
+  it('ignores pieces below 5★', () => {
+    expect(fitSpecials([{ ...five('a', 'gun', 1200), stars: 4 }], weights).specials).toEqual({})
   })
 })

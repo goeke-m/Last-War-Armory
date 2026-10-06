@@ -14,6 +14,11 @@
  "merged": {
   "boostDefense": "boostHp"
  },
+ "specials": {
+  "gun": 15652.051477929926,
+  "armor": 23521.735044496774,
+  "radar": 23571.800908889447
+ },
  "fit": {
   "rows": 35,
   "maxResidualPct": 0.00032645055845832423,
