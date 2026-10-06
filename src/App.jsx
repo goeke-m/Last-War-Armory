@@ -1,6 +1,8 @@
 import { useState, useReducer, useMemo, useEffect } from 'react'
 import { QUALITY_MAX_LEVEL } from './gear/constants.js'
 import { RESOURCES, rankUpgrades, coverage } from './gear/roi.js'
+import { assignGear as placeGear, releaseClashingPins } from './squad/assign.js'
+import { rowOf, arrangeFormation, swapRows } from './squad/rows.js'
 
 // ═══════════════════════════════════════════════════════════════════
 // SECTION 1: GAME DATA
@@ -170,7 +172,8 @@ const BEATS = { tank: 'missile', missile: 'aircraft', aircraft: 'tank' }
 
 // Returns per-hero goal multiplier
 // codeType: for code_battles, which unit type gets the in-game +50% damage bonus this code
-function getGoalMod(heroId, goal, codeType) {
+// row: the hero's effective row (the player's placement, else the hero's default)
+function getGoalMod(heroId, goal, codeType, row = HEROES[heroId].defaultRow) {
   if (goal === 'code_battles') {
     if (codeType && HEROES[heroId].unitType === codeType) return 1.5
     return 1.0
@@ -178,7 +181,7 @@ function getGoalMod(heroId, goal, codeType) {
   const explicit = GOAL_WEIGHTS[goal][heroId]
   if (explicit !== undefined) return explicit
   const hero = HEROES[heroId]
-  if ((goal === 'pvp_rally' || goal === 'world_boss') && hero.role === 'dps' && hero.defaultRow === 'back') {
+  if ((goal === 'pvp_rally' || goal === 'world_boss') && hero.role === 'dps' && row === 'back') {
     return 1.15
   }
   return 1.0
@@ -193,7 +196,7 @@ function isPromotedUR(heroId, heroState, season) {
   return h.promotionSeason !== null && h.promotionSeason <= season && (heroState?.promoted ?? false)
 }
 
-function heroScore(heroId, heroState, season, goal, codeType) {
+function heroScore(heroId, heroState, season, goal, codeType, rows) {
   const { stars, skills, ewLevel } = heroState
   const effectiveRarity = isPromotedUR(heroId, heroState, season) ? 'UR' : HEROES[heroId].rarity
   const rarityWeight = RARITY_WEIGHTS[effectiveRarity]
@@ -213,7 +216,7 @@ function heroScore(heroId, heroState, season, goal, codeType) {
   const starBonus = stars >= 4 ? 1.4 : stars >= 3 ? 1.2 : 1.0
   // ewBonus: 5% per level across 0-30 range
   const ewBonus = effectiveRarity === 'UR' && ewLevel > 0 ? 1 + ewLevel * 0.05 : 1.0
-  const goalMod = getGoalMod(heroId, goal, codeType)
+  const goalMod = getGoalMod(heroId, goal, codeType, rowOf(heroId, rows, HEROES[heroId].defaultRow))
   return base * starBonus * ewBonus * goalMod
 }
 
@@ -223,10 +226,10 @@ function pieceScore(piece) {
 }
 
 // Returns { [heroId]: score } for all owned heroes
-function computeAllHeroScores(heroes, season, goal, codeType) {
+function computeAllHeroScores(heroes, season, goal, codeType, rows) {
   const scores = {}
   for (const [id, state] of Object.entries(heroes)) {
-    if (state.owned) scores[id] = heroScore(id, state, season, goal, codeType)
+    if (state.owned) scores[id] = heroScore(id, state, season, goal, codeType, rows)
   }
   return scores
 }
@@ -369,17 +372,17 @@ function computeSquadReasoning(combo, heroes, opponentType, ownedIds) {
   return { active, opportunities }
 }
 
-function hasFrontTank(combo) {
-  return combo.some(id => HEROES[id].role === 'tank' && HEROES[id].defaultRow === 'front')
+function hasFrontTank(combo, rows) {
+  return combo.some(id => HEROES[id].role === 'tank' && rowOf(id, rows, HEROES[id].defaultRow) === 'front')
 }
 
 // Returns { squad: heroId[], alternates: {[heroId]: {heroId, scoreDiff}}, score, insufficient }
-function findRecommendedSquad(ownedIds, heroScores, heroes, intent, opponentType) {
+function findRecommendedSquad(ownedIds, heroScores, heroes, intent, opponentType, rows) {
   if (ownedIds.length < 5) {
     return { squad: ownedIds, alternates: {}, score: 0, insufficient: true }
   }
   const combos = getCombinations(ownedIds, 5)
-  const valid = combos.filter(hasFrontTank)
+  const valid = combos.filter(c => hasFrontTank(c, rows))
   const pool = valid.length > 0 ? valid : combos
   const scored = pool
     .map(combo => ({ combo, score: computeSquadScore(combo, heroScores, heroes, intent, opponentType) }))
@@ -393,7 +396,7 @@ function findRecommendedSquad(ownedIds, heroScores, heroes, intent, opponentType
     for (const altId of ownedIds) {
       if (best.combo.includes(altId)) continue
       const swapped = best.combo.map(id => id === heroId ? altId : id)
-      if (valid.length > 0 && !hasFrontTank(swapped)) continue
+      if (valid.length > 0 && !hasFrontTank(swapped, rows)) continue
       const s = computeSquadScore(swapped, heroScores, heroes, intent, opponentType)
       if (s > bestAltScore) { bestAltScore = s; bestAlt = altId }
     }
@@ -404,27 +407,24 @@ function findRecommendedSquad(ownedIds, heroScores, heroes, intent, opponentType
   return { squad: best.combo, alternates, score: best.score, reasoning, insufficient: false }
 }
 
-// Returns { assigned: {[heroId]: {gun,chip,armor,radar}}, unassigned: piece[] }
+// Pinned pieces stay on their hero; the rest goes best-first by hero score and role slot priority.
 function assignGear(squadIds, gear, heroScores) {
-  // Best heroes pick first
-  const sortedSquad = [...squadIds].sort((a, b) => (heroScores[b] ?? 0) - (heroScores[a] ?? 0))
-  // Sort available gear by score descending for fast best-first lookup
-  const available = [...gear].sort((a, b) => pieceScore(b) - pieceScore(a))
-  const usedIds = new Set()
-  const assigned = {}
+  return placeGear(squadIds, gear, {
+    rank: heroScores,
+    pieceScore,
+    slotPriority: id => SLOT_PRIORITY[HEROES[id].role] ?? SLOT_PRIORITY.dps,
+  })
+}
 
-  for (const heroId of sortedSquad) {
-    const role = HEROES[heroId].role
-    const priority = SLOT_PRIORITY[role] ?? SLOT_PRIORITY.dps
-    assigned[heroId] = { gun: null, chip: null, armor: null, radar: null }
-    for (const slot of priority) {
-      const best = available.find(p => p.slot === slot && !usedIds.has(p.id))
-      if (best) { assigned[heroId][slot] = best; usedIds.add(best.id) }
-    }
+// The squad in use: the player's locked 5 when set and all still owned, else the recommendation.
+function activeSquad(recommended, squadLock, ownedIds, heroScores, heroes, intent, opponentType) {
+  const locked = Array.isArray(squadLock) && squadLock.length === 5 && squadLock.every(id => ownedIds.includes(id))
+  if (!locked) return { ...recommended, locked: false, recommended }
+  return {
+    squad: squadLock, alternates: {}, insufficient: false, locked: true, recommended,
+    score: computeSquadScore(squadLock, heroScores, heroes, intent, opponentType),
+    reasoning: computeSquadReasoning(squadLock, heroes, opponentType, ownedIds),
   }
-
-  const unassigned = gear.filter(p => !usedIds.has(p.id))
-  return { assigned, unassigned }
 }
 
 function roleBasedUpgrades(assigned) {
@@ -545,6 +545,8 @@ function getProfileData(state) {
     codeType: state.codeType,
     heroes: state.heroes,
     gear: state.gear,
+    squadLock: state.squadLock,
+    rows: state.rows,
   }
 }
 
@@ -575,7 +577,12 @@ const BLANK_PROFILE = {
   codeType: null,
   heroes: INITIAL_HEROES_STATE,
   gear: [],
+  squadLock: null, // the player's own 5 heroes, or null to use the recommended squad
+  rows: {},        // { [heroId]: 'front' | 'back' }, the player's row placement
 }
+
+// Profiles saved before squadLock/rows existed load with the defaults.
+const PROFILE_DEFAULTS = { squadLock: null, rows: {} }
 
 // Merges any heroes added after a profile was saved so new heroes always exist in state
 function mergeHeroes(saved) {
@@ -587,6 +594,7 @@ function buildInitialState() {
   if (saved) {
     const profile = saved.profiles[saved.activeProfile] ?? BLANK_PROFILE
     return {
+      ...PROFILE_DEFAULTS,
       ...profile,
       heroes: mergeHeroes(profile.heroes ?? {}),
       profiles: saved.profiles,
@@ -633,10 +641,18 @@ function reducer(state, action) {
     }
 
     // Gear mutations
-    case 'ADD_GEAR':
-      return syncProfile({ ...state, gear: [...state.gear, { ...action.piece, id: crypto.randomUUID() }] })
-    case 'UPDATE_GEAR':
-      return syncProfile({ ...state, gear: state.gear.map(g => g.id === action.id ? { ...g, ...action.updates } : g) })
+    case 'ADD_GEAR': {
+      const id = crypto.randomUUID()
+      return syncProfile({ ...state, gear: releaseClashingPins([...state.gear, { ...action.piece, id }], id) })
+    }
+    case 'UPDATE_GEAR': {
+      const gear = state.gear.map(g => g.id === action.id ? { ...g, ...action.updates } : g)
+      return syncProfile({ ...state, gear: releaseClashingPins(gear, action.id) })
+    }
+    case 'SET_SQUAD_LOCK':
+      return syncProfile({ ...state, squadLock: action.payload })
+    case 'SET_ROWS':
+      return syncProfile({ ...state, rows: action.payload })
     case 'DELETE_GEAR':
       return syncProfile({ ...state, gear: state.gear.filter(g => g.id !== action.id) })
 
@@ -659,7 +675,7 @@ function reducer(state, action) {
     case 'SWITCH_PROFILE': {
       const profile = state.profiles[action.name]
       if (!profile) return state
-      return { ...state, activeProfile: action.name, ...profile, heroes: mergeHeroes(profile.heroes ?? {}) }
+      return { ...state, activeProfile: action.name, ...PROFILE_DEFAULTS, ...profile, heroes: mergeHeroes(profile.heroes ?? {}) }
     }
     case 'RENAME_PROFILE': {
       const { oldName, newName } = action
@@ -677,11 +693,11 @@ function reducer(state, action) {
       const { [action.name]: _, ...remaining } = state.profiles
       const nextActive = state.activeProfile === action.name ? Object.keys(remaining)[0] : state.activeProfile
       const nextProfile = remaining[nextActive]
-      return { ...state, profiles: remaining, activeProfile: nextActive, ...nextProfile }
+      return { ...state, profiles: remaining, activeProfile: nextActive, ...PROFILE_DEFAULTS, ...nextProfile }
     }
     case 'IMPORT_PROFILE': {
       const { name, data } = action
-      return { ...state, profiles: { ...state.profiles, [name]: data }, activeProfile: name, ...data }
+      return { ...state, profiles: { ...state.profiles, [name]: data }, activeProfile: name, ...PROFILE_DEFAULTS, ...data, heroes: mergeHeroes(data.heroes ?? {}) }
     }
 
     default:
@@ -1009,7 +1025,8 @@ function UpgradePriority({ state, dispatch, upgradePriority }) {
   )
 }
 
-function HeroFormationCard({ heroId, state, heroScores, gearAssignment, alternates }) {
+// swap: { selected, target, onClick } for moving heroes between rows (tap ⇅, then a hero in the other row)
+function HeroFormationCard({ heroId, state, heroScores, gearAssignment, alternates, swap }) {
   const hero = HEROES[heroId]
   const colors = UNIT_COLORS[hero.unitType]
   const h = state.heroes[heroId]
@@ -1017,10 +1034,18 @@ function HeroFormationCard({ heroId, state, heroScores, gearAssignment, alternat
   const alt = alternates[heroId]
 
   return (
-    <div className={`border-t-4 ${colors.border} bg-neutral-900 border border-neutral-800 p-2 flex flex-col gap-1`}>
+    <div className={`border-t-4 ${colors.border} bg-neutral-900 border p-2 flex flex-col gap-1
+      ${swap.selected ? 'border-amber-500' : swap.target ? 'border-amber-800 cursor-pointer' : 'border-neutral-800'}`}
+      onClick={swap.target ? swap.onClick : undefined}>
       {/* Hero identity */}
       <div>
-        <p className="font-rajdhani font-semibold text-sm text-gray-200 truncate leading-tight">{hero.name}</p>
+        <div className="flex items-center gap-1">
+          <p className="font-rajdhani font-semibold text-sm text-gray-200 truncate leading-tight flex-1">{hero.name}</p>
+          <button onClick={e => { e.stopPropagation(); swap.onClick() }} title="Move to the other row"
+            className={`font-mono text-xs px-1 border min-h-[24px] ${swap.selected ? 'border-amber-500 text-amber-500' : 'border-neutral-700 text-neutral-500 hover:text-gray-300'}`}>
+            ⇅
+          </button>
+        </div>
         <div className="flex items-center gap-1 flex-wrap">
           <span className={`font-orbitron text-xs ${colors.text}`}>{hero.rarity}</span>
           <span className="font-mono text-xs text-neutral-500">{h.stars}★</span>
@@ -1057,8 +1082,33 @@ function HeroFormationCard({ heroId, state, heroScores, gearAssignment, alternat
   )
 }
 
-function SquadOptimizer({ state, recommendedSquad, gearAssignment, heroScores }) {
+function SquadPicker({ state, dispatch, ownedIds, onDone }) {
+  const [picked, setPicked] = useState(state.squadLock ?? [])
+  const toggle = id => setPicked(p => p.includes(id) ? p.filter(x => x !== id) : p.length < 5 ? [...p, id] : p)
+  return (
+    <div className="mb-4 border border-neutral-700 p-2">
+      <p className="font-orbitron text-xs text-neutral-500 mb-2">PICK YOUR 5 — <span className="text-amber-600">{picked.length}/5</span></p>
+      <div className="flex flex-wrap gap-1 mb-2">
+        {ownedIds.map(id => (
+          <button key={id} onClick={() => toggle(id)}
+            className={`px-2 py-1 font-rajdhani text-sm border min-h-[36px] ${picked.includes(id) ? 'border-amber-600 text-amber-600 bg-amber-600/10' : 'border-neutral-700 text-neutral-500'}`}>
+            {HEROES[id].name}
+          </button>
+        ))}
+      </div>
+      <div className="flex gap-2">
+        <button disabled={picked.length !== 5} onClick={() => { dispatch({ type: 'SET_SQUAD_LOCK', payload: picked }); onDone() }}
+          className="flex-1 py-2 font-orbitron text-xs bg-amber-600 text-black disabled:opacity-40 min-h-[40px]">USE MY SQUAD</button>
+        <button onClick={onDone} className="px-3 py-2 font-orbitron text-xs border border-neutral-700 text-neutral-400 min-h-[40px]">CANCEL</button>
+      </div>
+    </div>
+  )
+}
+
+function SquadOptimizer({ state, dispatch, recommendedSquad, gearAssignment, heroScores, ownedIds }) {
   const [open, setOpen] = useState(false) // must be before early return — hooks must run unconditionally
+  const [picking, setPicking] = useState(false)
+  const [swapFrom, setSwapFrom] = useState(null)
   if (recommendedSquad.insufficient) {
     return (
       <div className="p-4">
@@ -1072,19 +1122,50 @@ function SquadOptimizer({ state, recommendedSquad, gearAssignment, heroScores })
     )
   }
 
-  const { squad, alternates } = recommendedSquad
-  const sorted = [...squad].sort((a, b) =>
-    (HEROES[a].defaultRow === 'front' ? 0 : 1) - (HEROES[b].defaultRow === 'front' ? 0 : 1)
-  )
-  const frontRow = sorted.slice(0, 2)
-  const backRow = sorted.slice(2)
+  const { squad, alternates, locked, recommended } = recommendedSquad
+  const formation = arrangeFormation(squad, id => rowOf(id, state.rows, HEROES[id].defaultRow))
+  const frontRow = formation.front
+  const backRow = formation.back
+  const rowOfCard = id => (frontRow.includes(id) ? 'front' : 'back')
+  // Tap ⇅ on one hero, then any hero in the other row: the two swap rows.
+  const swapFor = id => ({
+    selected: swapFrom === id,
+    target: swapFrom !== null && rowOfCard(swapFrom) !== rowOfCard(id),
+    onClick: () => {
+      if (swapFrom !== null && rowOfCard(swapFrom) !== rowOfCard(id)) {
+        dispatch({ type: 'SET_ROWS', payload: swapRows(state.rows, formation, swapFrom, id) })
+        setSwapFrom(null)
+      } else setSwapFrom(swapFrom === id ? null : id)
+    },
+  })
   const cardProps = { state, heroScores, gearAssignment, alternates }
 
   return (
     <div className="p-3 max-w-lg">
-      <p className="font-orbitron text-amber-600 text-xs tracking-widest border-b border-dashed border-neutral-700 pb-2 mb-4">
-        // OPTIMAL SQUAD · SCORE {recommendedSquad.score.toFixed(1)}
+      <p className="font-orbitron text-amber-600 text-xs tracking-widest border-b border-dashed border-neutral-700 pb-2 mb-2">
+        // {locked ? 'MY SQUAD' : 'OPTIMAL SQUAD'} · SCORE {recommendedSquad.score.toFixed(1)}
       </p>
+      <div className="flex items-center gap-2 mb-3 flex-wrap">
+        <button onClick={() => setPicking(p => !p)}
+          className="px-3 py-1 font-orbitron text-xs border border-neutral-700 text-neutral-400 hover:border-neutral-500 min-h-[36px]">
+          {locked ? 'CHANGE MY SQUAD' : 'SET MY SQUAD'}
+        </button>
+        {locked && (
+          <button onClick={() => dispatch({ type: 'SET_SQUAD_LOCK', payload: null })}
+            className="px-3 py-1 font-orbitron text-xs border border-neutral-700 text-neutral-400 hover:border-neutral-500 min-h-[36px]">
+            USE RECOMMENDED
+          </button>
+        )}
+        {locked && !recommended.insufficient && (
+          <p className="font-rajdhani text-xs text-neutral-500 w-full">
+            App suggests: {recommended.squad.map(id => HEROES[id].name).join(', ')} (score {recommended.score.toFixed(1)} vs yours {recommendedSquad.score.toFixed(1)})
+          </p>
+        )}
+        {swapFrom && (
+          <p className="font-rajdhani text-xs text-amber-600 w-full">Tap a hero in the other row to swap with {HEROES[swapFrom].name}.</p>
+        )}
+      </div>
+      {picking && <SquadPicker state={state} dispatch={dispatch} ownedIds={ownedIds} onDone={() => setPicking(false)} />}
 
       {/* Enemy direction label */}
       <p className="font-orbitron text-xs text-neutral-600 tracking-widest text-center mb-1">▲ ENEMY ▲</p>
@@ -1093,7 +1174,7 @@ function SquadOptimizer({ state, recommendedSquad, gearAssignment, heroScores })
       <div className="mb-1">
         <p className="font-orbitron text-xs text-neutral-500 tracking-widest mb-1">FRONT ROW</p>
         <div className="grid grid-cols-2 gap-2">
-          {frontRow.map(id => <HeroFormationCard key={id} heroId={id} {...cardProps} />)}
+          {frontRow.map(id => <HeroFormationCard key={id} heroId={id} {...cardProps} swap={swapFor(id)} />)}
         </div>
       </div>
 
@@ -1104,7 +1185,7 @@ function SquadOptimizer({ state, recommendedSquad, gearAssignment, heroScores })
       <div className="mb-3">
         <p className="font-orbitron text-xs text-neutral-500 tracking-widest mb-1">BACK ROW</p>
         <div className="grid grid-cols-3 gap-2">
-          {backRow.map(id => <HeroFormationCard key={id} heroId={id} {...cardProps} />)}
+          {backRow.map(id => <HeroFormationCard key={id} heroId={id} {...cardProps} swap={swapFor(id)} />)}
         </div>
       </div>
 
@@ -1201,6 +1282,9 @@ function GearPieceRow({ piece, onEdit }) {
         <p className="font-mono text-xs text-gray-300">Lv {piece.level}</p>
         <GearSegBar level={piece.level} />
         <StarPips stars={piece.stars} />
+        {piece.heroId && HEROES[piece.heroId] && (
+          <p className="font-mono text-xs text-sky-500">on {HEROES[piece.heroId].name}</p>
+        )}
         {piece.quality === 'legendary' && piece.level === 40 && piece.stars < 5 && (
           <p className={`font-mono text-xs ${piece.sub == null ? 'text-amber-700' : 'text-neutral-500'}`}>
             {piece.sub == null ? 'sub-upgrade ?/4 — tap to set' : `sub-upgrade ${piece.sub}/4`}
@@ -1212,12 +1296,14 @@ function GearPieceRow({ piece, onEdit }) {
   )
 }
 
-function GearEditModal({ piece, onSave, onDelete, onClose }) {
+// heroOptions: owned hero ids the piece can be put on
+function GearEditModal({ piece, heroOptions, onSave, onDelete, onClose }) {
   const [slot, setSlot] = useState(piece?.slot ?? 'gun')
   const [quality, setQuality] = useState(piece?.quality ?? 'legendary')
   const [level, setLevel] = useState(piece?.level ?? 0)
   const [stars, setStars] = useState(piece?.stars ?? 0)
   const [sub, setSub] = useState(piece?.sub ?? null)
+  const [heroId, setHeroId] = useState(piece?.heroId ?? '')
   // Sub-upgrades (4 per star tier) only exist on legendary gear at level 40.
   const hasSub = quality === 'legendary' && level === QUALITY_MAX_LEVEL[quality] && stars < 5
 
@@ -1305,9 +1391,19 @@ function GearEditModal({ piece, onSave, onDelete, onClose }) {
           </div>
         )}
 
+        {/* Equipped on */}
+        <div>
+          <p className="font-orbitron text-xs text-neutral-500 mb-1">EQUIPPED ON — <span className="font-rajdhani normal-case text-neutral-600">Auto lets the optimizer choose</span></p>
+          <select value={heroId} onChange={e => setHeroId(e.target.value)}
+            className="w-full bg-neutral-900 border border-neutral-700 text-gray-200 font-rajdhani text-sm px-2 py-2 min-h-[40px]">
+            <option value="">Auto</option>
+            {heroOptions.map(id => <option key={id} value={id}>{HEROES[id].name}</option>)}
+          </select>
+        </div>
+
         {/* Actions */}
         <div className="flex gap-2 pt-2">
-          <button onClick={() => onSave({ slot, quality, level, stars, sub: hasSub ? sub : stars === 5 ? 0 : null })}
+          <button onClick={() => onSave({ slot, quality, level, stars, sub: hasSub ? sub : stars === 5 ? 0 : null, heroId: heroId || undefined })}
             className="flex-1 py-2 font-orbitron text-xs bg-amber-600 text-black hover:bg-amber-500 min-h-[44px]">
             {isNew ? 'ADD' : 'SAVE'}
           </button>
@@ -1327,7 +1423,7 @@ function GearEditModal({ piece, onSave, onDelete, onClose }) {
   )
 }
 
-function GearInventory({ state, dispatch }) {
+function GearInventory({ state, dispatch, ownedIds }) {
   const [editPiece, setEditPiece] = useState(null)
 
   const counts = SLOTS.reduce((acc, slot) => {
@@ -1338,7 +1434,7 @@ function GearInventory({ state, dispatch }) {
   return (
     <div className="p-3 max-w-lg">
       <p className="font-orbitron text-amber-600 text-xs tracking-widest border-b border-dashed border-neutral-700 pb-2 mb-3">
-        // GEAR INVENTORY — FLAT LIST, NO HERO LOCK
+        // GEAR INVENTORY
       </p>
 
       {/* Summary + tooltip */}
@@ -1367,6 +1463,7 @@ function GearInventory({ state, dispatch }) {
       {editPiece !== null && (
         <GearEditModal
           piece={Object.keys(editPiece).length > 0 ? editPiece : null}
+          heroOptions={ownedIds}
           onSave={data => {
             if (editPiece.id) dispatch({ type: 'UPDATE_GEAR', id: editPiece.id, updates: data })
             else dispatch({ type: 'ADD_GEAR', piece: data })
@@ -1733,8 +1830,8 @@ function HelpGuide() {
       <Section title="// QUICK START">
         <Row label="1. GOAL">Set your current season, optimization goal (PvP / World Boss / Code Battles), and squad intent (Mono or Hybrid).</Row>
         <Row label="2. ROSTER">Tap any hero to mark them as owned. Tap again to expand and enter their stars, hero level, skill levels, and EW level.</Row>
-        <Row label="3. GEAR">Tap + ADD GEAR and enter each piece of gear you own. Select the color (Gold / Purple / Blue / Green) that matches the gear in-game.</Row>
-        <Row label="4. SQUAD">The optimizer picks your best 5 heroes and assigns your gear. Check the bottom panel for your loadout, upgrade list, and warnings.</Row>
+        <Row label="3. GEAR">Tap + ADD GEAR and enter each piece of gear you own. Select the color (Gold / Purple / Blue / Green) that matches the gear in-game. Set EQUIPPED ON to put a piece on a specific hero, or leave it on Auto.</Row>
+        <Row label="4. SQUAD">The optimizer picks your best 5 heroes and assigns your gear. SET MY SQUAD locks in your own 5 instead (the app's pick stays shown for comparison). Tap ⇅ on a hero, then a hero in the other row, to swap their rows. Check the bottom panel for your loadout, upgrade list, and warnings.</Row>
       </Section>
 
       <Section title="// ROSTER">
@@ -1747,7 +1844,7 @@ function HelpGuide() {
       <Section title="// GEAR">
         <Row label="QUALITY">Match the color of your gear in-game — Gold (Legendary, max Lv40), Purple (Epic, max Lv30), Blue (Rare, max Lv15), Green (Common, max Lv10).</Row>
         <Row label="STARS">Gear must be at max level before it can be starred. Selecting any star automatically sets the level to max. Blueprints required for 1–4★, Mythic Blueprints for 5★.</Row>
-        <Row label="NO HERO LOCK">Gear is never assigned to a specific hero. The optimizer re-solves the full assignment every time — just enter what you own.</Row>
+        <Row label="GEAR PLACEMENT">Pieces left on Auto are re-assigned by the optimizer every time. A piece set to a hero stays on that hero; putting another piece on the same hero and slot moves the old one back to Auto, like equipping in-game.</Row>
         <Row label="INVEST">Focus all investment on Legendary (Gold) gear. Dismantle Epic and below for crafting materials.</Row>
       </Section>
 
@@ -1845,23 +1942,29 @@ export default function App() {
   )
 
   const heroScores = useMemo(
-    () => computeAllHeroScores(state.heroes, state.season, state.goal, state.codeType),
-    [state.heroes, state.season, state.goal, state.codeType]
+    () => computeAllHeroScores(state.heroes, state.season, state.goal, state.codeType, state.rows),
+    [state.heroes, state.season, state.goal, state.codeType, state.rows]
   )
 
   const recommendedSquad = useMemo(
-    () => findRecommendedSquad(ownedIds, heroScores, state.heroes, state.intent, state.opponentType),
-    [ownedIds, heroScores, state.heroes, state.intent, state.opponentType]
+    () => findRecommendedSquad(ownedIds, heroScores, state.heroes, state.intent, state.opponentType, state.rows),
+    [ownedIds, heroScores, state.heroes, state.intent, state.opponentType, state.rows]
+  )
+
+  // From here on, "squad" is the one in use: the player's locked 5 if set, else the recommendation.
+  const squadInfo = useMemo(
+    () => activeSquad(recommendedSquad, state.squadLock, ownedIds, heroScores, state.heroes, state.intent, state.opponentType),
+    [recommendedSquad, state.squadLock, ownedIds, heroScores, state.heroes, state.intent, state.opponentType]
   )
 
   const gearAssignment = useMemo(
-    () => assignGear(recommendedSquad.squad, state.gear, heroScores),
-    [recommendedSquad.squad, state.gear, heroScores]
+    () => assignGear(squadInfo.squad, state.gear, heroScores),
+    [squadInfo.squad, state.gear, heroScores]
   )
 
   const hasSquadEW5 = useMemo(
-    () => recommendedSquad.squad.some(id => (state.heroes[id]?.ewLevel ?? 0) >= 5),
-    [recommendedSquad.squad, state.heroes]
+    () => squadInfo.squad.some(id => (state.heroes[id]?.ewLevel ?? 0) >= 5),
+    [squadInfo.squad, state.heroes]
   )
 
   const upgradePriority = useMemo(
@@ -1870,15 +1973,15 @@ export default function App() {
   )
 
   const warnings = useMemo(
-    () => computeWarnings(state, recommendedSquad.squad, state.season),
-    [state.intent, state.heroes, state.gear, recommendedSquad.squad, state.season]
+    () => computeWarnings(state, squadInfo.squad, state.season),
+    [state.intent, state.heroes, state.gear, squadInfo.squad, state.season]
   )
 
   const sections = {
     goal:     <GoalSelector state={state} dispatch={dispatch} ownedIds={ownedIds} />,
     roster:   <RosterManager state={state} dispatch={dispatch} heroScores={heroScores} season={state.season} />,
-    gear:     <GearInventory state={state} dispatch={dispatch} />,
-    squad:    <SquadOptimizer state={state} recommendedSquad={recommendedSquad} gearAssignment={gearAssignment} heroScores={heroScores} />,
+    gear:     <GearInventory state={state} dispatch={dispatch} ownedIds={ownedIds} />,
+    squad:    <SquadOptimizer state={state} dispatch={dispatch} recommendedSquad={squadInfo} gearAssignment={gearAssignment} heroScores={heroScores} ownedIds={ownedIds} />,
     upgrades: <UpgradePriority state={state} dispatch={dispatch} upgradePriority={upgradePriority} />,
     help:     <HelpGuide />,
   }
@@ -1929,7 +2032,7 @@ export default function App() {
       <RecPanel
         state={state}
         dispatch={dispatch}
-        recommendedSquad={recommendedSquad}
+        recommendedSquad={squadInfo}
         gearAssignment={gearAssignment}
         upgradePriority={upgradePriority}
         warnings={warnings}
