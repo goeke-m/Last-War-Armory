@@ -20,6 +20,8 @@
 - CSV facts: CRLF line endings, 14 columns, percentages like `2.50%`, no quoted fields. CSV equipment names map `Railgun→gun`, `Data Chip→chip`, `Armor→armor`, `Radar→radar` (the app's `SLOTS`).
 - Stats exist only for `legendary` quality pieces (max Lv 40). Other qualities have no ROI.
 
+> **2026-10-06 amendment (sub-upgrades):** every star tier, 0★ included, has 4 sub-upgrades that battle reports do not show. See the spec's "Sub-upgrades" section. Implemented: `stateKey(level, stars, sub)` in `src/gear/state.js` (plain `level:stars` = top of tier, sub 4); optional `Sub` CSV column; `getStats(slot, level, stars, sub = 4)`; `buildDesign(lineups, getStats, checks)` drops lineups with a Lv.40 piece lacking `sub` and turns `data/raw/powerChecks.json` entries into stat-delta rows (fit data, no longer only validation); `scripts/readGearScreens.js` reads star bars from screenshots. Still open: per-step costs in `upgradeCosts.json`, and the ROI/UI tasks ranking single steps.
+
 > **2026-09-20 amendment (star tiers):** star promotions only unlock at level 40 (user-confirmed), so pieces below level 40 always have 0 stars and `rankUpgrades` offers a star promotion only when the piece is at max level (Task 5 code and tests below already reflect this).
 
 > **2026-09-20 amendment:** the border filter in Task 3's code below was removed after execution (commit `refactor: drop border filter…`): a border is just the star tier, so `buildDesign(lineups, getStats)` takes no border, pieces have no `border` field, and the CLI takes no `--border` flag. The Task 3 code blocks below show the original version.

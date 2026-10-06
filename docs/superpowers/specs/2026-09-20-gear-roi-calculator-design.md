@@ -1,7 +1,7 @@
 # Gear ROI Calculator — Design
 
 **Date:** 2026-09-20
-**Status:** Approved in conversation; pending written-spec review
+**Status:** Approved in conversation; pending written-spec review. Revised 2026-10-06 for sub-upgrades (below).
 **Background:** `docs/gear-roi-research-status.md`
 
 ## Goal
@@ -14,9 +14,11 @@ resource.**
 ## Decisions
 
 - **Return metric:** in-game Power delta per upgrade.
-- **Power source:** battle-report gear pages show one Power total per side
-  (5 heroes × 4 pieces), never per piece. Per-piece Power is recovered by
-  regression against those totals.
+- **Power source:** Power-per-stat weights are fitted only from data whose
+  stats are known exactly (see "Sub-upgrades"): in-game power checks (Power
+  before/after one upgrade) and lineups whose every level-40 piece has a known
+  sub-upgrade step. Battle-report sides of other players are kept for
+  cross-checking but are not fit data.
 - **Cost model:** resources (gold, ore, ceramic, blueprints) are kept separate.
   The user picks a *limiting resource*; ROI = Power gained ÷ units of that
   resource. No invented exchange rate.
@@ -37,6 +39,36 @@ resource.**
 `computeUpgradePriority` (max-efficiency mode) calls `roi.js`. `heroScore` is
 untouched. Role-based and Weakest-link modes are untouched (they use levels only).
 
+## Sub-upgrades (added 2026-10-06)
+
+Every star tier, 0★ included, has 4 sub-upgrades (a 4-segment progress bar on the
+piece's own upgrade screen; user-confirmed). A level-40 piece's state is therefore
+(stars, sub) with sub 0–4; sub-upgrades and promotions only exist at level 40.
+
+- Order: (s, 0) → (s, 1) → … → (s, 4) → promote → (s+1, 0).
+- `gear-stats.csv` rows without a Sub value are the **top of the tier**, (s, 4):
+  the user records each tier after its 4th sub-upgrade. Rows for sub 0–3 are
+  added with an optional `Sub` column (after `Stars`). The upgrade screen
+  previews the next step's stats, so they can be recorded without spending.
+- Battle reports show only the star count, never sub progress. A side of
+  another player is therefore a range (between the tier's floor and its top)
+  and cannot be fitted exactly. This is why identical-looking 20× Lv.40 0★
+  lineups read 2.9M, 3.0M and 3.3M on 2026-09-25.
+- Lineup pieces carry an optional `sub`. A lineup is exact (fit data) only if
+  every level-40 piece has `sub`. The user can annotate their own lineups by
+  checking each piece in-game.
+- **Power checks** (`data/raw/powerChecks.json`) are the primary fit data:
+  `{ id, slot, from: {level, stars, sub}, to: {level, stars, sub}, powerBefore,
+  powerAfter }`, one upgrade each. Each is one exact equation:
+  stats(to) − stats(from) against powerAfter − powerBefore. Power is read where
+  the game shows it as a full integer (the hero's Power on the hero screen),
+  not the rounded gear-page total.
+- The ROI unit is one step: a level, a sub-upgrade, or a promotion.
+  `upgradeCosts.json` currently sums Cpt Hedgehog's per-sub-tier promotion costs
+  into whole-star costs; it must be re-sourced per step (Cpt's sub-tier arrays
+  map directly: tier 1–4 of star s = sub-upgrades of s, tier 0 of s =
+  promotion into s).
+
 ## Data coverage
 
 Star promotions only unlock at level 40 (user-confirmed), so the full state space
@@ -56,15 +88,15 @@ promotion is only offered for a piece already at max level.
   (slot, level, stars) plus the gear-total Power. Border color is not recorded:
   the user confirmed it only encodes stars (orange = gold gear below 5★, red =
   5★ "mythic"), so stars already carry it.
-- Non-negative least squares over all lineups. Columns that move together
+- Non-negative least squares over all exact rows (power checks and exact lineups). Columns that move together
   (e.g. Armor's identical Boost HP / Boost Defense) are reported unidentifiable
   and merged, not given arbitrary values.
 - **Quality gate:** the script prints per-lineup residuals and refuses to write
   `powerModel.js` if error exceeds 2% of gear total. If residuals show
   non-linearity, try per-stat exponents or per-slot weights before abandoning
   the approach.
-- **Validation:** check fitted deltas against 3–5 upgrades recorded in-game
-  (Power before/after).
+- **Validation:** battle-report sides of other players must fall inside the
+  range their star tiers allow; power checks held out from the fit must match.
 - Lineups containing a piece with no CSV stats are dropped, not estimated.
 
 ## UI
@@ -99,6 +131,9 @@ weighting of gear, live-game data extraction.
 ## Open questions
 
 - Does the game show Power on a single piece or on upgrade? (Would give a
-  cleaner fit and validation.)
+  cleaner fit and validation.) Power checks currently use the hero screen's Power.
+- Does 5★ have sub-upgrades? Nothing follows it, so the CSV's 5★ row is treated
+  as the final state until confirmed.
+- Resolved 2026-10-06: 0★ has 4 sub-upgrades too.
 - Resolved 2026-09-20: red/orange borders are just the star tier (orange = gold below 5★,
   red = 5★ mythic), not a quality tier. No border field or filter is used.
