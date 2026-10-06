@@ -16,3 +16,36 @@ Red-border consistency check: every red-bordered piece has 5 stars.
 Note: attack1 both sides read 6.4M; attack1-left has a different build than attack2/3/4-left (2.9M) - transcribed as shown.
 Right sides of attack1, attack2 and defense1/2/3 (6.4M) are the same enemy build (attack1/2 identical to each other;
 defense1/2/3 identical to each other).
+
+# 2026-09-25 batch (55 reports, verified)
+
+Source: `~/Downloads/Last War Data Mining/Battle Report/New folder/` (110 screenshots, Overview + Gear per report).
+Claude-chat transcriptions of these (`Battle Data 1-4.json`) were discarded: the same player's
+build came out differently in each file and 10 reports were missing.
+
+## How it was read
+- Stars were counted from pixels, not by eye (now `scripts/readGearScreens.js`): every dot on every tile was measured
+  (filled dot = bright gold, empty = dark brown). Readings were bimodal (≤10% vs ≥70% gold), with no
+  ambiguous dots. Slot order was checked by icon matching (left gun/armor/chip/radar, right mirrored):
+  0 mismatches.
+- Only Lv.40 pieces have a dot bar. The 121 pieces with no bar were read by eye (Lv.0–20) and have 0 stars.
+- The same detector re-checked the 7 reports from 2026-09-18 above: all 14 sides match.
+- Names, Attack/Defense labels, Battle Report IDs and gear-page Power were read by eye.
+- Self-consistency: all 28 player/Power combinations (including my 6.4M, 2.9M and 1.5M lineups
+  across 55 reports) have exactly one build.
+
+## Fields
+- `date` is null: the battle timestamp is cropped out of these screenshots. `capturedAt` is the
+  screenshot time. `screenshots` names the Overview/Gear files. `hero` was not transcribed.
+- `battleReports.json` gets each distinct (power, pieces) lineup once (24 new sides); the full 110-side
+  transcription is in `battleReports.2026-09-25.full.json`.
+- Left out: 1420011371824889328-enemy (Player 8, 2.4M) has only 4 heroes (16 pieces); the fitter requires 20.
+
+## Findings
+- My 2.9M squad had Murphy's gun at Lv.20 (no bar) on 09-25; on 09-18 it was Lv.40.
+- Identical-looking gear does not give identical Power: 20× Lv.40 0★ reads 2.9M (me), 3.0M (Player 2)
+  and 3.3M (Player 3). Explanation (user, 2026-09-27): every star tier has 4 hidden sub-upgrades
+  (a 4-segment progress bar on the piece's own upgrade screen). The battle report shows only the star
+  count, never the sub-progress, and `gear-stats.csv` records each tier after its 4th sub-upgrade (the
+  top of the tier). So a battle-report side only bounds its stats: somewhere between the tier's floor
+  and its top. Only lineups whose sub-progress is known (my own, checked piece by piece) are exact.
