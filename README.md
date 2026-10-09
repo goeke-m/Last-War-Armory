@@ -1,6 +1,8 @@
-# Last War · Squad & Gear Optimizer
+# Last War Armory
 
-A mobile-first community tool for Last War Survival players. Input your hero roster and gear inventory — get an optimal squad, gear loadout, and upgrade priority list instantly.
+A mobile-first community tool for Last War Survival players. Enter your hero roster and gear, and get a recommended squad, gear loadout and upgrade priority list.
+
+**Use it:** https://goeke-m.github.io/Last-War-Armory/ (beta: Gold gear only; skills, hero level and code battles aren’t counted yet).
 
 ## What It Does
 

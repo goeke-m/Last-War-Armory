@@ -580,6 +580,7 @@ function syncProfile(state) {
 
 function loadFromLocalStorage() {
   try {
+    // The key predates the Armory name; kept so existing saved profiles still load.
     const raw = localStorage.getItem('lastwar_optimizer_v1')
     if (!raw) return null
     const saved = JSON.parse(raw)
@@ -2087,9 +2088,9 @@ export default function App() {
     <div className="h-screen flex flex-col bg-ground text-ink overflow-hidden">
       <header className="flex-none h-14 bg-panel border-b border-line flex items-center justify-between gap-3 px-3 md:px-5 z-10">
         <p className="flex items-baseline gap-2 min-w-0">
-          <span className="font-stencil text-2xl leading-none whitespace-nowrap">Last War</span>
+          <span className="font-stencil text-2xl leading-none whitespace-nowrap">Last War Armory</span>
           <span className="self-center text-xs font-semibold text-on-signal bg-signal rounded-xs px-1.5 leading-5" title="Beta: some features are limited, see Help">Beta</span>
-          <span className="hidden sm:inline text-sm text-ink-2 truncate">Squad and gear optimizer</span>
+          <span className="hidden md:inline text-sm text-ink-2 truncate">Squad and gear planner</span>
         </p>
         <ProfileSwitcher state={state} dispatch={dispatch} />
       </header>
