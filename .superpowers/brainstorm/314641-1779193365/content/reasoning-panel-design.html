@@ -1,0 +1,202 @@
+<style>
+  .mock-squad {
+    background: #171717;
+    border: 1px solid #262626;
+    border-radius: 4px;
+    padding: 10px;
+    font-family: monospace;
+    max-width: 340px;
+  }
+  .mock-header {
+    font-size: 10px;
+    color: #d97706;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: 1px dashed #404040;
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+  }
+  .mock-row-label {
+    font-size: 9px;
+    color: #737373;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 2px;
+  }
+  .mock-hero-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+  .mock-hero-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+  }
+  .mock-hero-card {
+    background: #1a1a1a;
+    border: 1px solid #262626;
+    border-top: 3px solid;
+    padding: 4px 6px;
+    font-size: 9px;
+  }
+  .mock-hero-name { color: #d1d5db; font-weight: bold; margin-bottom: 1px; }
+  .mock-hero-sub { color: #737373; }
+  .mock-divider { border-top: 1px dashed #404040; margin: 6px 0; }
+
+  /* Toggle button */
+  .toggle-btn {
+    width: 100%;
+    background: none;
+    border: none;
+    border-top: 1px dashed #333;
+    margin-top: 8px;
+    padding: 4px 0 0 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    font-size: 9px;
+    color: #525252;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-family: 'Courier New', monospace;
+  }
+  .toggle-chevron { color: #d97706; font-size: 9px; }
+
+  /* Reasoning panel */
+  .reason-panel {
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    border-left: 2px solid #d97706;
+    padding: 6px 8px;
+    margin-top: 6px;
+  }
+  .reason-section-label {
+    font-size: 8px;
+    color: #525252;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+    margin-top: 4px;
+  }
+  .reason-section-label:first-child { margin-top: 0; }
+  .reason-item {
+    font-size: 10px;
+    color: #a3a3a3;
+    padding: 1px 0;
+    font-family: 'Courier New', monospace;
+    display: flex;
+    gap: 4px;
+  }
+  .reason-item .bullet { color: #d97706; flex-shrink: 0; }
+  .positive { color: #4ade80; }
+  .hint { color: #facc15; }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .split-label { font-size: 10px; color: #737373; text-align: center; margin-top: 6px; font-family: monospace; text-transform: uppercase; letter-spacing: 0.08em; }
+</style>
+
+<h2>Squad reasoning panel — toggle design</h2>
+<p class="subtitle">Left: closed (default). Right: expanded.</p>
+
+<div class="split" style="margin-top: 16px;">
+
+  <!-- CLOSED STATE -->
+  <div>
+    <div class="mock-squad">
+      <div class="mock-header">// OPTIMAL SQUAD · SCORE 284.7</div>
+      <div class="mock-row-label">BACK ROW</div>
+      <div class="mock-hero-grid-3">
+        <div class="mock-hero-card" style="border-top-color: #6366f1;">
+          <div class="mock-hero-name">Violet</div>
+          <div class="mock-hero-sub">UR · EW20</div>
+        </div>
+        <div class="mock-hero-card" style="border-top-color: #6366f1;">
+          <div class="mock-hero-name">Rosa</div>
+          <div class="mock-hero-sub">SSR · DPS</div>
+        </div>
+        <div class="mock-hero-card" style="border-top-color: #6366f1;">
+          <div class="mock-hero-name">Jess</div>
+          <div class="mock-hero-sub">SR · Support</div>
+        </div>
+      </div>
+      <div class="mock-divider"></div>
+      <div class="mock-row-label">FRONT ROW</div>
+      <div class="mock-hero-grid-2">
+        <div class="mock-hero-card" style="border-top-color: #6366f1;">
+          <div class="mock-hero-name">Rex</div>
+          <div class="mock-hero-sub">SSR · Tank</div>
+        </div>
+        <div class="mock-hero-card" style="border-top-color: #22c55e;">
+          <div class="mock-hero-name">Marco</div>
+          <div class="mock-hero-sub">SSR · Infantry</div>
+        </div>
+      </div>
+      <!-- Toggle button closed -->
+      <button class="toggle-btn">
+        <span class="toggle-chevron">›</span> WHY THIS SQUAD
+      </button>
+    </div>
+    <div class="split-label">Default — closed</div>
+  </div>
+
+  <!-- OPEN STATE -->
+  <div>
+    <div class="mock-squad">
+      <div class="mock-header">// OPTIMAL SQUAD · SCORE 284.7</div>
+      <div class="mock-row-label">BACK ROW</div>
+      <div class="mock-hero-grid-3">
+        <div class="mock-hero-card" style="border-top-color: #6366f1;">
+          <div class="mock-hero-name">Violet</div>
+          <div class="mock-hero-sub">UR · EW20</div>
+        </div>
+        <div class="mock-hero-card" style="border-top-color: #6366f1;">
+          <div class="mock-hero-name">Rosa</div>
+          <div class="mock-hero-sub">SSR · DPS</div>
+        </div>
+        <div class="mock-hero-card" style="border-top-color: #6366f1;">
+          <div class="mock-hero-name">Jess</div>
+          <div class="mock-hero-sub">SR · Support</div>
+        </div>
+      </div>
+      <div class="mock-divider"></div>
+      <div class="mock-row-label">FRONT ROW</div>
+      <div class="mock-hero-grid-2">
+        <div class="mock-hero-card" style="border-top-color: #6366f1;">
+          <div class="mock-hero-name">Rex</div>
+          <div class="mock-hero-sub">SSR · Tank</div>
+        </div>
+        <div class="mock-hero-card" style="border-top-color: #22c55e;">
+          <div class="mock-hero-name">Marco</div>
+          <div class="mock-hero-sub">SSR · Infantry</div>
+        </div>
+      </div>
+      <!-- Toggle button open -->
+      <button class="toggle-btn" style="color: #d97706;">
+        <span class="toggle-chevron" style="transform: rotate(90deg); display:inline-block;">›</span> WHY THIS SQUAD
+      </button>
+      <!-- Reasoning panel -->
+      <div class="reason-panel">
+        <div class="reason-section-label">Active bonuses</div>
+        <div class="reason-item"><span class="bullet">›</span><span>4/5 Mech — <span class="positive">+15% mono bonus</span></span></div>
+        <div class="reason-item"><span class="bullet">›</span><span>Violet EW20 buffs 3 Mech allies — <span class="positive">+7.5% each</span></span></div>
+        <div class="reason-item"><span class="bullet">›</span><span>Counters Infantry enemy — <span class="positive">+8% counter bonus</span></span></div>
+        <div class="reason-section-label">Opportunities</div>
+        <div class="reason-item"><span class="bullet">›</span><span>Swap Marco for a Mech hero — <span class="hint">unlock +5% full mono</span></span></div>
+        <div class="reason-item"><span class="bullet">›</span><span>Level Rosa EW to 20 — <span class="hint">add another +7.5% stack</span></span></div>
+      </div>
+    </div>
+    <div class="split-label">Expanded</div>
+  </div>
+
+</div>
+
+<div style="margin-top: 20px; padding: 12px; background: #141414; border: 1px solid #2a2a2a; border-radius: 4px; font-family: monospace; font-size: 11px; color: #737373;">
+  <strong style="color: #a3a3a3;">Implementation notes:</strong><br>
+  — Active bonuses: mono mult, EW buff stacks, counter mult, pulled from existing score computation<br>
+  — Opportunities only shown if achievable (mono: have a spare hero of dominant type; EW: hero in squad with EW 15–19)<br>
+  — Near-miss counter bonus if only 1–2 counter heroes in squad and more owned<br>
+  — <span style="color: #facc15;">Yellow</span> = opportunity &nbsp;|&nbsp; <span style="color: #4ade80;">Green</span> = active bonus
+</div>

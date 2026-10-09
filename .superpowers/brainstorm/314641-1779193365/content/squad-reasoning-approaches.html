@@ -1,0 +1,272 @@
+<style>
+  /* Match the app's dark theme */
+  .mock-squad {
+    background: #171717;
+    border: 1px solid #262626;
+    border-radius: 4px;
+    padding: 10px;
+    font-family: monospace;
+    max-width: 340px;
+  }
+  .mock-header {
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    color: #d97706;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: 1px dashed #404040;
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+  }
+  .mock-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .mock-row-label {
+    font-size: 9px;
+    color: #737373;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 2px;
+  }
+  .mock-hero-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+  .mock-hero-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+  }
+  .mock-hero-card {
+    background: #1a1a1a;
+    border: 1px solid #262626;
+    border-top: 3px solid;
+    padding: 4px 6px;
+    font-size: 9px;
+  }
+  .mock-hero-name { color: #d1d5db; font-weight: bold; margin-bottom: 1px; }
+  .mock-hero-sub { color: #737373; }
+  .mock-divider {
+    border-top: 1px dashed #404040;
+    margin: 6px 0;
+  }
+
+  /* Option A: Inline badges */
+  .badge-row {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+  .badge {
+    font-size: 9px;
+    padding: 1px 5px;
+    border: 1px solid;
+    border-radius: 2px;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .badge-green { color: #4ade80; border-color: #166534; background: #052e16; }
+  .badge-sky { color: #38bdf8; border-color: #0c4a6e; background: #082f49; }
+  .badge-amber { color: #fbbf24; border-color: #78350f; background: #1c0a00; }
+  .badge-red { color: #f87171; border-color: #7f1d1d; background: #2a0a0a; }
+
+  /* Option B: Reasoning panel */
+  .reason-panel {
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    border-left: 2px solid #d97706;
+    padding: 6px 8px;
+    margin-top: 6px;
+  }
+  .reason-item {
+    font-size: 10px;
+    color: #a3a3a3;
+    padding: 2px 0;
+    font-family: 'Courier New', monospace;
+  }
+  .reason-item .bullet { color: #d97706; margin-right: 4px; }
+  .reason-item .positive { color: #4ade80; }
+  .reason-item .negative { color: #f87171; }
+
+  /* Option C: Score breakdown */
+  .score-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6px;
+    font-size: 10px;
+    font-family: 'Courier New', monospace;
+  }
+  .score-table td {
+    padding: 2px 4px;
+    border-bottom: 1px solid #1f1f1f;
+  }
+  .score-table .label-col { color: #737373; }
+  .score-table .value-col { color: #a3a3a3; text-align: right; }
+  .score-table .value-col.positive { color: #4ade80; }
+  .score-table .value-col.negative { color: #f87171; }
+  .score-table .value-col.neutral { color: #60a5fa; }
+  .score-table .total-row td { color: #d97706; border-top: 1px solid #404040; border-bottom: none; padding-top: 4px; font-weight: bold; }
+
+  .option-label {
+    font-size: 10px;
+    color: #737373;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 4px;
+    margin-bottom: 6px;
+  }
+</style>
+
+<h2>How should squad reasoning be displayed?</h2>
+<p class="subtitle">Three options for showing why the optimizer chose this squad</p>
+
+<div class="cards">
+
+  <!-- Option A: Inline badges -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 12px; background: #0f0f0f;">
+      <div class="mock-squad">
+        <div class="mock-header">// OPTIMAL SQUAD · SCORE 284.7</div>
+        <div class="mock-row-label">BACK ROW</div>
+        <div class="mock-hero-grid-3">
+          <div class="mock-hero-card" style="border-top-color: #6366f1;">
+            <div class="mock-hero-name">Violet</div>
+            <div class="mock-hero-sub">UR · EW20</div>
+          </div>
+          <div class="mock-hero-card" style="border-top-color: #6366f1;">
+            <div class="mock-hero-name">Rosa</div>
+            <div class="mock-hero-sub">SSR · EW12</div>
+          </div>
+          <div class="mock-hero-card" style="border-top-color: #6366f1;">
+            <div class="mock-hero-name">Jess</div>
+            <div class="mock-hero-sub">SR · EW0</div>
+          </div>
+        </div>
+        <div class="mock-divider"></div>
+        <div class="mock-row-label">FRONT ROW</div>
+        <div class="mock-hero-grid-2">
+          <div class="mock-hero-card" style="border-top-color: #6366f1;">
+            <div class="mock-hero-name">Rex</div>
+            <div class="mock-hero-sub">SSR · Tank</div>
+          </div>
+          <div class="mock-hero-card" style="border-top-color: #22c55e;">
+            <div class="mock-hero-name">Marco</div>
+            <div class="mock-hero-sub">SSR · Infantry</div>
+          </div>
+        </div>
+        <!-- Reasoning as badges -->
+        <div class="badge-row">
+          <span class="badge badge-green">MONO +15%</span>
+          <span class="badge badge-sky">COUNTER +8%</span>
+          <span class="badge badge-amber">EW BUFF ×1</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Inline Badges</h3>
+      <p>Active bonuses shown as compact chips directly below the formation. Minimal footprint, scannable at a glance.</p>
+    </div>
+  </div>
+
+  <!-- Option B: Reasoning panel -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 12px; background: #0f0f0f;">
+      <div class="mock-squad">
+        <div class="mock-header">// OPTIMAL SQUAD · SCORE 284.7</div>
+        <div class="mock-row-label">BACK ROW</div>
+        <div class="mock-hero-grid-3">
+          <div class="mock-hero-card" style="border-top-color: #6366f1;">
+            <div class="mock-hero-name">Violet</div>
+            <div class="mock-hero-sub">UR · EW20</div>
+          </div>
+          <div class="mock-hero-card" style="border-top-color: #6366f1;">
+            <div class="mock-hero-name">Rosa</div>
+            <div class="mock-hero-sub">SSR · EW12</div>
+          </div>
+          <div class="mock-hero-card" style="border-top-color: #6366f1;">
+            <div class="mock-hero-name">Jess</div>
+            <div class="mock-hero-sub">SR · EW0</div>
+          </div>
+        </div>
+        <div class="mock-divider"></div>
+        <div class="mock-row-label">FRONT ROW</div>
+        <div class="mock-hero-grid-2">
+          <div class="mock-hero-card" style="border-top-color: #6366f1;">
+            <div class="mock-hero-name">Rex</div>
+            <div class="mock-hero-sub">SSR · Tank</div>
+          </div>
+          <div class="mock-hero-card" style="border-top-color: #22c55e;">
+            <div class="mock-hero-name">Marco</div>
+            <div class="mock-hero-sub">SSR · Infantry</div>
+          </div>
+        </div>
+        <!-- Reasoning panel -->
+        <div class="reason-panel">
+          <div class="reason-item"><span class="bullet">›</span>4/5 Mech — <span class="positive">+15% mono bonus</span></div>
+          <div class="reason-item"><span class="bullet">›</span>Counters Infantry enemy — <span class="positive">+8% counter bonus</span></div>
+          <div class="reason-item"><span class="bullet">›</span>Violet EW20 buffs 3 Mech allies — <span class="positive">+7.5% each</span></div>
+          <div class="reason-item"><span class="bullet">›</span>Beats next-best squad by <span class="positive">+12.4 pts</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Reasoning Panel</h3>
+      <p>A small callout below the formation with bullet points explaining each active bonus. Reads like a brief analysis.</p>
+    </div>
+  </div>
+
+  <!-- Option C: Score breakdown -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 12px; background: #0f0f0f;">
+      <div class="mock-squad">
+        <div class="mock-header">// OPTIMAL SQUAD · SCORE 284.7</div>
+        <div class="mock-row-label">BACK ROW</div>
+        <div class="mock-hero-grid-3">
+          <div class="mock-hero-card" style="border-top-color: #6366f1;">
+            <div class="mock-hero-name">Violet</div>
+            <div class="mock-hero-sub">UR · EW20</div>
+          </div>
+          <div class="mock-hero-card" style="border-top-color: #6366f1;">
+            <div class="mock-hero-name">Rosa</div>
+            <div class="mock-hero-sub">SSR · EW12</div>
+          </div>
+          <div class="mock-hero-card" style="border-top-color: #6366f1;">
+            <div class="mock-hero-name">Jess</div>
+            <div class="mock-hero-sub">SR · EW0</div>
+          </div>
+        </div>
+        <div class="mock-divider"></div>
+        <div class="mock-row-label">FRONT ROW</div>
+        <div class="mock-hero-grid-2">
+          <div class="mock-hero-card" style="border-top-color: #6366f1;">
+            <div class="mock-hero-name">Rex</div>
+            <div class="mock-hero-sub">SSR · Tank</div>
+          </div>
+          <div class="mock-hero-card" style="border-top-color: #22c55e;">
+            <div class="mock-hero-name">Marco</div>
+            <div class="mock-hero-sub">SSR · Infantry</div>
+          </div>
+        </div>
+        <!-- Score breakdown table -->
+        <table class="score-table">
+          <tr><td class="label-col">Base score</td><td class="value-col neutral">221.5</td></tr>
+          <tr><td class="label-col">4/5 Mech mono</td><td class="value-col positive">×1.15</td></tr>
+          <tr><td class="label-col">Counter vs Infantry</td><td class="value-col positive">×1.08</td></tr>
+          <tr><td class="label-col">EW type buff (Violet)</td><td class="value-col positive">×1.075</td></tr>
+          <tr class="total-row"><td>TOTAL</td><td>284.7</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Score Breakdown</h3>
+      <p>A compact table showing base score × each multiplier applied. Precise and numeric — satisfying for power users.</p>
+    </div>
+  </div>
+
+</div>

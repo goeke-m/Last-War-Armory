@@ -625,7 +625,6 @@ function buildInitialState() {
       profiles: saved.profiles,
       activeProfile: saved.activeProfile,
       activeSection: 'roster',
-      activeRecTab: 'loadout',
       upgradeMode: 'max_efficiency',
       limitingResource: RESOURCES[0],
     }
@@ -635,7 +634,6 @@ function buildInitialState() {
     profiles: { [DEFAULT_PROFILE_NAME]: BLANK_PROFILE },
     activeProfile: DEFAULT_PROFILE_NAME,
     activeSection: 'roster',
-    activeRecTab: 'loadout',
     upgradeMode: 'max_efficiency',
     limitingResource: RESOURCES[0],
   }
@@ -684,8 +682,6 @@ function reducer(state, action) {
     // UI state (not synced to profile)
     case 'SET_SECTION':
       return { ...state, activeSection: action.payload }
-    case 'SET_REC_TAB':
-      return { ...state, activeRecTab: action.payload }
     case 'SET_UPGRADE_MODE':
       return { ...state, upgradeMode: action.payload }
     case 'SET_LIMITING_RESOURCE':
@@ -736,7 +732,6 @@ function reducer(state, action) {
 
 const SLOT_NAMES = { gun: 'Gun', chip: 'Chip', armor: 'Armor', radar: 'Radar' }
 const ROLE_NAMES = { dps: 'DPS', tank: 'Tank', support: 'Support' }
-const RARITY_TEXT = { UR: 'text-q-gold border-q-gold/60', SSR: 'text-q-purple border-q-purple/60', SR: 'text-q-blue border-q-blue/60' }
 
 // Shared control styles. Selected choices get a yellow tint; the solid yellow fill is kept for each screen's main action.
 const choice = on => `border rounded-xs transition-colors ${on
@@ -852,7 +847,8 @@ function ProfileSwitcher({ state, dispatch }) {
   const closeImport = () => { setImportModal(false); setImportText(''); setImportFile(''); setImportError('') }
 
   const names = Object.keys(state.profiles)
-  const item = 'w-full text-left px-3 min-h-[40px] text-sm text-ink-2 hover:bg-panel hover:text-ink'
+  const itemBase = 'w-full text-left px-3 min-h-[40px] text-sm'
+  const item = `${itemBase} text-ink-2 hover:bg-panel hover:text-ink`
 
   return (
     <div className="relative">
@@ -870,7 +866,7 @@ function ProfileSwitcher({ state, dispatch }) {
             {names.map(name => (
               <button key={name} role="menuitemradio" aria-checked={name === state.activeProfile}
                 onClick={() => { dispatch({ type: 'SWITCH_PROFILE', name }); setOpen(false) }}
-                className={`${item} flex items-center gap-2 ${name === state.activeProfile ? 'text-ink font-semibold' : ''}`}>
+                className={`${name === state.activeProfile ? `${itemBase} text-ink font-semibold hover:bg-panel` : item} flex items-center gap-2`}>
                 <span className={`w-1.5 h-1.5 rounded-full flex-none ${name === state.activeProfile ? 'bg-signal' : 'bg-transparent'}`} />
                 <span className="truncate">{name}</span>
               </button>
@@ -895,7 +891,7 @@ function ProfileSwitcher({ state, dispatch }) {
             <button role="menuitem" className={item} onClick={handleExport}>Download as JSON</button>
             <button role="menuitem" className={item} onClick={() => { setImportModal(true); setOpen(false) }}>Import profile</button>
             <div className="border-t border-line-soft my-1" />
-            <button role="menuitem" className={`${item} text-danger hover:text-danger hover:bg-danger/10`}
+            <button role="menuitem" className={`${itemBase} text-danger hover:bg-danger/10`}
               onClick={() => { dispatch({ type: 'DELETE_PROFILE', name: state.activeProfile }); setOpen(false) }}>
               Delete this profile
             </button>
@@ -935,115 +931,53 @@ function ProfileSwitcher({ state, dispatch }) {
   )
 }
 
-// One upgrade step as a single line, for the briefing panel.
-function upgradeLine(item) {
-  const slot = SLOT_NAMES[item.slot]
-  if (item.type === 'level') return `${slot} Lv ${item.from} → ${item.to}`
-  if (item.type === 'sub') return `${slot} ${item.stars}★ sub-upgrade ${item.from ?? '?'} → ${item.to ?? '?'} of 4`
-  return `${slot} to ${item.to}★`
+// Star pips, filled up to the piece's stars. small fits the squad cards and the loadout table.
+function StarPips({ stars, small = false }) {
+  return (
+    <span className={`inline-flex gap-px leading-none ${small ? 'text-[0.625rem] sm:text-xs' : 'text-sm'}`} aria-label={`${stars} of 5 stars`}>
+      {[0,1,2,3,4].map(i => (
+        <span key={i} aria-hidden="true" className={i < stars ? 'text-accent' : 'text-line'}>★</span>
+      ))}
+    </span>
+  )
 }
 
-// layout: 'side' is the right-hand column on wide screens, 'bottom' the collapsible strip on phones.
-function Briefing({ state, dispatch, recommendedSquad, gearAssignment, upgradePriority, warnings, layout }) {
-  const [open, setOpen] = useState(true)
-  const side = layout === 'side'
-  const dangerCount = warnings.filter(w => w.severity === 'danger').length
-
-  const loadoutContent = recommendedSquad.insufficient ? (
-    <p className="text-sm text-ink-3">Own 5 or more heroes to see a loadout.</p>
-  ) : (
-    <table className="w-full text-sm">
-      <tbody>
-        {recommendedSquad.squad.map(heroId => {
-          const slots = gearAssignment.assigned[heroId] ?? {}
-          return (
-            <tr key={heroId} className="border-b border-line-soft last:border-0">
-              <td className="py-1 pr-2 text-ink truncate max-w-28">{HEROES[heroId].name}</td>
-              {SLOTS.map(slot => {
-                const p = slots[slot]
-                return (
-                  <td key={slot} className="py-1 px-1 text-right" title={p ? `${SLOT_NAMES[slot]} Lv ${p.level}, ${p.stars}★` : `No ${SLOT_NAMES[slot].toLowerCase()}`}>
-                    {p
-                      ? <span className={QUALITY_META[p.quality].text}>{slot[0].toUpperCase()}<span className="text-ink-2 ml-0.5">{p.level}</span></span>
-                      : <span className="text-ink-3">{slot[0].toUpperCase()}–</span>}
-                  </td>
-                )
-              })}
-            </tr>
-          )
-        })}
-      </tbody>
-    </table>
-  )
-
-  const upgradesContent = (
-    <ol className="space-y-1.5">
-      {upgradePriority.slice(0, side ? 8 : 5).map((item, i) => (
-        <li key={item.type === 'callout' ? `callout-${i}` : `${item.heroId}-${item.slot}-${item.type}-${i}`} className="flex gap-2 text-sm">
-          {item.type === 'callout'
-            ? <p className="border-l-2 border-signal pl-2 text-ink-2">{item.reason}</p>
-            : <>
-                <span className="w-4 flex-none text-ink-3 text-right">{i + 1}</span>
-                <span className="text-ink">{upgradeLine(item)} <span className="text-ink-3">{HEROES[item.heroId]?.name}</span></span>
-              </>}
-        </li>
-      ))}
-      {upgradePriority.length === 0 && <p className="text-sm text-ink-3">Add heroes and gear to see what to upgrade next.</p>}
-    </ol>
-  )
-
-  const warningsContent = (
-    <div className="space-y-2">
-      {warnings.length === 0 && <p className="text-sm text-ink-3">No warnings for this squad.</p>}
-      {warnings.map((w, i) => (
-        <p key={`${w.severity}-${i}`} className={`text-sm text-ink-2 border-l-2 pl-2 ${w.severity === 'danger' ? 'border-danger' : 'border-signal'}`}>
-          {w.message}
-        </p>
-      ))}
-    </div>
-  )
-
-  const content = { loadout: loadoutContent, upgrades: upgradesContent, warnings: warningsContent }
-  const tabs = [
-    { key: 'loadout', label: 'Loadout' },
-    { key: 'upgrades', label: 'Next upgrades' },
-    { key: 'warnings', label: 'Warnings' },
-  ]
-  // On phones, tapping the open tab folds the panel away to give the screen back.
-  const pick = key => {
-    if (!side && key === state.activeRecTab) setOpen(o => !o)
-    else { dispatch({ type: 'SET_REC_TAB', payload: key }); setOpen(true) }
-  }
-  const shown = side || open
-
+// Sub-upgrade progress inside a star tier: 4 segments, like the bar on the in-game upgrade screen.
+// A full bar means the next step is the star promotion, so it says that instead.
+function SubTicks({ sub, stars }) {
+  if (sub >= 4) return <span className="text-xs text-ok">Ready for {stars + 1}★</span>
   return (
-    <aside aria-label="Briefing"
-      className={side
-        ? 'hidden lg:flex flex-col w-80 xl:w-96 flex-none border-l border-line bg-panel'
-        : 'lg:hidden flex-none border-t border-line bg-panel'}>
-      <div role="tablist" className="flex border-b border-line-soft">
-        {tabs.map(({ key, label }) => {
-          const on = state.activeRecTab === key
-          return (
-            <button key={key} role="tab" aria-selected={on} aria-expanded={side ? undefined : on && open} onClick={() => pick(key)}
-              className={`flex-1 flex items-center justify-center gap-1.5 min-h-[44px] text-sm border-b-2 -mb-px transition-colors
-                ${on ? 'border-signal text-ink font-semibold' : 'border-transparent text-ink-2 hover:text-ink'}`}>
-              {label}
-              {key === 'warnings' && dangerCount > 0 && (
-                <span className="min-w-5 h-5 px-1 rounded-full bg-danger text-ground text-xs font-semibold leading-5">{dangerCount}</span>
-              )}
-              {!side && on && <Chevron open={!open} />}
-            </button>
-          )
-        })}
-      </div>
-      {shown && (
-        <div className={side ? 'flex-1 overflow-y-auto p-4' : 'p-3 h-36 overflow-y-auto'}>
-          {content[state.activeRecTab]}
-        </div>
-      )}
-    </aside>
+    <span className="inline-flex gap-0.5" aria-label={`Sub-upgrade ${sub} of 4`}>
+      {[0,1,2,3].map(i => (
+        <span key={i} aria-hidden="true" className={`w-2.5 h-1 rounded-full ${i < sub ? 'bg-accent' : 'bg-line'}`} />
+      ))}
+    </span>
   )
+}
+
+const isMaxed = piece => piece.level >= (QUALITY_MAX_LEVEL[piece.quality] ?? 40)
+
+// What's worth knowing about a piece at a glance: its level until it's maxed, then its stars.
+function PieceStatus({ piece, small = false }) {
+  if (!piece) return <span className="text-ink-3">–</span>
+  if (!isMaxed(piece)) return <span className="text-ink-2">Lv {piece.level}</span>
+  return <StarPips stars={piece.stars} small={small} />
+}
+
+// Full description of a piece for tooltips, e.g. "Chip Lv 40, 4★, sub-upgrade 4 of 4".
+function pieceSummary(slot, piece) {
+  if (!piece) return `No ${SLOT_NAMES[slot].toLowerCase()}`
+  const parts = [`${SLOT_NAMES[slot]} Lv ${piece.level}`, `${piece.stars}★`]
+  if (isMaxed(piece) && piece.stars < 5 && piece.sub != null) parts.push(`sub-upgrade ${piece.sub} of 4`)
+  return parts.join(', ')
+}
+
+// One upgrade step, without the hero: "Promote Armor to 5★".
+function upgradeAction(item) {
+  const slot = SLOT_NAMES[item.slot]
+  if (item.type === 'level') return `Level up ${slot}, Lv ${item.from} → ${item.to}`
+  if (item.type === 'sub') return `Sub-upgrade ${slot} ${item.stars}★${item.from !== null ? `, ${item.from} → ${item.to} of 4` : ''}`
+  return `Promote ${slot} to ${item.to}★`
 }
 
 const RESOURCE_LABELS = { gold: 'Gold', ore: 'Ore', dielectric_ceramic: 'Ceramic', blueprints: 'Blueprints' }
@@ -1051,24 +985,50 @@ const RESOURCE_LABELS = { gold: 'Gold', ore: 'Ore', dielectric_ceramic: 'Ceramic
 // ROI is shown per a unit that keeps the number readable: per 1M gold, per 1K ore, per ceramic, per blueprint.
 const RESOURCE_PER = { gold: [1e6, '1M'], ore: [1e3, '1K'] }
 
-function RoiLine({ item }) {
-  if (!('roi' in item)) return null
-  // The 5th star is paid in mythic blueprints, a different item from the legendary ones for 1★-4★.
+// The resource as the player names it. The 5th star is paid in mythic blueprints, a different item from the legendary ones for 1★-4★.
+function resourceName(item) {
   const mythic = item.resource === 'blueprints' && item.type === 'stars' && item.to === 5
-  const res = mythic ? 'mythic blueprints' : RESOURCE_LABELS[item.resource]?.toLowerCase() ?? item.resource
-  if (item.roi === null) {
-    const why = item.from === null ? '' : item.powerGain === null ? ': no stat data for this step yet' : `: doesn’t use ${res}`
-    return <p className="text-xs text-ink-3 mt-1">No ROI{why}</p>
-  }
+  return mythic ? 'mythic blueprints' : RESOURCE_LABELS[item.resource]?.toLowerCase() ?? item.resource
+}
+
+function roiFigure(item) {
   const per = RESOURCE_PER[item.resource]
-  const unit = per ? `${per[1]} ${res}` : res.replace(/s$/, '')
+  const res = resourceName(item)
+  return { value: Math.round(item.roi * (per?.[0] ?? 1)).toLocaleString(), unit: per ? `${per[1]} ${res}` : res.replace(/s$/, '') }
+}
+
+function noRoiReason(item) {
+  if (item.from === null) return 'Set this piece’s sub-upgrade on the Gear screen to rank it.'
+  if (item.powerGain === null) return 'No stat data for this step yet.'
+  return `Doesn’t use ${resourceName(item)}.`
+}
+
+const hasRoi = item => 'roi' in item && item.roi !== null
+
+// Max efficiency: steps with an ROI for the chosen resource, kept apart from the ones without.
+function splitByRoi(list) {
+  return { ranked: list.filter(i => !('roi' in i) || i.roi !== null), unranked: list.filter(i => 'roi' in i && i.roi === null) }
+}
+
+// Shown when none of the squad's next steps use the chosen resource, with a way out.
+function SwitchResource({ state, dispatch, rankable }) {
+  const res = RESOURCE_LABELS[state.limitingResource]?.toLowerCase() ?? state.limitingResource
   return (
-    <p className="text-xs mt-1">
-      <span className="text-ok font-semibold">+{Math.round(item.powerGain).toLocaleString()} Power</span>
-      <span className="text-ink-2"> for {Math.round(item.cost).toLocaleString()} {res}, </span>
-      <span className="text-ink font-semibold">{Math.round(item.roi * (per?.[0] ?? 1)).toLocaleString()}</span>
-      <span className="text-ink-2"> per {unit}</span>
-    </p>
+    <div className="border border-dashed border-line rounded-xs p-4 space-y-3 mb-4">
+      <p className="text-sm text-ink">
+        None of your squad’s next steps use {res}.
+        {rankable.length > 0 ? ' Rank them by what they do cost:' : ' Add stat data for your gear to rank them.'}
+      </p>
+      {rankable.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {rankable.map(r => (
+            <button key={r} onClick={() => dispatch({ type: 'SET_LIMITING_RESOURCE', payload: r })} className={`${btnSecondary} text-sm`}>
+              Rank by {RESOURCE_LABELS[r]?.toLowerCase() ?? r}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -1078,8 +1038,37 @@ const UPGRADE_MODES = [
   { key: 'weakest_link',   label: 'Weakest link',   note: 'The squad’s weakest pieces, brought up to its average first.' },
 ]
 
-function UpgradePriority({ state, dispatch, upgradePriority }) {
+// rank: the step's place in the list, or null for steps that can't be ranked.
+function UpgradeRow({ rank, item }) {
+  const roi = hasRoi(item) && roiFigure(item)
+  return (
+    <li className="flex gap-3 py-3 border-b border-line-soft">
+      <span className="w-6 flex-none text-right text-base font-semibold text-ink-3 leading-6">{rank}</span>
+      <div className="flex-1 min-w-0">
+        <p className="text-base leading-6">
+          <span className="font-semibold text-ink">{HEROES[item.heroId]?.name}</span> <span className="text-ink-2">{upgradeAction(item)}</span>
+        </p>
+        {roi
+          ? <p className="text-xs text-ink-2"><span className="text-ok font-semibold">+{Math.round(item.powerGain).toLocaleString()} Power</span> for {Math.round(item.cost).toLocaleString()} {resourceName(item)}</p>
+          : <p className="text-xs text-ink-3">{'roi' in item ? noRoiReason(item) : item.reason}</p>}
+      </div>
+      {roi && (
+        <div className="flex-none text-right max-w-[8rem] sm:max-w-[12rem]">
+          <p className="text-lg font-semibold text-ink leading-6">{roi.value}</p>
+          <p className="text-xs text-ink-3 leading-tight">Power per {roi.unit}</p>
+        </div>
+      )}
+    </li>
+  )
+}
+
+function UpgradePriority({ state, dispatch, upgradePriority, rankable }) {
+  const [showUnranked, setShowUnranked] = useState(false)
   const mode = UPGRADE_MODES.find(m => m.key === state.upgradeMode) ?? UPGRADE_MODES[0]
+  const maxEff = state.upgradeMode === 'max_efficiency'
+  const { ranked, unranked } = maxEff ? splitByRoi(upgradePriority) : { ranked: upgradePriority, unranked: [] }
+  const nothingRanked = maxEff && upgradePriority.length > 0 && !ranked.some(i => i.type !== 'callout')
+  const res = RESOURCE_LABELS[state.limitingResource]?.toLowerCase() ?? state.limitingResource
   let rank = 0
 
   return (
@@ -1099,7 +1088,7 @@ function UpgradePriority({ state, dispatch, upgradePriority }) {
           <p className="text-xs text-ink-3 mt-1.5">{mode.note}</p>
         </Field>
 
-        {state.upgradeMode === 'max_efficiency' && (() => {
+        {maxEff && (() => {
           const cov = coverage(state.gear)
           return (
             <Field label="Resource you’re shortest on">
@@ -1111,9 +1100,11 @@ function UpgradePriority({ state, dispatch, upgradePriority }) {
                   </button>
                 ))}
               </div>
-              <p className="text-xs text-ink-3 mt-1.5">
-                {cov.covered} of {cov.total} gear pieces have stat data. Steps without it show no ROI and sort last.
-              </p>
+              {cov.covered < cov.total && (
+                <p className="text-xs text-ink-3 mt-1.5">
+                  {cov.covered} of {cov.total} gear pieces have stat data. Steps without it can’t be ranked.
+                </p>
+              )}
             </Field>
           )
         })()}
@@ -1124,34 +1115,37 @@ function UpgradePriority({ state, dispatch, upgradePriority }) {
           Add heroes to your roster and gear to your inventory to see upgrade advice.
         </p>
       )}
-      <ol className="border-t border-line">
-        {upgradePriority.map((item, i) => {
-          const key = item.type === 'callout' ? `callout-${i}` : `${item.heroId}-${item.slot}-${item.type}-${i}`
-          if (item.type === 'callout') {
-            return (
-              <li key={key} className="my-3 border-l-4 border-signal bg-signal/10 px-3 py-2 text-sm text-ink">{item.reason}</li>
-            )
-          }
-          rank += 1
-          const slot = <span className="font-semibold">{SLOT_NAMES[item.slot]}</span>
-          return (
-            <li key={key} className="flex gap-3 py-3 border-b border-line-soft">
-              <span className="w-6 flex-none text-right text-base font-semibold text-ink-3 leading-6">{rank}</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-base text-ink leading-6">
-                  {item.type === 'level' && <>Level up {slot}, Lv {item.from} → {item.to}</>}
-                  {item.type === 'sub' && <>Sub-upgrade {slot} {item.stars}★{item.from !== null && <>, {item.from} → {item.to} of 4</>}</>}
-                  {item.type === 'stars' && <>Promote {slot} to {item.to}★</>}
-                  <span className="text-ink-2 text-sm ml-2">{HEROES[item.heroId]?.name}</span>
-                </p>
-                <p className="text-xs text-ink-3">{item.reason}</p>
-                <RoiLine item={item} />
-                {item.blueprintWarning && <p className="text-xs text-accent mt-1">Costs blueprints. Check you have enough first.</p>}
-              </div>
-            </li>
-          )
-        })}
-      </ol>
+      {nothingRanked && <SwitchResource state={state} dispatch={dispatch} rankable={rankable} />}
+      {ranked.some(i => i.blueprintWarning) && (
+        <p className="text-xs text-accent mb-2">Star promotions cost blueprints, which are scarce. Check you have enough before you spend.</p>
+      )}
+
+      {ranked.length > 0 && (
+        <ol className="border-t border-line">
+          {ranked.map((item, i) => {
+            if (item.type === 'callout') {
+              return <li key={`callout-${i}`} className="my-3 border-l-4 border-signal bg-signal/10 px-3 py-2 text-sm text-ink">{item.reason}</li>
+            }
+            rank += 1
+            return <UpgradeRow key={`${item.heroId}-${item.slot}-${item.type}-${i}`} rank={rank} item={item} />
+          })}
+        </ol>
+      )}
+
+      {unranked.length > 0 && (
+        <div className={ranked.length > 0 ? 'mt-4' : ''}>
+          <button onClick={() => setShowUnranked(o => !o)} aria-expanded={showUnranked}
+            className="w-full flex items-center justify-between gap-2 py-3 text-sm text-ink-2 hover:text-ink border-t border-line">
+            {unranked.length} {unranked.length === 1 ? 'step' : 'steps'} with no ROI for {res}
+            <Chevron open={showUnranked} />
+          </button>
+          {showUnranked && (
+            <ol>
+              {unranked.map((item, i) => <UpgradeRow key={`${item.heroId}-${item.slot}-${item.type}-${i}`} rank={null} item={item} />)}
+            </ol>
+          )}
+        </div>
+      )}
     </div>
   )
 }
@@ -1185,23 +1179,20 @@ function HeroFormationCard({ heroId, state, heroScores, gearAssignment, alternat
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-px bg-line-soft border border-line-soft rounded-xs overflow-hidden">
-        {SLOTS.map(slot => {
-          const piece = slots[slot]
-          return (
-            <div key={slot} className="bg-raised px-1 py-0.5 text-center min-w-0">
-              <p className={`text-[0.6875rem] sm:text-xs font-semibold leading-tight truncate ${piece ? QUALITY_META[piece.quality]?.text : 'text-ink-3'}`}>{SLOT_NAMES[slot]}</p>
-              <p className="text-[0.6875rem] sm:text-xs text-ink-2 leading-tight">{piece ? <>{piece.level}{piece.stars > 0 && <> {piece.stars}★</>}</> : 'none'}</p>
-            </div>
-          )
-        })}
-      </div>
+      <ul className="space-y-px">
+        {SLOTS.map(slot => (
+          <li key={slot} title={pieceSummary(slot, slots[slot])} className="flex items-center justify-between gap-1 text-[0.6875rem] sm:text-xs leading-5">
+            <span className="text-ink-2">{SLOT_NAMES[slot]}</span>
+            <PieceStatus piece={slots[slot]} small />
+          </li>
+        ))}
+      </ul>
 
       {alt && (
         <p className="text-xs text-ink-3 truncate">Alt <span className="text-ink-2">{HEROES[alt.heroId].name}</span> <span className="text-danger">{alt.scoreDiff.toFixed(1)}</span></p>
       )}
       <div className="flex items-center justify-between gap-1 text-xs">
-        <span className="text-ink-2" title="Hero score">{heroScores[heroId]?.toFixed(1)}</span>
+        <span className="text-ink" title="Hero score"><span className="hidden sm:inline text-ink-3">Score </span>{heroScores[heroId]?.toFixed(1)}</span>
         <button onClick={e => { e.stopPropagation(); swap.onClick() }} aria-pressed={swap.selected}
           aria-label={`Move ${hero.name} to the other row`} title="Move to the other row"
           className={`flex-none w-8 h-7 flex items-center justify-center rounded-xs border ${swap.selected ? 'border-accent bg-signal text-on-signal' : 'border-line text-ink-2 hover:text-ink hover:border-ink-3'}`}>
@@ -1254,7 +1245,22 @@ function ReasonList({ title, lines, gainClass }) {
   )
 }
 
-function SquadOptimizer({ state, dispatch, recommendedSquad, gearAssignment, heroScores, ownedIds }) {
+// The squad's warnings, danger first. Nothing is shown when there are none.
+function SquadWarnings({ warnings }) {
+  if (warnings.length === 0) return null
+  const sorted = [...warnings].sort((a, b) => (a.severity === 'danger' ? 0 : 1) - (b.severity === 'danger' ? 0 : 1))
+  return (
+    <section aria-label="Warnings" className="mb-5 space-y-1.5">
+      {sorted.map((w, i) => (
+        <p key={`${w.severity}-${i}`} className={`text-sm text-ink border-l-4 px-3 py-2 ${w.severity === 'danger' ? 'border-danger bg-danger/10' : 'border-signal bg-signal/10'}`}>
+          {w.message}
+        </p>
+      ))}
+    </section>
+  )
+}
+
+function SquadOptimizer({ state, dispatch, recommendedSquad, gearAssignment, heroScores, ownedIds, warnings }) {
   const [open, setOpen] = useState(false) // must be before early return — hooks must run unconditionally
   const [picking, setPicking] = useState(false)
   const [swapFrom, setSwapFrom] = useState(null)
@@ -1262,6 +1268,7 @@ function SquadOptimizer({ state, dispatch, recommendedSquad, gearAssignment, her
     return (
       <div>
         <Title>Squad</Title>
+        <SquadWarnings warnings={warnings} />
         <p className="text-sm text-ink-2 py-8 text-center border border-dashed border-line rounded-xs">
           Add at least 5 heroes to your roster to get a squad.
         </p>
@@ -1293,6 +1300,7 @@ function SquadOptimizer({ state, dispatch, recommendedSquad, gearAssignment, her
       <Title note={<>Squad score <span className="text-ink font-semibold">{recommendedSquad.score.toFixed(1)}</span>{locked ? ', picked by you' : ', the optimizer’s pick'}</>}>
         {locked ? 'My squad' : 'Best squad'}
       </Title>
+      <SquadWarnings warnings={warnings} />
 
       <div className="flex items-center gap-2 mb-4 flex-wrap">
         <button onClick={() => setPicking(p => !p)} aria-expanded={picking} className={`${btnSecondary} text-sm`}>
@@ -1345,63 +1353,6 @@ function SquadOptimizer({ state, dispatch, recommendedSquad, gearAssignment, her
         </div>
       )}
     </div>
-  )
-}
-
-function GearSegBar({ level, swatch }) {
-  return (
-    <div className="flex gap-0.5 mt-1 w-full max-w-40" aria-hidden="true">
-      {[0,10,20,30].map(start => {
-        const segLevel = Math.min(10, Math.max(0, level - start))
-        return (
-          <div key={start} className="flex-1 h-1 bg-line-soft rounded-full overflow-hidden">
-            <div className={`h-full ${swatch} transition-all`} style={{ width: `${segLevel * 10}%` }} />
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
-function StarPips({ stars }) {
-  return (
-    <span className="inline-flex gap-px text-xs" aria-label={`${stars} of 5 stars`}>
-      {[0,1,2,3,4].map(i => (
-        <span key={i} aria-hidden="true" className={i < stars ? 'text-accent' : 'text-line'}>★</span>
-      ))}
-    </span>
-  )
-}
-
-function GearPieceRow({ piece, onEdit }) {
-  const meta = QUALITY_META[piece.quality]
-  const needsSub = piece.quality === 'legendary' && piece.level === 40 && piece.stars < 5
-
-  return (
-    <button type="button" data-piece={piece.id} onClick={onEdit}
-      className="w-full text-left flex items-stretch gap-3 bg-raised border border-line-soft rounded-xs hover:border-ink-3 min-h-[56px] overflow-hidden">
-      <span className={`w-1 flex-none ${meta.swatch}`} aria-hidden="true" />
-      <div className="flex-1 min-w-0 py-2">
-        <p className="text-sm text-ink leading-tight">
-          <span className="font-semibold">{SLOT_NAMES[piece.slot]}</span>
-          <span className={`${meta.text} ml-2 text-xs`}>{meta.tag}</span>
-        </p>
-        <div className="flex items-center gap-3 mt-0.5">
-          <span className="text-xs text-ink-2 w-11 flex-none">Lv {piece.level}</span>
-          <GearSegBar level={piece.level} swatch={meta.swatch} />
-          <StarPips stars={piece.stars} />
-        </div>
-        {(piece.heroId && HEROES[piece.heroId] || needsSub) && (
-          <p className="text-xs mt-0.5">
-            {piece.heroId && HEROES[piece.heroId] && <span className="text-air mr-3">On {HEROES[piece.heroId].name}</span>}
-            {needsSub && (piece.sub == null
-              ? <span className="text-accent">Sub-upgrade not set, tap to add</span>
-              : <span className="text-ink-3">Sub-upgrade {piece.sub} of 4</span>)}
-          </p>
-        )}
-      </div>
-      <span className="self-center pr-3 text-sm text-ink-2 flex-none" title="Piece score">{pieceScore(piece).toFixed(2)}</span>
-    </button>
   )
 }
 
@@ -1505,7 +1456,36 @@ function GearEditModal({ piece, heroOptions, onSave, onDelete, onClose }) {
   )
 }
 
-function GearInventory({ state, dispatch, ownedIds }) {
+// One slot of a hero's loadout on the Gear screen. Empty slots add a piece for that hero and slot.
+function GearSlot({ slot, piece, auto = false, caption, onClick }) {
+  const meta = piece && QUALITY_META[piece.quality]
+  const maxed = piece && isMaxed(piece)
+  const subUnset = piece && piece.quality === 'legendary' && maxed && piece.stars < 5 && piece.sub == null
+  return (
+    <button type="button" data-piece={piece?.id} onClick={onClick} title={piece ? `${pieceSummary(slot, piece)}. Tap to edit.` : undefined}
+      className={`text-left rounded-xs border px-2.5 py-2 min-h-[64px] flex flex-col justify-start gap-1.5 min-w-0
+        ${piece ? 'bg-raised border-line-soft hover:border-ink-3' : 'border-dashed border-line text-ink-3 hover:border-ink-3 hover:text-ink'}`}>
+      <span className="flex items-baseline justify-between gap-2 text-sm">
+        <span className={piece ? 'font-semibold text-ink' : ''}>{SLOT_NAMES[slot]}</span>
+        {piece && piece.quality !== 'legendary' && <span className={`text-xs ${meta.text}`}>{meta.tag}</span>}
+        {auto && <span className="text-xs text-ink-3" title="Placed by the optimizer">Auto</span>}
+      </span>
+      {piece ? (
+        <span className="flex items-center gap-2 flex-wrap">
+          <PieceStatus piece={piece} />
+          {maxed && piece.stars < 5 && piece.sub > 0 && <SubTicks sub={piece.sub} stars={piece.stars} />}
+          {subUnset && <span className="text-xs text-accent">Set sub-upgrade</span>}
+        </span>
+      ) : (
+        <span className="text-xs">Add</span>
+      )}
+      {caption && <span className="text-xs text-ink-3 truncate">{caption}</span>}
+    </button>
+  )
+}
+
+// squad: hero ids in the squad; assigned: what each squad hero is wearing, pinned or placed by the optimizer.
+function GearInventory({ state, dispatch, ownedIds, squad, assigned }) {
   const [editPiece, setEditPiece] = useState(null)
 
   const counts = SLOTS.reduce((acc, slot) => {
@@ -1513,15 +1493,52 @@ function GearInventory({ state, dispatch, ownedIds }) {
     return acc
   }, {})
 
+  // Squad heroes show what they actually wear; other heroes show the pieces set to them.
+  const inSquad = new Set(squad)
+  const shown = new Set()
+  const loadout = heroId => {
+    const slots = {}
+    for (const slot of SLOTS) {
+      const piece = inSquad.has(heroId)
+        ? assigned[heroId]?.[slot] ?? null
+        : state.gear.find(p => p.heroId === heroId && p.slot === slot && !shown.has(p.id)) ?? null
+      if (piece) shown.add(piece.id)
+      slots[slot] = piece
+    }
+    return slots
+  }
+  const squadGroups = squad.map(id => ({ id, slots: loadout(id) }))
+  const otherGroups = HERO_ORDER.filter(id => !inSquad.has(id) && state.gear.some(p => p.heroId === id)).map(id => ({ id, slots: loadout(id) }))
+  // Left over: Auto pieces the optimizer didn't place, and extra pieces set to a hero whose slot is already filled.
+  const spare = state.gear.filter(p => !shown.has(p.id)).sort((a, b) => SLOTS.indexOf(a.slot) - SLOTS.indexOf(b.slot))
+
+  const group = ({ id, slots }) => {
+    const colors = UNIT_COLORS[HEROES[id].unitType]
+    return (
+      <section key={id} className="mb-4">
+        <h3 className="flex items-center gap-2 mb-1.5 text-sm font-semibold text-ink">
+          <span className={`w-2 h-2 rounded-full ${colors.bg}`} aria-hidden="true" />
+          {HEROES[id].name}
+        </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1">
+          {SLOTS.map(slot => (
+            <GearSlot key={slot} slot={slot} piece={slots[slot]} auto={!!slots[slot] && !slots[slot].heroId}
+              onClick={() => setEditPiece(slots[slot] ?? { slot, heroId: id })} />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
   return (
     <div>
-      <Title note="Every piece you own. Tap one to edit it."
+      <Title note="Your gear, hero by hero. Tap a piece to edit it, or an empty slot to add one."
         action={<button onClick={() => setEditPiece({})} className={`${btnPrimary} flex-none`}>Add gear</button>}>
         Gear
       </Title>
 
       {state.gear.length > 0 && (
-        <p className="text-sm text-ink-2 mb-3">
+        <p className="text-sm text-ink-2 mb-5">
           {SLOTS.map((s, i) => (
             <span key={s}>{i > 0 && ', '}<span className="text-ink font-semibold">{counts[s]}</span> {SLOT_NAMES[s].toLowerCase()}{counts[s] === 1 ? '' : 's'}</span>
           ))}
@@ -1529,17 +1546,39 @@ function GearInventory({ state, dispatch, ownedIds }) {
       )}
 
       {state.gear.length === 0 && (
-        <p className="text-sm text-ink-2 py-8 text-center border border-dashed border-line rounded-xs">
+        <p className="text-sm text-ink-2 py-8 text-center border border-dashed border-line rounded-xs mb-6">
           No gear yet. Add your first piece to get upgrade advice.
         </p>
       )}
-      <div className="space-y-1">
-        {state.gear.map(piece => (
-          <GearPieceRow key={piece.id} piece={piece} onEdit={() => setEditPiece(piece)} />
-        ))}
-      </div>
+
+      {squadGroups.length > 0 && (
+        <div className="mb-6">
+          <h2 className="text-base font-semibold text-ink border-b border-line pb-1.5 mb-3">Your squad</h2>
+          {squadGroups.map(group)}
+        </div>
+      )}
+      {otherGroups.length > 0 && (
+        <div className="mb-6">
+          <h2 className="text-base font-semibold text-ink border-b border-line pb-1.5 mb-3">Other heroes</h2>
+          {otherGroups.map(group)}
+        </div>
+      )}
+      {spare.length > 0 && (
+        <div className="mb-6">
+          <h2 className="text-base font-semibold text-ink border-b border-line pb-1.5 mb-1">Not equipped</h2>
+          <p className="text-xs text-ink-3 mb-3">Pieces left on Auto that the optimizer didn’t need, or a second piece set to a hero’s filled slot.</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1">
+            {spare.map(p => (
+              <GearSlot key={p.id} slot={p.slot} piece={p}
+                caption={p.heroId && HEROES[p.heroId] ? `Set to ${HEROES[p.heroId].name}` : 'Auto'}
+                onClick={() => setEditPiece(p)} />
+            ))}
+          </div>
+        </div>
+      )}
+
       {state.gear.length > 0 && (
-        <p className="text-xs text-ink-3 mt-4 max-w-[60ch]">
+        <p className="text-xs text-ink-3 max-w-[60ch]">
           Moving gear between heroes costs a little gold in-game. It’s worth it whenever the optimizer suggests it.
         </p>
       )}
@@ -1585,23 +1624,24 @@ function HeroCard({ heroId, heroState: heroStateProp, heroScore, season, dispatc
           else setExpanded(e => !e)
         }}>
         <span className={`self-stretch w-1 flex-none ${heroState.owned ? colors.bg : 'bg-line-soft'}`} aria-hidden="true" />
-        <span className={`text-xs font-semibold border rounded-xs px-1 w-10 text-center flex-none ${RARITY_TEXT[promotedSSR ? 'UR' : hero.rarity]}`}
-          title={promotedSSR ? 'Promoted from SSR' : undefined}>
-          {promotedSSR ? 'UR*' : hero.rarity}
-        </span>
-
         <span className="flex-1 min-w-0 py-1.5">
           <span className={`block font-semibold text-sm truncate ${heroState.owned ? 'text-ink' : 'text-ink-2'}`}>{hero.name}</span>
           <span className="block text-xs text-ink-3">
-            <span className={heroState.owned ? colors.text : ''}>{colors.name}</span>, {ROLE_NAMES[hero.role]}
+            <span className={heroState.owned ? colors.text : ''}>{colors.name}</span> unit, {ROLE_NAMES[hero.role]} role
             {heroState.owned && <>, {heroState.stars}★</>}
           </span>
         </span>
 
+        {promotedSSR && (
+          <span className="text-xs text-q-gold border border-q-gold/50 rounded-xs px-1.5 flex-none" title="Promoted from SSR, counts as UR">Promoted</span>
+        )}
+        {heroState.owned && heroState.ewLevel > 0 && (
+          <span className="text-xs text-air border border-air/50 rounded-xs px-1.5 flex-none" title="Exclusive Weapon level">EW {heroState.ewLevel}</span>
+        )}
         {nearPromotion && (
           <span className="text-xs text-ok border border-ok/50 rounded-xs px-1.5 flex-none">UR in S{hero.promotionSeason}</span>
         )}
-        {heroState.owned && <span className="text-sm text-ink-2 flex-none" title="Hero score">{heroScore?.toFixed(1) ?? '–'}</span>}
+        {heroState.owned && <span className="text-sm text-ink w-9 text-right flex-none" title="Hero score">{heroScore?.toFixed(1) ?? '–'}</span>}
         {heroState.owned
           ? <span className="text-ink-3"><Chevron open={open} /></span>
           : <span className="text-xs font-semibold text-accent flex-none">Add</span>}
@@ -1715,9 +1755,9 @@ function RosterManager({ state, dispatch, heroScores, season }) {
         const owned = ids.filter(id => state.heroes[id]?.owned).length
         return (
           <section key={label} className="mb-6">
-            <h2 className="flex items-baseline justify-between text-sm font-semibold text-ink mb-2">
-              {label}
-              <span className="text-xs font-normal text-ink-3">{owned} of {ids.length} owned</span>
+            <h2 className="flex items-baseline justify-between text-sm font-semibold text-ink mb-2 pr-9">
+              <span>{label} <span className="text-xs font-normal text-ink-3 ml-1.5">{owned} of {ids.length} owned</span></span>
+              <span className="text-xs font-normal text-ink-3">Score</span>
             </h2>
             <div className="space-y-1">
               {ids.map(id => (
@@ -1816,6 +1856,8 @@ function GoalSelector({ state, dispatch, ownedIds }) {
 }
 
 function HelpGuide() {
+  // v1: the scoring section below is hidden. Restore this with it.
+  // const [showScoring, setShowScoring] = useState(false)
   const Section = ({ title, children }) => (
     <section className="mb-8">
       <h2 className="text-base font-semibold text-ink border-b border-line pb-1.5 mb-3">{title}</h2>
@@ -1823,7 +1865,7 @@ function HelpGuide() {
     </section>
   )
   const Row = ({ label, children }) => (
-    <div className="sm:grid sm:grid-cols-[8rem_1fr] sm:gap-4">
+    <div className="sm:grid sm:grid-cols-[9rem_1fr] sm:gap-4">
       <dt className="font-semibold text-ink">{label}</dt>
       <dd className="text-ink-2 max-w-[62ch]">{children}</dd>
     </div>
@@ -1831,20 +1873,20 @@ function HelpGuide() {
 
   return (
     <div className="pb-8">
-      <Title note="How the optimizer reads your account, and what each screen does.">Help</Title>
+      <Title note="What each screen does and how to read it.">Help</Title>
 
       <p className="mb-8 border-l-4 border-signal bg-signal/10 px-3 py-2 text-sm text-ink max-w-[62ch]">
-        This is a beta. It covers Gold (Legendary) gear only, doesn’t track skills, and doesn’t optimize for code battles yet. Results may change as more game data is added.
+        This is a beta. It covers Gold (Legendary) gear only.
       </p>
 
       <section className="mb-8">
         <h2 className="text-base font-semibold text-ink border-b border-line pb-1.5 mb-3">Getting started</h2>
         <ol className="space-y-3 text-sm">
           {[
-            ['Goal', 'Set your current season and what you’re optimizing for: PvP rally, world boss or balanced.'],
-            ['Roster', 'Tap each hero you own to add them, then tap again to enter their stars, hero level and Exclusive Weapon level.'],
-            ['Gear', 'Tap Add gear for each Gold (Legendary) piece you own. Set Equipped on to keep a piece on one hero, or leave it on Auto.'],
-            ['Squad', 'Once you own 5 heroes, the optimizer picks your best 5 and hands out your gear. Pick my own squad locks in your 5 instead, with the optimizer’s pick still shown for comparison. Tap the swap button on a hero, then a hero in the other row, to switch their rows.'],
+            ['Goal', 'Pick your current season and what you’re playing for.'],
+            ['Roster', 'Add each hero you own, with their stars and Exclusive Weapon level.'],
+            ['Gear', 'Add each Gold piece you own, and the hero wearing it.'],
+            ['Squad and Upgrades', 'See your best 5 heroes, then what to upgrade next.'],
           ].map(([label, text], i) => (
             <li key={label} className="flex gap-3">
               <span className="w-6 h-6 flex-none rounded-full bg-signal text-on-signal text-xs font-semibold flex items-center justify-center">{i + 1}</span>
@@ -1852,65 +1894,63 @@ function HelpGuide() {
             </li>
           ))}
         </ol>
-        <p className="text-sm text-ink-2 mt-3 max-w-[62ch]">The briefing panel (on the right on wide screens, at the bottom on phones) keeps your squad’s loadout, its next upgrades and any warnings in view.</p>
       </section>
 
-      <Section title="Goal">
-        <Row label="PvP rally">Schuyler ×1.3, DVA and Kimberly ×1.2, and any other DPS hero in the back row ×1.15. Also lets you set the opponent’s unit type for the counter bonus.</Row>
-        <Row label="World boss">Mason ×1.3, Sarah ×1.25, Elsa and Swift ×1.2, and any other DPS hero in the back row ×1.15.</Row>
-        {/* v1: Code battles is hidden.
-        <Row label="Code battles">Pick the unit type the current code buffs, and heroes of that type count ×1.5.</Row> */}
-        <Row label="Balanced">No goal modifiers.</Row>
-        <Row label="Squad makeup">Doesn’t change which heroes are picked. Choosing a hybrid option with no hero at Exclusive Weapon 5 or higher adds a warning, and while building to hybrid, Upgrades tells you to level an Exclusive Weapon to 5 first.</Row>
-      </Section>
-
       <Section title="Roster">
-        <Row label="Hero score">The number on each hero. It’s the app’s own rating for choosing squads and handing out gear, not in-game Power: rarity (UR 3, SSR 2, SR 1) × stars ÷ 5, then the star bonus, the Exclusive Weapon bonus and your goal’s modifier.</Row>
-        <Row label="Stars">Raise the score directly, with an extra ×1.2 at 3★ and ×1.4 at 4★ and above. In-game, each star also unlocks a skill, so starring up usually beats any gear upgrade at low star counts.</Row>
-        {/* v1: skills are switched off.
-        <Row label="Skills">Skills unlock by star: skill 1 at 1★, skill 2 at 2★, skill 3 at 3★, skill 4 at 4★. Skill 4 can’t be leveled: it’s at max as soon as it unlocks. The ★ marks the skill to level first.</Row> */}
-        <Row label="Exclusive Weapon">UR heroes only. Each level adds 5% to the hero’s score, so level 30 is ×2.5.</Row>
-        <Row label="Promotion">Some SSR heroes can become UR from a set season. A “UR in S…” badge shows the season before; from that season on, the hero card has a Promoted to UR switch, and a promoted hero counts as UR.</Row>
-        <Row label="Hero level">Recorded for later, but not used in the score yet.</Row>
-        <Row label="Skills">Not tracked in this version.</Row>
+        <Row label="Hero score">The number beside each hero. It’s the app’s own rating for choosing squads and handing out gear, not in-game Power. Rarity, stars, Exclusive Weapon level and your goal raise it.</Row>
+        <Row label="Promotion">SSR heroes that can become UR show a “UR in S…” badge the season before. From that season on, their card has a Promoted to UR switch.</Row>
       </Section>
 
       <Section title="Gear">
-        <Row label="Quality">This version tracks Gold (Legendary) gear only, max Lv 40. Purple, Blue and Green gear aren’t covered yet.</Row>
-        <Row label="Stars">Gear must be at max level before it can be starred, so picking a star sets the level to max. 1★ to 4★ cost blueprints; 5★ costs mythic blueprints.</Row>
-        <Row label="Sub-upgrade">At Lv 40, each star tier below 5★ has 4 sub-upgrades before the next star. Enter how many segments of the bar are filled on the upgrade screen. Max efficiency needs this to rank the piece’s next step.</Row>
-        <Row label="Placement">Each piece only ever goes in its own slot. Pieces on Auto are reassigned by the optimizer every time; a piece set to a hero stays there, and giving that hero another piece in the same slot moves the old one back to Auto, as equipping does in-game.</Row>
-        <Row label="Where to invest">Put everything into Legendary (Gold) gear. Dismantle Epic and below for crafting materials.</Row>
+        <Row label="Layout">Grouped by hero, your squad first. Tap a piece to edit it, or an empty slot to add a piece for that hero.</Row>
+        <Row label="Stars">Gear must reach Lv 40 before it can be starred. 1★ to 4★ cost blueprints; 5★ costs mythic blueprints.</Row>
+        <Row label="Sub-upgrades">Each star tier below 5★ has 4. Enter how many segments of the bar are filled on the in-game upgrade screen. “Ready for 4★” means they’re done and the star is next.</Row>
+        <Row label="Auto">Pieces left on Auto go wherever the optimizer puts them and are tagged Auto. A piece set to a hero stays there; giving that hero another piece in the same slot moves the old one back to Auto, as in-game.</Row>
+        <Row label="Not equipped">Auto pieces your squad doesn’t need, and extra pieces set to a hero whose slot is already filled.</Row>
       </Section>
 
       <Section title="Squad">
-        <Row label="Formation">2 in the front row and 3 in the back. The optimizer only picks squads with a tank-role hero in the front row when it can, and a squad without a DPS hero scores ×0.6. Rows matter: the ×1.15 PvP rally and world boss bonus for DPS heroes only applies in the back row.</Row>
-        <Row label="One-type bonus">All 5 the same unit type: +20%. 4 the same: +15%. A 3 and 2 split: +10%. 3 the same: +5%. This applies whatever you choose under Squad makeup.</Row>
-        <Row label="EW type buff">Each hero at Exclusive Weapon 20 or higher gives +7.5% to every squad member of the same type. Several of them stack.</Row>
-        <Row label="Counters">In PvP rally, set the opponent’s unit type to get a counter bonus: +8% with 1 or 2 heroes of the counter type, +15% with 3, +20% with 4 or 5. Tanks beat missiles, missiles beat aircraft, aircraft beat tanks.</Row>
-        <Row label="Alt">On the optimizer’s pick, each hero shows the best hero to swap in for that spot and how many points the squad would lose.</Row>
-        <Row label="Why this squad">Lists the bonuses in effect and what could raise them, like one more hero of the main type.</Row>
+        <Row label="Your squad">Once you own 5 heroes, the optimizer picks the best 5 and hands out your gear. Pick my own squad locks in yours, and the optimizer’s pick stays listed for comparison.</Row>
+        <Row label="Rows">Tap the swap button on a hero, then a hero in the other row, to switch them. Rows change the score: DPS heroes get their goal bonus in the back row.</Row>
+        <Row label="Alt">On the optimizer’s pick, each hero shows the best hero to swap in and how many points the squad would lose.</Row>
+        <Row label="Warnings">Shown at the top, most serious first. Red: you have no Gold gear, or you chose a hybrid squad and none of your heroes is at Exclusive Weapon 5. Yellow: a hero below 3★, or an SSR whose promotion season hasn’t come yet.</Row>
       </Section>
 
       <Section title="Upgrades">
-        <Row label="What’s ranked">Only gear on your current squad, as handed out on the Squad screen.</Row>
-        <Row label="Max efficiency">Ranks the next step of every piece (level, sub-upgrade or star) by in-game Power gained per unit of the resource you pick. Power comes from a model fitted to real Gear Details screens; steps without stat data show no ROI and sort last.</Row>
-        <Row label="By role">Flags gear that doesn’t fit the hero’s role. DPS: Gun should lead, and Chip shouldn’t trail Gun. Tank: Armor should lead. Support: Radar should lead.</Row>
-        <Row label="Weakest link">Lists the squad’s 10 lowest-rated pieces, weakest first.</Row>
-        <Row label="Blueprints">Star promotions note that they cost blueprints. They’re scarce, so check you have enough before spending.</Row>
+        <Row label="Max efficiency">Ranks each piece’s next step by Power gained per unit of the resource you’re shortest on. If none of the steps use it, you’ll be offered the resources they do use. Steps it can’t rank are listed below the ranking.</Row>
+        <Row label="By role">Gear that doesn’t fit the hero’s role: Gun should lead on DPS heroes, Armor on tanks, Radar on support.</Row>
+        <Row label="Weakest link">The squad’s 10 weakest pieces, weakest first.</Row>
+        <Row label="What’s included">Only the gear your squad is wearing.</Row>
       </Section>
 
-      <Section title="Warnings">
-        <Row label="Danger">You have no Legendary gear, or your squad makeup is hybrid with no hero at Exclusive Weapon 5 or higher.</Row>
-        <Row label="Caution">A squad hero is below 3★, or is an SSR whose UR promotion season hasn’t arrived yet, so gear spent on them pays off poorly for now.</Row>
+      <Section title="Profiles">
+        <Row label="Profiles">Tap your profile name at the top right to add, rename, duplicate or delete one. Everything saves in this browser.</Row>
+        <Row label="Share and back up">Download as JSON saves the profile as a file. Import profile takes that file or its pasted contents, and replaces any profile with the same name.</Row>
       </Section>
 
-      <Section title="Profiles and sharing">
-        <Row label="Profiles">Tap your profile name at the top right to create, rename, duplicate or delete profiles. You can’t delete your only profile. Everything saves to this browser automatically.</Row>
-        <Row label="Download as JSON">Saves the current profile as a .json file, ready to keep as a backup or send to alliance members.</Row>
-        <Row label="Import">Under Import profile, choose a downloaded .json file or paste its contents to add it on this device. It keeps its original name, and replaces any profile you already have with that name.</Row>
-        <Row label="Backup">To back up every profile at once, open your browser’s DevTools, go to Application, then Local Storage, and copy the value of <code className="text-xs text-accent">lastwar_optimizer_v1</code>.</Row>
-      </Section>
+      {/* v1: "How scores are calculated" is hidden.
+      <section className="border-t border-line">
+        <button onClick={() => setShowScoring(o => !o)} aria-expanded={showScoring}
+          className="w-full flex items-center justify-between gap-2 py-3 text-base font-semibold text-ink hover:text-accent">
+          How scores are calculated
+          <Chevron open={showScoring} />
+        </button>
+        {showScoring && (
+          <dl className="space-y-3 text-sm pb-2">
+            <Row label="Hero score">Rarity (UR 3, SSR 2, SR 1) × stars ÷ 5, then ×1.2 at 3★ or ×1.4 at 4★ and above, +5% per Exclusive Weapon level (UR only), and the goal modifier. A promoted SSR counts as UR.</Row>
+            <Row label="PvP rally">Schuyler ×1.3, DVA and Kimberly ×1.2, any other DPS hero in the back row ×1.15.</Row>
+            <Row label="World boss">Mason ×1.3, Sarah ×1.25, Elsa and Swift ×1.2, any other DPS hero in the back row ×1.15.</Row>
+            v1: Code battles is hidden.
+            <Row label="Code battles">Heroes of the unit type the current code buffs count ×1.5.</Row>
+            <Row label="One unit type">All 5 the same type +20%, 4 the same +15%, a 3 and 2 split +10%, 3 the same +5%. Squad makeup on the Goal screen doesn’t change this; it only adds warnings.</Row>
+            <Row label="EW type buff">Each hero at Exclusive Weapon 20 or higher gives +7.5% to every squad member of the same type, and they stack.</Row>
+            <Row label="Counters">PvP rally only, once you set the opponent’s type: +8% with 1 or 2 heroes of the counter type, +15% with 3, +20% with 4 or 5. Tanks beat missiles, missiles beat aircraft, aircraft beat tanks.</Row>
+            <Row label="Squad rules">The optimizer picks squads with a tank-role hero in the front row when it can. A squad with no DPS hero scores ×0.6.</Row>
+            <Row label="Gear Power">Max efficiency uses in-game Power from a model fitted to real Gear Details screens.</Row>
+          </dl>
+        )}
+      </section>
+      */}
     </div>
   )
 }
@@ -2023,6 +2063,12 @@ export default function App() {
     [gearAssignment.assigned, heroScores, state.upgradeMode, state.intent, hasSquadEW5, state.limitingResource]
   )
 
+  // Resources that rank at least one of the squad's next steps, offered when the chosen one ranks none.
+  const rankable = useMemo(
+    () => RESOURCES.filter(r => rankUpgrades(gearAssignment.assigned, r).some(i => i.roi !== null)),
+    [gearAssignment.assigned]
+  )
+
   const warnings = useMemo(
     () => computeWarnings(state, squadInfo.squad, state.season),
     [state.intent, state.heroes, state.gear, squadInfo.squad, state.season]
@@ -2031,12 +2077,11 @@ export default function App() {
   const sections = {
     goal:     <GoalSelector state={state} dispatch={dispatch} ownedIds={ownedIds} />,
     roster:   <RosterManager state={state} dispatch={dispatch} heroScores={heroScores} season={state.season} />,
-    gear:     <GearInventory state={state} dispatch={dispatch} ownedIds={ownedIds} />,
-    squad:    <SquadOptimizer state={state} dispatch={dispatch} recommendedSquad={squadInfo} gearAssignment={gearAssignment} heroScores={heroScores} ownedIds={ownedIds} />,
-    upgrades: <UpgradePriority state={state} dispatch={dispatch} upgradePriority={upgradePriority} />,
+    gear:     <GearInventory state={state} dispatch={dispatch} ownedIds={ownedIds} squad={squadInfo.insufficient ? [] : squadInfo.squad} assigned={gearAssignment.assigned} />,
+    squad:    <SquadOptimizer state={state} dispatch={dispatch} recommendedSquad={squadInfo} gearAssignment={gearAssignment} heroScores={heroScores} ownedIds={ownedIds} warnings={warnings} />,
+    upgrades: <UpgradePriority state={state} dispatch={dispatch} upgradePriority={upgradePriority} rankable={rankable} />,
     help:     <HelpGuide />,
   }
-  const briefingProps = { state, dispatch, recommendedSquad: squadInfo, gearAssignment, upgradePriority, warnings }
 
   return (
     <div className="h-screen flex flex-col bg-ground text-ink overflow-hidden">
@@ -2070,11 +2115,7 @@ export default function App() {
             {sections[state.activeSection]}
           </div>
         </main>
-
-        <Briefing {...briefingProps} layout="side" />
       </div>
-
-      <Briefing {...briefingProps} layout="bottom" />
     </div>
   )
 }
