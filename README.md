@@ -2,7 +2,7 @@
 
 A mobile-first community tool for Last War Survival players. Enter your hero roster and gear, and get a recommended squad, gear loadout and upgrade priority list.
 
-**Use it:** https://goeke-m.github.io/Last-War-Armory/ (beta: Gold gear only; skills, hero level and code battles aren’t counted yet).
+**Use it:** https://wpnz-armory.duckdns.org/ (beta: Gold gear only; skills, hero level and code battles aren’t counted yet).
 
 ## What It Does
 

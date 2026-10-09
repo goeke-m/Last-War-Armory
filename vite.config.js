@@ -2,8 +2,8 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
-// Production builds are served from GitHub Pages at /Last-War-Armory/; the dev server stays at /.
-export default defineConfig(({ command }) => ({
-  base: command === 'build' ? '/Last-War-Armory/' : '/',
+// Served from the root of https://wpnz-armory.duckdns.org (GitHub Pages custom domain).
+export default defineConfig({
+  base: '/',
   plugins: [react()],
-}))
+})
