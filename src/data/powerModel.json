@@ -1,0 +1,28 @@
+{
+ "weights": {
+  "heroAttack": 12.506223908442687,
+  "critRate": 313505.0608000834,
+  "heroDefense": 34.88729282789359,
+  "heroHp": 0.500260305010717,
+  "boostAttack": 1157.9795010051305,
+  "boostHp": 922.4250711562769,
+  "boostDefense": 0,
+  "resistAll": 1048599.1141563396,
+  "resistPhysical": 524583.4065998759,
+  "resistEnergy": 524979.2648401877
+ },
+ "merged": {
+  "boostDefense": "boostHp"
+ },
+ "specials": {
+  "gun": 15652.051477929926,
+  "armor": 23521.735044496774,
+  "radar": 23571.800908889447,
+  "chip": 17585.36846951407
+ },
+ "fit": {
+  "rows": 35,
+  "maxResidualPct": 0.00032645055845832423,
+  "rmsResidualPct": 0.00015291719086110922
+ }
+}

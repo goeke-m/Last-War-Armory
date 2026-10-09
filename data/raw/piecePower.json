@@ -1,0 +1,721 @@
+[
+ {
+  "id": "2026-10-06-145501",
+  "hero": "Kimberly",
+  "slot": "gun",
+  "level": 40,
+  "stars": 5,
+  "sub": 0,
+  "power": 344410,
+  "stats": {
+   "heroAttack": 12249,
+   "critRate": 0.4,
+   "heroDefense": 1433,
+   "boostAttack": 0.15
+  },
+  "subFrom": "5★ has no sub-upgrades",
+  "screenshot": "Screenshot 2026-10-06 145501.png"
+ },
+ {
+  "id": "2026-10-06-145510",
+  "hero": "Kimberly",
+  "slot": "armor",
+  "level": 40,
+  "stars": 5,
+  "sub": 0,
+  "power": 509726,
+  "stats": {
+   "heroDefense": 716,
+   "heroHp": 502245,
+   "boostHp": 0.15,
+   "boostDefense": 0.15,
+   "resistPhysical": 0.4
+  },
+  "subFrom": "5★ has no sub-upgrades",
+  "screenshot": "Screenshot 2026-10-06 145510.png"
+ },
+ {
+  "id": "2026-10-06-145520",
+  "hero": "Kimberly",
+  "slot": "chip",
+  "level": 40,
+  "stars": 4,
+  "sub": 4,
+  "power": 378502,
+  "stats": {
+   "heroAttack": 8193,
+   "heroHp": 140565,
+   "resistAll": 0.196,
+   "boostAttack": 0.145
+  },
+  "subFrom": "stats equal the CSV 4★ row (top of tier)",
+  "screenshot": "Screenshot 2026-10-06 145520.png"
+ },
+ {
+  "id": "2026-10-06-145529",
+  "hero": "Kimberly",
+  "slot": "radar",
+  "level": 40,
+  "stars": 5,
+  "sub": 0,
+  "power": 417560,
+  "stats": {
+   "heroDefense": 2033,
+   "heroHp": 225747,
+   "boostHp": 0.15,
+   "boostDefense": 0.15,
+   "resistEnergy": 0.4
+  },
+  "subFrom": "5★ has no sub-upgrades",
+  "screenshot": "Screenshot 2026-10-06 145529.png"
+ },
+ {
+  "id": "2026-10-06-145539",
+  "hero": "Murphy",
+  "slot": "gun",
+  "level": 40,
+  "stars": 0,
+  "sub": 4,
+  "power": 134665,
+  "stats": {
+   "heroAttack": 3961,
+   "critRate": 0.22,
+   "heroDefense": 461,
+   "boostAttack": 0.085
+  },
+  "subFrom": "stats = 0★ sub 0 + 4 equal steps",
+  "screenshot": "Screenshot 2026-10-06 145539.png"
+ },
+ {
+  "id": "2026-10-06-145548",
+  "hero": "Murphy",
+  "slot": "armor",
+  "level": 40,
+  "stars": 3,
+  "sub": 4,
+  "power": 379019,
+  "stats": {
+   "heroDefense": 532,
+   "heroHp": 405739,
+   "boostHp": 0.13,
+   "boostDefense": 0.13,
+   "resistPhysical": 0.3
+  },
+  "subFrom": "boost 13% = 3★ sub 0 (12%) + 4 × 0.25%",
+  "screenshot": "Screenshot 2026-10-06 145548.png"
+ },
+ {
+  "id": "2026-10-06-145557",
+  "hero": "Murphy",
+  "slot": "chip",
+  "level": 40,
+  "stars": 0,
+  "sub": 4,
+  "power": 172727,
+  "stats": {
+   "heroAttack": 2807,
+   "heroHp": 48461,
+   "resistAll": 0.108,
+   "boostAttack": 0.085
+  },
+  "subFrom": "stats = 0★ sub 0 + 4 equal steps",
+  "screenshot": "Screenshot 2026-10-06 145557.png"
+ },
+ {
+  "id": "2026-10-06-145605",
+  "hero": "Murphy",
+  "slot": "radar",
+  "level": 40,
+  "stars": 5,
+  "sub": 0,
+  "power": 417560,
+  "stats": {
+   "heroDefense": 2033,
+   "heroHp": 225747,
+   "boostHp": 0.15,
+   "boostDefense": 0.15,
+   "resistEnergy": 0.4
+  },
+  "subFrom": "5★ has no sub-upgrades",
+  "screenshot": "Screenshot 2026-10-06 145605.png"
+ },
+ {
+  "id": "2026-10-06-145613",
+  "hero": "Adam",
+  "slot": "gun",
+  "level": 40,
+  "stars": 0,
+  "sub": 4,
+  "power": 134665,
+  "stats": {
+   "heroAttack": 3961,
+   "critRate": 0.22,
+   "heroDefense": 461,
+   "boostAttack": 0.085
+  },
+  "subFrom": "stats = 0★ sub 0 + 4 equal steps",
+  "screenshot": "Screenshot 2026-10-06 145613.png"
+ },
+ {
+  "id": "2026-10-06-145620",
+  "hero": "Adam",
+  "slot": "armor",
+  "level": 40,
+  "stars": 4,
+  "sub": 4,
+  "power": 472134,
+  "stats": {
+   "heroDefense": 669,
+   "heroHp": 477413,
+   "boostHp": 0.145,
+   "boostDefense": 0.145,
+   "resistPhysical": 0.4
+  },
+  "subFrom": "stats equal the CSV 4★ row (top of tier)",
+  "screenshot": "Screenshot 2026-10-06 145620.png"
+ },
+ {
+  "id": "2026-10-06-145629",
+  "hero": "Adam",
+  "slot": "chip",
+  "level": 40,
+  "stars": 0,
+  "sub": 4,
+  "power": 172727,
+  "stats": {
+   "heroAttack": 2807,
+   "heroHp": 48461,
+   "resistAll": 0.108,
+   "boostAttack": 0.085
+  },
+  "subFrom": "stats = 0★ sub 0 + 4 equal steps",
+  "screenshot": "Screenshot 2026-10-06 145629.png"
+ },
+ {
+  "id": "2026-10-06-145637",
+  "hero": "Adam",
+  "slot": "radar",
+  "level": 40,
+  "stars": 5,
+  "sub": 0,
+  "power": 417560,
+  "stats": {
+   "heroDefense": 2033,
+   "heroHp": 225747,
+   "boostHp": 0.15,
+   "boostDefense": 0.15,
+   "resistEnergy": 0.4
+  },
+  "subFrom": "5★ has no sub-upgrades",
+  "screenshot": "Screenshot 2026-10-06 145637.png"
+ },
+ {
+  "id": "2026-10-06-145645",
+  "hero": "Marshall",
+  "slot": "gun",
+  "level": 40,
+  "stars": 2,
+  "sub": 4,
+  "power": 214352,
+  "stats": {
+   "heroAttack": 7186,
+   "critRate": 0.305,
+   "heroDefense": 824,
+   "boostAttack": 0.115
+  },
+  "subFrom": "stats equal the CSV 2★ row (top of tier)",
+  "screenshot": "Screenshot 2026-10-06 145645.png"
+ },
+ {
+  "id": "2026-10-06-145654",
+  "hero": "Marshall",
+  "slot": "armor",
+  "level": 40,
+  "stars": 3,
+  "sub": 0,
+  "power": 354074,
+  "stats": {
+   "heroDefense": 449,
+   "heroHp": 361719,
+   "boostHp": 0.12,
+   "boostDefense": 0.12,
+   "resistPhysical": 0.3
+  },
+  "subFrom": "stats equal the 2★→3★ promote preview",
+  "screenshot": "Screenshot 2026-10-06 145654.png"
+ },
+ {
+  "id": "2026-10-06-145702",
+  "hero": "Marshall",
+  "slot": "chip",
+  "level": 40,
+  "stars": 0,
+  "sub": 4,
+  "power": 172727,
+  "stats": {
+   "heroAttack": 2807,
+   "heroHp": 48461,
+   "resistAll": 0.108,
+   "boostAttack": 0.085
+  },
+  "subFrom": "stats = 0★ sub 0 + 4 equal steps",
+  "screenshot": "Screenshot 2026-10-06 145702.png"
+ },
+ {
+  "id": "2026-10-06-145711",
+  "hero": "Marshall",
+  "slot": "radar",
+  "level": 40,
+  "stars": 3,
+  "sub": 4,
+  "power": 299721,
+  "stats": {
+   "heroDefense": 1665,
+   "heroHp": 167843,
+   "boostHp": 0.13,
+   "boostDefense": 0.13,
+   "resistEnergy": 0.3
+  },
+  "subFrom": "assumed top of tier: boost 13% like 3★ armor at sub 4",
+  "screenshot": "Screenshot 2026-10-06 145711.png"
+ },
+ {
+  "id": "2026-10-06-145719",
+  "hero": "Scarlett",
+  "slot": "gun",
+  "level": 40,
+  "stars": 5,
+  "sub": 0,
+  "power": 344410,
+  "stats": {
+   "heroAttack": 12249,
+   "critRate": 0.4,
+   "heroDefense": 1433,
+   "boostAttack": 0.15
+  },
+  "subFrom": "5★ has no sub-upgrades",
+  "screenshot": "Screenshot 2026-10-06 145719.png"
+ },
+ {
+  "id": "2026-10-06-145727",
+  "hero": "Scarlett",
+  "slot": "armor",
+  "level": 40,
+  "stars": 5,
+  "sub": 0,
+  "power": 509726,
+  "stats": {
+   "heroDefense": 716,
+   "heroHp": 502245,
+   "boostHp": 0.15,
+   "boostDefense": 0.15,
+   "resistPhysical": 0.4
+  },
+  "subFrom": "5★ has no sub-upgrades",
+  "screenshot": "Screenshot 2026-10-06 145727.png"
+ },
+ {
+  "id": "2026-10-06-145735",
+  "hero": "Scarlett",
+  "slot": "chip",
+  "level": 40,
+  "stars": 3,
+  "sub": 4,
+  "power": 313502,
+  "stats": {
+   "heroAttack": 6828,
+   "heroHp": 111895,
+   "resistAll": 0.164,
+   "boostAttack": 0.13
+  },
+  "subFrom": "stats equal the CSV 3★ row (top of tier)",
+  "screenshot": "Screenshot 2026-10-06 145735.png"
+ },
+ {
+  "id": "2026-10-06-145742",
+  "hero": "Scarlett",
+  "slot": "radar",
+  "level": 40,
+  "stars": 5,
+  "sub": 0,
+  "power": 417560,
+  "stats": {
+   "heroDefense": 2033,
+   "heroHp": 225747,
+   "boostHp": 0.15,
+   "boostDefense": 0.15,
+   "resistEnergy": 0.4
+  },
+  "subFrom": "5★ has no sub-upgrades",
+  "screenshot": "Screenshot 2026-10-06 145742.png"
+ },
+ {
+  "id": "2026-10-06-150938",
+  "hero": "Thunder",
+  "slot": "gun",
+  "level": 40,
+  "stars": 0,
+  "sub": 0,
+  "power": 115107,
+  "stats": {
+   "heroAttack": 3187,
+   "critRate": 0.2,
+   "heroDefense": 358,
+   "boostAttack": 0.075
+  },
+  "subFrom": "stats equal the 0★ sub-0 upgrade screen",
+  "screenshot": "Screenshot 2026-10-06 150938.png"
+ },
+ {
+  "id": "2026-10-06-150947",
+  "hero": "Thunder",
+  "slot": "armor",
+  "level": 40,
+  "stars": 0,
+  "sub": 0,
+  "power": 179304,
+  "stats": {
+   "heroDefense": 179,
+   "heroHp": 136065,
+   "boostHp": 0.075,
+   "boostDefense": 0.075,
+   "resistPhysical": 0.2
+  },
+  "subFrom": "stats equal the 0★ sub-0 upgrade screen",
+  "screenshot": "Screenshot 2026-10-06 150947.png"
+ },
+ {
+  "id": "2026-10-06-150955",
+  "hero": "Thunder",
+  "slot": "chip",
+  "level": 10,
+  "stars": 0,
+  "power": 55229,
+  "stats": {
+   "heroAttack": 1145,
+   "heroHp": 18813,
+   "resistAll": 0.03,
+   "boostAttack": 0.0375
+  },
+  "subFrom": "below level 40",
+  "screenshot": "Screenshot 2026-10-06 150955.png"
+ },
+ {
+  "id": "2026-10-06-151003",
+  "hero": "Thunder",
+  "slot": "radar",
+  "level": 40,
+  "stars": 0,
+  "sub": 0,
+  "power": 152761,
+  "stats": {
+   "heroDefense": 558,
+   "heroHp": 56439,
+   "boostHp": 0.075,
+   "boostDefense": 0.075,
+   "resistEnergy": 0.2
+  },
+  "subFrom": "stats equal the 0★ sub-0 upgrade screen",
+  "screenshot": "Screenshot 2026-10-06 151003.png"
+ },
+ {
+  "id": "2026-10-06-151012",
+  "hero": "Storm Hunter",
+  "slot": "gun",
+  "level": 0,
+  "stars": 0,
+  "power": 31059,
+  "stats": {
+   "heroAttack": 895,
+   "critRate": 0.05,
+   "heroDefense": 119,
+   "boostAttack": 0.025
+  },
+  "subFrom": "below level 40",
+  "screenshot": "Screenshot 2026-10-06 151012.png"
+ },
+ {
+  "id": "2026-10-06-151020",
+  "hero": "Storm Hunter",
+  "slot": "armor",
+  "level": 0,
+  "stars": 0,
+  "power": 17768,
+  "stats": {
+   "heroDefense": 59,
+   "heroHp": 31355,
+   "boostHp": 0.025,
+   "boostDefense": 0.025
+  },
+  "subFrom": "below level 40",
+  "screenshot": "Screenshot 2026-10-06 151020.png"
+ },
+ {
+  "id": "2026-10-06-151029",
+  "hero": "Storm Hunter",
+  "slot": "chip",
+  "level": 0,
+  "stars": 0,
+  "power": 34736,
+  "stats": {
+   "heroAttack": 597,
+   "heroHp": 12542,
+   "resistAll": 0.02,
+   "boostAttack": 0.025
+  },
+  "subFrom": "below level 40",
+  "screenshot": "Screenshot 2026-10-06 151029.png"
+ },
+ {
+  "id": "2026-10-06-151037",
+  "hero": "Storm Hunter",
+  "slot": "radar",
+  "level": 40,
+  "stars": 0,
+  "sub": 0,
+  "power": 152761,
+  "stats": {
+   "heroDefense": 558,
+   "heroHp": 56439,
+   "boostHp": 0.075,
+   "boostDefense": 0.075,
+   "resistEnergy": 0.2
+  },
+  "subFrom": "stats equal the 0★ sub-0 upgrade screen",
+  "screenshot": "Screenshot 2026-10-06 151037.png"
+ },
+ {
+  "id": "2026-10-06-151044",
+  "hero": "Ironclad General",
+  "slot": "gun",
+  "level": 0,
+  "stars": 0,
+  "power": 31059,
+  "stats": {
+   "heroAttack": 895,
+   "critRate": 0.05,
+   "heroDefense": 119,
+   "boostAttack": 0.025
+  },
+  "subFrom": "below level 40",
+  "screenshot": "Screenshot 2026-10-06 151044.png"
+ },
+ {
+  "id": "2026-10-06-151051",
+  "hero": "Ironclad General",
+  "slot": "armor",
+  "level": 40,
+  "stars": 0,
+  "sub": 0,
+  "power": 179304,
+  "stats": {
+   "heroDefense": 179,
+   "heroHp": 136065,
+   "boostHp": 0.075,
+   "boostDefense": 0.075,
+   "resistPhysical": 0.2
+  },
+  "subFrom": "stats equal the 0★ sub-0 upgrade screen",
+  "screenshot": "Screenshot 2026-10-06 151051.png"
+ },
+ {
+  "id": "2026-10-06-151059",
+  "hero": "Ironclad General",
+  "slot": "chip",
+  "level": 0,
+  "stars": 0,
+  "power": 34736,
+  "stats": {
+   "heroAttack": 597,
+   "heroHp": 12542,
+   "resistAll": 0.02,
+   "boostAttack": 0.025
+  },
+  "subFrom": "below level 40",
+  "screenshot": "Screenshot 2026-10-06 151059.png"
+ },
+ {
+  "id": "2026-10-06-151107",
+  "hero": "Ironclad General",
+  "slot": "radar",
+  "level": 40,
+  "stars": 0,
+  "sub": 0,
+  "power": 152761,
+  "stats": {
+   "heroDefense": 558,
+   "heroHp": 56439,
+   "boostHp": 0.075,
+   "boostDefense": 0.075,
+   "resistEnergy": 0.2
+  },
+  "subFrom": "stats equal the 0★ sub-0 upgrade screen",
+  "screenshot": "Screenshot 2026-10-06 151107.png"
+ },
+ {
+  "id": "2026-10-06-151119",
+  "hero": "Magnetic Expert",
+  "slot": "gun",
+  "level": 40,
+  "stars": 0,
+  "sub": 0,
+  "power": 115107,
+  "stats": {
+   "heroAttack": 3187,
+   "critRate": 0.2,
+   "heroDefense": 358,
+   "boostAttack": 0.075
+  },
+  "subFrom": "stats equal the 0★ sub-0 upgrade screen",
+  "screenshot": "Screenshot 2026-10-06 151119.png"
+ },
+ {
+  "id": "2026-10-06-151126",
+  "hero": "Magnetic Expert",
+  "slot": "armor",
+  "level": 40,
+  "stars": 0,
+  "sub": 0,
+  "power": 179304,
+  "stats": {
+   "heroDefense": 179,
+   "heroHp": 136065,
+   "boostHp": 0.075,
+   "boostDefense": 0.075,
+   "resistPhysical": 0.2
+  },
+  "subFrom": "stats equal the 0★ sub-0 upgrade screen",
+  "screenshot": "Screenshot 2026-10-06 151126.png"
+ },
+ {
+  "id": "2026-10-06-151132",
+  "hero": "Magnetic Expert",
+  "slot": "chip",
+  "level": 0,
+  "stars": 0,
+  "power": 34736,
+  "stats": {
+   "heroAttack": 597,
+   "heroHp": 12542,
+   "resistAll": 0.02,
+   "boostAttack": 0.025
+  },
+  "subFrom": "below level 40",
+  "screenshot": "Screenshot 2026-10-06 151132.png"
+ },
+ {
+  "id": "2026-10-06-151140",
+  "hero": "Magnetic Expert",
+  "slot": "radar",
+  "level": 40,
+  "stars": 0,
+  "sub": 0,
+  "power": 152761,
+  "stats": {
+   "heroDefense": 558,
+   "heroHp": 56439,
+   "boostHp": 0.075,
+   "boostDefense": 0.075,
+   "resistEnergy": 0.2
+  },
+  "subFrom": "stats equal the 0★ sub-0 upgrade screen",
+  "screenshot": "Screenshot 2026-10-06 151140.png"
+ },
+ {
+  "id": "2026-10-06-151158",
+  "hero": "Potion Mistress",
+  "slot": "gun",
+  "level": 0,
+  "stars": 0,
+  "power": 31059,
+  "stats": {
+   "heroAttack": 895,
+   "critRate": 0.05,
+   "heroDefense": 119,
+   "boostAttack": 0.025
+  },
+  "subFrom": "below level 40",
+  "screenshot": "Screenshot 2026-10-06 151158.png"
+ },
+ {
+  "id": "2026-10-06-151205",
+  "hero": "Potion Mistress",
+  "slot": "armor",
+  "level": 0,
+  "stars": 0,
+  "power": 17768,
+  "stats": {
+   "heroDefense": 59,
+   "heroHp": 31355,
+   "boostHp": 0.025,
+   "boostDefense": 0.025
+  },
+  "subFrom": "below level 40",
+  "screenshot": "Screenshot 2026-10-06 151205.png"
+ },
+ {
+  "id": "2026-10-06-151212",
+  "hero": "Potion Mistress",
+  "slot": "chip",
+  "level": 0,
+  "stars": 0,
+  "power": 34736,
+  "stats": {
+   "heroAttack": 597,
+   "heroHp": 12542,
+   "resistAll": 0.02,
+   "boostAttack": 0.025
+  },
+  "subFrom": "below level 40",
+  "screenshot": "Screenshot 2026-10-06 151212.png"
+ },
+ {
+  "id": "2026-10-06-151218",
+  "hero": "Potion Mistress",
+  "slot": "radar",
+  "level": 0,
+  "stars": 0,
+  "power": 13587,
+  "stats": {
+   "heroDefense": 119,
+   "heroHp": 18813,
+   "boostHp": 0.025,
+   "boostDefense": 0.025
+  },
+  "subFrom": "below level 40",
+  "screenshot": "Screenshot 2026-10-06 151218.png"
+ },
+ {
+  "id": "2026-10-06-151235",
+  "hero": "Lion Cub",
+  "slot": "radar",
+  "level": 10,
+  "stars": 0,
+  "power": 23881,
+  "stats": {
+   "heroDefense": 279,
+   "heroHp": 28219,
+   "boostHp": 0.0375,
+   "boostDefense": 0.0375
+  },
+  "subFrom": "below level 40",
+  "screenshot": "Screenshot 2026-10-06 151235.png"
+ },
+ {
+  "id": "2026-10-06-chip5-pasted",
+  "hero": "unknown (aircraft UR)",
+  "slot": "chip",
+  "level": 40,
+  "stars": 5,
+  "sub": 0,
+  "power": 411146,
+  "stats": {
+   "heroAttack": 8666,
+   "heroHp": 150498,
+   "boostAttack": 0.15,
+   "resistAll": 0.2
+  },
+  "subFrom": "5★ has no sub-upgrades",
+  "screenshot": "pasted into chat 2026-10-06 (no file)"
+ }
+]
