@@ -739,12 +739,12 @@ const ROLE_NAMES = { dps: 'DPS', tank: 'Tank', support: 'Support' }
 const RARITY_TEXT = { UR: 'text-q-gold border-q-gold/60', SSR: 'text-q-purple border-q-purple/60', SR: 'text-q-blue border-q-blue/60' }
 
 // Shared control styles. Selected choices get a yellow tint; the solid yellow fill is kept for each screen's main action.
-const choice = on => `border rounded-sm transition-colors ${on
+const choice = on => `border rounded-xs transition-colors ${on
   ? 'border-accent bg-signal/15 text-ink'
   : 'border-line text-ink-2 hover:border-ink-3 hover:text-ink'}`
-const btnPrimary = 'rounded-sm bg-signal text-on-signal font-semibold px-4 min-h-[44px] hover:brightness-105 disabled:opacity-40 disabled:cursor-not-allowed'
-const btnSecondary = 'rounded-sm border border-line text-ink-2 px-3 min-h-[40px] hover:border-ink-3 hover:text-ink'
-const btnDanger = 'rounded-sm border border-danger/50 text-danger px-3 min-h-[40px] hover:bg-danger/10'
+const btnPrimary = 'rounded-xs bg-signal text-on-signal font-semibold px-4 min-h-[44px] hover:brightness-105 disabled:opacity-40 disabled:cursor-not-allowed'
+const btnSecondary = 'rounded-xs border border-line text-ink-2 px-3 min-h-[40px] hover:border-ink-3 hover:text-ink'
+const btnDanger = 'rounded-xs border border-danger/50 text-danger px-3 min-h-[40px] hover:bg-danger/10'
 
 function Title({ children, note, action }) {
   return (
@@ -788,7 +788,7 @@ function Sheet({ title, onClose, children }) {
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
       <button aria-label="Close" tabIndex={-1} onClick={onClose} className="absolute inset-0 bg-black/55 cursor-default" />
       <div role="dialog" aria-modal="true" aria-label={title}
-        className="relative w-full sm:max-w-md max-h-[92vh] overflow-y-auto bg-raised border border-line rounded-t-md sm:rounded-sm p-5 space-y-5 shadow-2xl">
+        className="relative w-full sm:max-w-md max-h-[92vh] overflow-y-auto bg-raised border border-line rounded-t-md sm:rounded-xs p-5 space-y-5 shadow-2xl">
         <h2 className="font-stencil text-2xl leading-none">{title}</h2>
         {children}
       </div>
@@ -857,7 +857,7 @@ function ProfileSwitcher({ state, dispatch }) {
   return (
     <div className="relative">
       <button onClick={() => setOpen(o => !o)} aria-expanded={open} aria-haspopup="menu"
-        className="flex items-center gap-2 text-sm text-ink border border-line rounded-sm px-3 min-h-[36px] max-w-[180px] hover:border-ink-3">
+        className="flex items-center gap-2 text-sm text-ink border border-line rounded-xs px-3 min-h-[36px] max-w-[180px] hover:border-ink-3">
         <span className="truncate">{state.activeProfile}</span>
         <Chevron open={open} />
       </button>
@@ -865,7 +865,7 @@ function ProfileSwitcher({ state, dispatch }) {
       {open && (
         <>
           <button aria-label="Close menu" tabIndex={-1} className="fixed inset-0 z-40 cursor-default" onClick={() => setOpen(false)} />
-          <div role="menu" className="absolute right-0 top-full mt-1 bg-raised border border-line rounded-sm z-50 min-w-[220px] py-1 shadow-xl">
+          <div role="menu" className="absolute right-0 top-full mt-1 bg-raised border border-line rounded-xs z-50 min-w-[220px] py-1 shadow-xl">
             <p className="px-3 pt-1 pb-1 text-xs text-ink-3">Profiles</p>
             {names.map(name => (
               <button key={name} role="menuitemradio" aria-checked={name === state.activeProfile}
@@ -906,7 +906,7 @@ function ProfileSwitcher({ state, dispatch }) {
       {importModal && (
         <Sheet title="Import profile" onClose={closeImport}>
           <Field label="Profile file" hint="from Download as JSON">
-            <label className={`${btnSecondary} inline-flex items-center gap-2 text-sm cursor-pointer focus-within:outline focus-within:outline-2 focus-within:outline-accent`}>
+            <label className={`${btnSecondary} inline-flex items-center gap-2 text-sm cursor-pointer focus-within:outline-solid focus-within:outline-2 focus-within:outline-accent`}>
               <input type="file" accept=".json,application/json" onChange={handleFile} className="sr-only" />
               Choose a file
             </label>
@@ -916,7 +916,7 @@ function ProfileSwitcher({ state, dispatch }) {
             <textarea value={importText} aria-label="Profile JSON"
               onChange={e => { setImportText(e.target.value); setImportFile(''); setImportError('') }}
               placeholder="Paste a profile here"
-              className="w-full bg-panel border border-line rounded-sm text-ink text-xs p-2 h-36 resize-none" />
+              className="w-full bg-panel border border-line rounded-xs text-ink text-xs p-2 h-36 resize-none" />
           </Field>
           {importError && <p className="text-sm text-danger">{importError}</p>}
           <div className="flex gap-2">
@@ -927,7 +927,7 @@ function ProfileSwitcher({ state, dispatch }) {
       )}
 
       {toast && (
-        <div role="status" className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-ink text-ground rounded-sm px-4 py-2 text-sm z-50 pointer-events-none shadow-lg">
+        <div role="status" className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-ink text-ground rounded-xs px-4 py-2 text-sm z-50 pointer-events-none shadow-lg">
           {toast}
         </div>
       )}
@@ -958,7 +958,7 @@ function Briefing({ state, dispatch, recommendedSquad, gearAssignment, upgradePr
           const slots = gearAssignment.assigned[heroId] ?? {}
           return (
             <tr key={heroId} className="border-b border-line-soft last:border-0">
-              <td className="py-1 pr-2 text-ink truncate max-w-[7rem]">{HEROES[heroId].name}</td>
+              <td className="py-1 pr-2 text-ink truncate max-w-28">{HEROES[heroId].name}</td>
               {SLOTS.map(slot => {
                 const p = slots[slot]
                 return (
@@ -1030,7 +1030,7 @@ function Briefing({ state, dispatch, recommendedSquad, gearAssignment, upgradePr
                 ${on ? 'border-signal text-ink font-semibold' : 'border-transparent text-ink-2 hover:text-ink'}`}>
               {label}
               {key === 'warnings' && dangerCount > 0 && (
-                <span className="min-w-[1.25rem] h-5 px-1 rounded-full bg-danger text-ground text-xs font-semibold leading-5">{dangerCount}</span>
+                <span className="min-w-5 h-5 px-1 rounded-full bg-danger text-ground text-xs font-semibold leading-5">{dangerCount}</span>
               )}
               {!side && on && <Chevron open={!open} />}
             </button>
@@ -1120,7 +1120,7 @@ function UpgradePriority({ state, dispatch, upgradePriority }) {
       </div>
 
       {upgradePriority.length === 0 && (
-        <p className="text-sm text-ink-2 py-8 text-center border border-dashed border-line rounded-sm">
+        <p className="text-sm text-ink-2 py-8 text-center border border-dashed border-line rounded-xs">
           Add heroes to your roster and gear to your inventory to see upgrade advice.
         </p>
       )}
@@ -1174,7 +1174,7 @@ function HeroFormationCard({ heroId, state, heroScores, gearAssignment, alternat
 
   return (
     <div data-hero={heroId}
-      className={`border-t-[3px] ${colors.border} bg-raised border-x border-b rounded-sm p-2 flex flex-col gap-1.5 min-w-0 transition-shadow
+      className={`border-t-[3px] ${colors.border} bg-raised border-x border-b rounded-xs p-2 flex flex-col gap-1.5 min-w-0 transition-shadow
         ${swap.selected ? 'border-x-accent border-b-accent ring-2 ring-accent' : swap.target ? 'border-x-accent border-b-accent border-dashed cursor-pointer hover:ring-1 hover:ring-accent' : 'border-x-line border-b-line'}`}
       {...(swap.target ? { role: 'button', tabIndex: 0, onClick: swap.onClick, onKeyDown: e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); swap.onClick() } } } : {})}>
       <div className="min-w-0">
@@ -1185,7 +1185,7 @@ function HeroFormationCard({ heroId, state, heroScores, gearAssignment, alternat
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-px bg-line-soft border border-line-soft rounded-sm overflow-hidden">
+      <div className="grid grid-cols-2 gap-px bg-line-soft border border-line-soft rounded-xs overflow-hidden">
         {SLOTS.map(slot => {
           const piece = slots[slot]
           return (
@@ -1204,7 +1204,7 @@ function HeroFormationCard({ heroId, state, heroScores, gearAssignment, alternat
         <span className="text-ink-2" title="Hero score">{heroScores[heroId]?.toFixed(1)}</span>
         <button onClick={e => { e.stopPropagation(); swap.onClick() }} aria-pressed={swap.selected}
           aria-label={`Move ${hero.name} to the other row`} title="Move to the other row"
-          className={`flex-none w-8 h-7 flex items-center justify-center rounded-sm border ${swap.selected ? 'border-accent bg-signal text-on-signal' : 'border-line text-ink-2 hover:text-ink hover:border-ink-3'}`}>
+          className={`flex-none w-8 h-7 flex items-center justify-center rounded-xs border ${swap.selected ? 'border-accent bg-signal text-on-signal' : 'border-line text-ink-2 hover:text-ink hover:border-ink-3'}`}>
           <SwapIcon />
         </button>
       </div>
@@ -1216,7 +1216,7 @@ function SquadPicker({ state, dispatch, ownedIds, onDone }) {
   const [picked, setPicked] = useState(state.squadLock ?? [])
   const toggle = id => setPicked(p => p.includes(id) ? p.filter(x => x !== id) : p.length < 5 ? [...p, id] : p)
   return (
-    <div className="mb-5 border border-line rounded-sm bg-panel p-3 space-y-3">
+    <div className="mb-5 border border-line rounded-xs bg-panel p-3 space-y-3">
       <p className="text-sm text-ink">Pick 5 heroes <span className="text-ink-3">({picked.length} of 5)</span></p>
       <div className="flex flex-wrap gap-1">
         {ownedIds.map(id => (
@@ -1262,7 +1262,7 @@ function SquadOptimizer({ state, dispatch, recommendedSquad, gearAssignment, her
     return (
       <div>
         <Title>Squad</Title>
-        <p className="text-sm text-ink-2 py-8 text-center border border-dashed border-line rounded-sm">
+        <p className="text-sm text-ink-2 py-8 text-center border border-dashed border-line rounded-xs">
           Add at least 5 heroes to your roster to get a squad.
         </p>
       </div>
@@ -1312,7 +1312,7 @@ function SquadOptimizer({ state, dispatch, recommendedSquad, gearAssignment, her
       {picking && <SquadPicker state={state} dispatch={dispatch} ownedIds={ownedIds} onDone={() => setPicking(false)} />}
 
       {/* Formation board, enemy at the top as in the game's battle view */}
-      <section aria-label="Formation" className="bg-panel border border-line rounded-sm p-2 sm:p-3">
+      <section aria-label="Formation" className="bg-panel border border-line rounded-xs p-2 sm:p-3">
         <p className="text-xs text-ink-3 text-center mb-2">Enemy ▲</p>
         <p className="text-xs font-semibold text-ink-2 mb-1.5">Front row</p>
         <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
@@ -1350,7 +1350,7 @@ function SquadOptimizer({ state, dispatch, recommendedSquad, gearAssignment, her
 
 function GearSegBar({ level, swatch }) {
   return (
-    <div className="flex gap-0.5 mt-1 w-full max-w-[10rem]" aria-hidden="true">
+    <div className="flex gap-0.5 mt-1 w-full max-w-40" aria-hidden="true">
       {[0,10,20,30].map(start => {
         const segLevel = Math.min(10, Math.max(0, level - start))
         return (
@@ -1379,7 +1379,7 @@ function GearPieceRow({ piece, onEdit }) {
 
   return (
     <button type="button" data-piece={piece.id} onClick={onEdit}
-      className="w-full text-left flex items-stretch gap-3 bg-raised border border-line-soft rounded-sm hover:border-ink-3 min-h-[56px] overflow-hidden">
+      className="w-full text-left flex items-stretch gap-3 bg-raised border border-line-soft rounded-xs hover:border-ink-3 min-h-[56px] overflow-hidden">
       <span className={`w-1 flex-none ${meta.swatch}`} aria-hidden="true" />
       <div className="flex-1 min-w-0 py-2">
         <p className="text-sm text-ink leading-tight">
@@ -1487,7 +1487,7 @@ function GearEditModal({ piece, heroOptions, onSave, onDelete, onClose }) {
 
       <Field label="Equipped on" hint="Auto lets the optimizer choose">
         <select value={heroId} onChange={e => setHeroId(e.target.value)} aria-label="Equipped on"
-          className="w-full bg-panel border border-line rounded-sm text-ink text-sm px-2 min-h-[44px]">
+          className="w-full bg-panel border border-line rounded-xs text-ink text-sm px-2 min-h-[44px]">
           <option value="">Auto</option>
           {heroOptions.map(id => <option key={id} value={id}>{HEROES[id].name}</option>)}
         </select>
@@ -1529,7 +1529,7 @@ function GearInventory({ state, dispatch, ownedIds }) {
       )}
 
       {state.gear.length === 0 && (
-        <p className="text-sm text-ink-2 py-8 text-center border border-dashed border-line rounded-sm">
+        <p className="text-sm text-ink-2 py-8 text-center border border-dashed border-line rounded-xs">
           No gear yet. Add your first piece to get upgrade advice.
         </p>
       )}
@@ -1577,7 +1577,7 @@ function HeroCard({ heroId, heroState: heroStateProp, heroScore, season, dispatc
   const open = heroState.owned && expanded
 
   return (
-    <div data-hero={heroId} className={`bg-raised border rounded-sm overflow-hidden ${heroState.owned ? 'border-line-soft' : 'border-transparent bg-raised/50'}`}>
+    <div data-hero={heroId} className={`bg-raised border rounded-xs overflow-hidden ${heroState.owned ? 'border-line-soft' : 'border-transparent bg-raised/50'}`}>
       <button type="button" aria-expanded={heroState.owned ? open : undefined}
         className="w-full flex items-center gap-3 pr-3 min-h-[52px] text-left select-none"
         onClick={() => {
@@ -1585,7 +1585,7 @@ function HeroCard({ heroId, heroState: heroStateProp, heroScore, season, dispatc
           else setExpanded(e => !e)
         }}>
         <span className={`self-stretch w-1 flex-none ${heroState.owned ? colors.bg : 'bg-line-soft'}`} aria-hidden="true" />
-        <span className={`text-xs font-semibold border rounded-sm px-1 w-10 text-center flex-none ${RARITY_TEXT[promotedSSR ? 'UR' : hero.rarity]}`}
+        <span className={`text-xs font-semibold border rounded-xs px-1 w-10 text-center flex-none ${RARITY_TEXT[promotedSSR ? 'UR' : hero.rarity]}`}
           title={promotedSSR ? 'Promoted from SSR' : undefined}>
           {promotedSSR ? 'UR*' : hero.rarity}
         </span>
@@ -1599,7 +1599,7 @@ function HeroCard({ heroId, heroState: heroStateProp, heroScore, season, dispatc
         </span>
 
         {nearPromotion && (
-          <span className="text-xs text-ok border border-ok/50 rounded-sm px-1.5 flex-none">UR in S{hero.promotionSeason}</span>
+          <span className="text-xs text-ok border border-ok/50 rounded-xs px-1.5 flex-none">UR in S{hero.promotionSeason}</span>
         )}
         {heroState.owned && <span className="text-sm text-ink-2 flex-none" title="Hero score">{heroScore?.toFixed(1) ?? '–'}</span>}
         {heroState.owned
@@ -1633,7 +1633,7 @@ function HeroCard({ heroId, heroState: heroStateProp, heroScore, season, dispatc
               <button role="switch" aria-checked={heroState.promoted} aria-label="Promoted to UR"
                 onClick={() => dispatch({ type: 'UPDATE_HERO', heroId, updates: { promoted: !heroState.promoted } })}
                 className={`relative inline-flex h-6 w-11 flex-none items-center rounded-full transition-colors ${heroState.promoted ? 'bg-signal' : 'bg-line'}`}>
-                <span className={`inline-block h-4 w-4 rounded-full bg-raised shadow transition-transform ${heroState.promoted ? 'translate-x-6' : 'translate-x-1'}`} />
+                <span className={`inline-block h-4 w-4 rounded-full bg-raised shadow-sm transition-transform ${heroState.promoted ? 'translate-x-6' : 'translate-x-1'}`} />
               </button>
             </div>
           )}
@@ -1662,7 +1662,7 @@ function HeroCard({ heroId, heroState: heroStateProp, heroScore, season, dispatc
                       {unlocked && isPriority && '★ '}{skillName}
                     </span>
                     {unlocked && !levelable ? (
-                      <span className="flex items-center justify-center w-full bg-panel border border-line-soft rounded-sm text-sm text-ink-2 min-h-[40px]">
+                      <span className="flex items-center justify-center w-full bg-panel border border-line-soft rounded-xs text-sm text-ink-2 min-h-[40px]">
                         Max
                       </span>
                     ) : (
@@ -1674,7 +1674,7 @@ function HeroCard({ heroId, heroState: heroStateProp, heroScore, season, dispatc
                         skills[i] = Math.min(skillMax, Math.max(1, Number(e.target.value)))
                         dispatch({ type: 'UPDATE_HERO', heroId, updates: { skills } })
                       }}
-                      className={`w-full bg-panel border rounded-sm text-center text-sm min-h-[40px]
+                      className={`w-full bg-panel border rounded-xs text-center text-sm min-h-[40px]
                         ${unlocked ? 'border-line text-ink' : 'border-line-soft text-ink-3 cursor-not-allowed'}`} />
                     )}
                     {!unlocked && <span className="block text-xs text-ink-3 mt-0.5">Unlocks at {i + 1}★</span>}
@@ -2043,7 +2043,7 @@ export default function App() {
       <header className="flex-none h-14 bg-panel border-b border-line flex items-center justify-between gap-3 px-3 md:px-5 z-10">
         <p className="flex items-baseline gap-2 min-w-0">
           <span className="font-stencil text-2xl leading-none whitespace-nowrap">Last War</span>
-          <span className="self-center text-xs font-semibold text-on-signal bg-signal rounded-sm px-1.5 leading-5" title="Beta: some features are limited, see Help">Beta</span>
+          <span className="self-center text-xs font-semibold text-on-signal bg-signal rounded-xs px-1.5 leading-5" title="Beta: some features are limited, see Help">Beta</span>
           <span className="hidden sm:inline text-sm text-ink-2 truncate">Squad and gear optimizer</span>
         </p>
         <ProfileSwitcher state={state} dispatch={dispatch} />

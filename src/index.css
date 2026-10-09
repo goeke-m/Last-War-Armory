@@ -1,8 +1,58 @@
-@import url('https://fonts.googleapis.com/css2?family=Saira+Semi+Condensed:wght@400;500;600;700&family=Saira+Stencil+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Saira+Semi+Condensed:wght@400;500;600;700&family=Saira+Stencil+One&display=swap')
+layer(base);
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Saira Semi Condensed', system-ui, sans-serif;
+  --font-stencil: 'Saira Stencil One', 'Saira Semi Condensed', sans-serif;
+
+  --color-ground: rgb(var(--ground));
+  --color-panel: rgb(var(--panel));
+  --color-raised: rgb(var(--raised));
+  --color-line: rgb(var(--line));
+  --color-line-soft: rgb(var(--line-soft));
+  --color-ink: rgb(var(--ink));
+  --color-ink-2: rgb(var(--ink-2));
+  --color-ink-3: rgb(var(--ink-3));
+  --color-signal: rgb(var(--signal));
+  --color-on-signal: rgb(var(--on-signal));
+  --color-accent: rgb(var(--accent));
+  --color-danger: rgb(var(--danger));
+  --color-ok: rgb(var(--ok));
+  --color-tank: rgb(var(--tank));
+  --color-air: rgb(var(--air));
+  --color-missile: rgb(var(--missile));
+  --color-q-gold: rgb(var(--q-gold));
+  --color-q-purple: rgb(var(--q-purple));
+  --color-q-blue: rgb(var(--q-blue));
+  --color-q-green: rgb(var(--q-green));
+
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.15rem;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.3rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.45rem;
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-line, currentcolor);
+  }
+}
 
 /* ─── Palette ────────────────────────────────
    Light: a requisition form, grey-green paper and dark ink.
