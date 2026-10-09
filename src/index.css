@@ -1,102 +1,136 @@
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Saira+Semi+Condensed:wght@400;500;600;700&family=Saira+Stencil+One&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Reset ──────────────────────────────── */
+/* ─── Palette ────────────────────────────────
+   Light: a requisition form, grey-green paper and dark ink.
+   Dark: painted equipment steel.
+   Hazard yellow (signal) is a fill for the one primary action and the
+   selected state; accent is its text-safe counterpart.               */
+:root {
+  --ground: 214 218 205;
+  --panel: 232 235 225;
+  --raised: 244 246 239;
+  --line: 160 166 148;
+  --line-soft: 194 199 184;
+  --ink: 27 33 25;
+  --ink-2: 74 82 68;
+  --ink-3: 112 120 104;
+  --signal: 232 178 28;
+  --on-signal: 27 26 14;
+  --accent: 122 88 0;
+  --danger: 168 50 31;
+  --ok: 52 104 38;
+  --tank: 166 85 17;
+  --air: 31 106 158;
+  --missile: 84 118 14;
+  --q-gold: 142 106 0;
+  --q-purple: 111 63 176;
+  --q-blue: 36 87 184;
+  --q-green: 62 122 59;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: 30 34 27;
+    --panel: 39 44 35;
+    --raised: 50 56 45;
+    --line: 82 90 72;
+    --line-soft: 60 66 53;
+    --ink: 233 231 216;
+    --ink-2: 168 172 151;
+    --ink-3: 118 125 104;
+    --accent: 240 193 75;
+    --danger: 232 104 80;
+    --ok: 156 196 107;
+    --tank: 228 140 64;
+    --air: 111 176 224;
+    --missile: 169 201 74;
+    --q-gold: 236 186 52;
+    --q-purple: 186 144 236;
+    --q-blue: 120 162 240;
+    --q-green: 140 192 138;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: 30 34 27;
+  --panel: 39 44 35;
+  --raised: 50 56 45;
+  --line: 82 90 72;
+  --line-soft: 60 66 53;
+  --ink: 233 231 216;
+  --ink-2: 168 172 151;
+  --ink-3: 118 125 104;
+  --accent: 240 193 75;
+  --danger: 232 104 80;
+  --ok: 156 196 107;
+  --tank: 228 140 64;
+  --air: 111 176 224;
+  --missile: 169 201 74;
+  --q-gold: 236 186 52;
+  --q-purple: 186 144 236;
+  --q-blue: 120 162 240;
+  --q-green: 140 192 138;
+  color-scheme: dark;
+}
+
 *, *::before, *::after { box-sizing: border-box; }
 
-/* ─── Selection ──────────────────────────── */
-::selection {
-  background: rgba(217, 119, 6, 0.35);
-  color: #fcd34d;
-}
-
-/* ─── Body + atmosphere ──────────────────── */
 body {
-  background-color: #080808;
-  background-image:
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(255, 255, 255, 0.018) 2px,
-      rgba(255, 255, 255, 0.018) 4px
-    ),
-    radial-gradient(ellipse 70% 55% at 12% 65%, rgba(217, 119, 6, 0.045) 0%, transparent 100%),
-    radial-gradient(ellipse 45% 35% at 88% 12%, rgba(217, 119, 6, 0.03) 0%, transparent 100%);
-  font-family: 'Rajdhani', sans-serif;
-  color: #e5e7eb;
+  background: rgb(var(--ground));
+  color: rgb(var(--ink));
+  font-family: 'Saira Semi Condensed', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* CRT scanline overlay */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9998;
+::selection {
+  background: rgb(var(--signal) / 0.45);
+  color: rgb(var(--ink));
+}
+
+/* Section titles: stenciled like a crate marking. The one loud element. */
+.stencil-title {
+  font-family: 'Saira Stencil One', 'Saira Semi Condensed', sans-serif;
+  font-size: 2rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: rgb(var(--ink));
+}
+
+/* Lane between the front and back rows on the formation board. */
+.lane {
   background: repeating-linear-gradient(
-    to bottom,
-    transparent 0px,
-    transparent 3px,
-    rgba(0, 0, 0, 0.055) 3px,
-    rgba(0, 0, 0, 0.055) 4px
+    90deg,
+    rgb(var(--line)) 0 10px,
+    transparent 10px 18px
   );
+  height: 2px;
 }
 
-/* ─── Typography ─────────────────────────── */
-h1, h2, h3, h4, label, .font-orbitron {
-  font-family: 'Orbitron', monospace;
+/* ─── Focus ─────────────────────────────── */
+:focus-visible {
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: 2px;
 }
-
-/* Amber text glow — applied to all amber text elements */
-.text-amber-600 {
-  text-shadow: 0 0 14px rgba(217, 119, 6, 0.5);
-}
-.text-amber-500 {
-  text-shadow: 0 0 10px rgba(245, 158, 11, 0.45);
-}
-.text-amber-400 {
-  text-shadow: 0 0 8px rgba(251, 191, 36, 0.35);
-}
-
-/* ─── Glow utilities ─────────────────────── */
-.glow-amber {
-  box-shadow: 0 0 8px rgba(217, 119, 6, 0.55), 0 0 24px rgba(217, 119, 6, 0.18);
-}
-
-/* Active nav button — inset left glow */
-.nav-active {
-  box-shadow: inset 3px 0 10px rgba(217, 119, 6, 0.25);
-}
-
-/* RecPanel top shadow */
-.rec-panel-shadow {
-  box-shadow: 0 -4px 20px rgba(217, 119, 6, 0.1), 0 -1px 0 rgba(217, 119, 6, 0.15);
-}
-
-/* ─── Section entrance animation ─────────── */
-@keyframes sectionFadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.section-enter {
-  animation: sectionFadeIn 0.2s ease-out forwards;
+input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline-offset: 0;
 }
 
 /* ─── Scrollbars ─────────────────────────── */
-::-webkit-scrollbar        { width: 3px; height: 3px; }
+::-webkit-scrollbar        { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track  { background: transparent; }
-::-webkit-scrollbar-thumb  { background: #1f1f1f; }
-::-webkit-scrollbar-thumb:hover { background: #d97706; }
+::-webkit-scrollbar-thumb  { background: rgb(var(--line)); border-radius: 3px; }
 
 /* ─── Range slider ───────────────────────── */
 input[type=range] {
-  accent-color: #d97706;
+  accent-color: rgb(var(--signal));
 }
 
 /* ─── Number inputs — hide spinners ─────── */
@@ -107,11 +141,14 @@ input[type=number]::-webkit-outer-spin-button {
 }
 input[type=number] { -moz-appearance: textfield; }
 
-/* ─── Input focus states ─────────────────── */
-input[type=number]:focus,
-input[type=text]:focus,
-textarea:focus {
-  outline: none;
-  border-color: #d97706 !important;
-  box-shadow: 0 0 0 1px rgba(217, 119, 6, 0.2), inset 0 0 6px rgba(217, 119, 6, 0.06);
+/* Opening a section: a short slide so the change of screen registers. */
+@keyframes sectionIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
+.section-enter { animation: sectionIn 0.16s ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .section-enter { animation: none; }
+  * { transition: none !important; }
 }

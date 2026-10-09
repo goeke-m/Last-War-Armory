@@ -38,6 +38,16 @@ describe('assignGear', () => {
     expect(ids(assigned).a.gun).toBe('g1')
     expect(unassigned.map(p => p.id)).toEqual(['g2'])
   })
+
+  it('only puts a piece in its own slot type, leaving other slots empty rather than borrowing', () => {
+    const all = { ...deps, slotPriority: () => ['radar', 'gun', 'chip', 'armor'] }
+    const gear = [piece('g1', 'gun', 9), piece('g2', 'gun', 8), piece('g3', 'gun', 7, 'a'), piece('a1', 'armor', 5, 'a')]
+    const { assigned, unassigned } = assignGear(['a'], gear, all)
+    const a = assigned.a
+    expect(Object.fromEntries(Object.entries(a).map(([s, p]) => [s, p?.id ?? null]))).toEqual({ gun: 'g3', chip: null, armor: 'a1', radar: null })
+    for (const [slot, p] of Object.entries(a)) if (p) expect(p.slot).toBe(slot)
+    expect(unassigned.map(p => p.id).sort()).toEqual(['g1', 'g2'])
+  })
 })
 
 describe('releaseClashingPins', () => {
