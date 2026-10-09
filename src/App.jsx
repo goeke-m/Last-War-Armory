@@ -15,7 +15,7 @@ const HEROES = {
   murphy:   { id: 'murphy',   name: 'Murphy',   rarity: 'UR', unitType: 'tank', role: 'tank', defaultRow: 'front', promotionSeason: null },
   marshall: { id: 'marshall', name: 'Marshall', rarity: 'UR', unitType: 'tank', role: 'support', defaultRow: 'back', promotionSeason: null },
   stetmann: { id: 'stetmann', name: 'Stetmann', rarity: 'UR', unitType: 'tank', role: 'dps', defaultRow: 'back', promotionSeason: null },
-  dva:      { id: 'dva',      name: 'DVA',      rarity: 'UR', unitType: 'missile', role: 'dps', defaultRow: 'back', promotionSeason: null },
+  dva:      { id: 'dva',      name: 'DVA',      rarity: 'UR', unitType: 'aircraft', role: 'dps', defaultRow: 'back', promotionSeason: null },
   morrison: { id: 'morrison', name: 'Morrison', rarity: 'UR', unitType: 'aircraft', role: 'dps', defaultRow: 'back', promotionSeason: null },
   schuyler: { id: 'schuyler', name: 'Schuyler', rarity: 'UR', unitType: 'aircraft', role: 'dps', defaultRow: 'back', promotionSeason: null },
   lucius:   { id: 'lucius',   name: 'Lucius',   rarity: 'UR', unitType: 'aircraft', role: 'tank', defaultRow: 'front', promotionSeason: null },
