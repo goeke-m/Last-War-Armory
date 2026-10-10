@@ -1,6 +1,7 @@
 import { useState, useReducer, useMemo, useEffect } from 'react'
 import { QUALITY_MAX_LEVEL } from './gear/constants.js'
 import { RESOURCES, rankUpgrades, coverage } from './gear/roi.js'
+import { roleBasedUpgrades, weakestLinkUpgrades } from './gear/modes.js'
 import { assignGear as placeGear, releaseClashingPins } from './squad/assign.js'
 import { rowOf, arrangeFormation, swapRows } from './squad/rows.js'
 
@@ -450,59 +451,12 @@ function activeSquad(recommended, squadLock, ownedIds, heroScores, heroes, inten
   }
 }
 
-function roleBasedUpgrades(assigned) {
-  const items = []
-  for (const [heroId, slots] of Object.entries(assigned)) {
-    const role = HEROES[heroId].role
-    if (role === 'dps') {
-      const gunLv = slots.gun?.level ?? 0
-      const armorLv = slots.armor?.level ?? 0
-      if (armorLv > gunLv && slots.gun) {
-        items.push({ heroId, slot: 'gun', piece: slots.gun, gap: armorLv - gunLv, reason: 'Role misalignment — Gun should lead for DPS hero' })
-      }
-      if (slots.chip && (slots.chip.level < (slots.gun?.level ?? 0))) {
-        items.push({ heroId, slot: 'chip', piece: slots.chip, gap: (slots.gun?.level ?? 0) - slots.chip.level, reason: 'Biggest DPS gap — Chip trails Gun' })
-      }
-    } else if (role === 'tank') {
-      const armorLv = slots.armor?.level ?? 0
-      const gunLv = slots.gun?.level ?? 0
-      if (gunLv > armorLv && slots.armor) {
-        items.push({ heroId, slot: 'armor', piece: slots.armor, gap: gunLv - armorLv, reason: 'Role misalignment — Armor should lead for Tank hero' })
-      }
-    } else if (role === 'support') {
-      const radarLv = slots.radar?.level ?? 0
-      const maxOther = Math.max(slots.gun?.level ?? 0, slots.chip?.level ?? 0, slots.armor?.level ?? 0)
-      if (maxOther > radarLv && slots.radar) {
-        items.push({ heroId, slot: 'radar', piece: slots.radar, gap: maxOther - radarLv, reason: 'Role misalignment — Radar should lead for Support hero' })
-      }
-    }
-  }
-  return items
-    .sort((a, b) => b.gap - a.gap)
-    .map(u => ({ type: 'level', slot: u.slot, heroId: u.heroId, from: u.piece.level, to: u.piece.level + 1, blueprintWarning: false, reason: u.reason, score: u.gap }))
-}
-
-function weakestLinkUpgrades(assigned, heroScores) {
-  const all = []
-  for (const [heroId, slots] of Object.entries(assigned)) {
-    for (const [slot, piece] of Object.entries(slots)) {
-      if (piece) all.push({ heroId, slot, piece, ps: pieceScore(piece) })
-    }
-  }
-  if (all.length === 0) return []
-  const avg = all.reduce((s, p) => s + p.ps, 0) / all.length
-  return all
-    .sort((a, b) => a.ps - b.ps)
-    .slice(0, 10)
-    .map(p => ({ type: 'level', slot: p.slot, heroId: p.heroId, from: p.piece.level, to: p.piece.level + 1, blueprintWarning: false, reason: 'Weakest link in squad', score: avg - p.ps }))
-}
-
 // hasEW5: boolean — true if any squad member has ewLevel >= 5
 function computeUpgradePriority(assigned, heroScores, mode, intent, hasEW5, resource) {
   let list = []
   if (mode === 'max_efficiency') list = rankUpgrades(assigned, resource)
-  else if (mode === 'role_based') list = roleBasedUpgrades(assigned)
-  else list = weakestLinkUpgrades(assigned, heroScores)
+  else if (mode === 'role_based') list = roleBasedUpgrades(assigned, id => HEROES[id].role)
+  else list = weakestLinkUpgrades(assigned)
 
   const needsEWCallout = (intent === 'hybrid_progress') && !hasEW5
   const callout = needsEWCallout
@@ -1113,7 +1067,11 @@ function UpgradePriority({ state, dispatch, upgradePriority, rankable }) {
 
       {upgradePriority.length === 0 && (
         <p className="text-sm text-ink-2 py-8 text-center border border-dashed border-line rounded-xs">
-          Add heroes to your roster and gear to your inventory to see upgrade advice.
+          {state.gear.length === 0
+            ? 'Add heroes to your roster and gear to your inventory to see upgrade advice.'
+            : state.upgradeMode === 'role_based'
+              ? 'Every squad hero’s gear already fits their role. Try Max efficiency for what to spend on next.'
+              : 'Your squad’s gear is fully upgraded.'}
         </p>
       )}
       {nothingRanked && <SwitchResource state={state} dispatch={dispatch} rankable={rankable} />}
