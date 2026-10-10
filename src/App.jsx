@@ -52,8 +52,8 @@ const HEROES = {
 const HERO_ORDER = [
   // UR
   'kimberly','williams','murphy','marshall','stetmann',
-  'dva','tesla','swift','fiona','mcgregor','adam',
-  'morrison','schuyler','lucius','carlie',
+  'tesla','swift','fiona','mcgregor','adam',
+  'dva', 'morrison','schuyler','lucius','carlie',
   // SSR
   'mason','violet','scarlett','farhad','monica','venom',
   'sarah','richard','elsa','maxwell','cage','braz',
