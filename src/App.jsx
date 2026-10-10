@@ -2014,6 +2014,17 @@ const NAV = [
   { key: 'help',     label: 'Help'     },
 ]
 
+// The app never changes its URL, so each screen is sent to GoatCounter (index.html) as its own page.
+// The script loads async, so a count made before it is ready waits for it. Ad blockers may stop it; that's fine.
+function countScreen(key) {
+  const send = () => window.goatcounter?.count?.({
+    path: `/${key}`,
+    title: NAV.find(n => n.key === key)?.label ?? key,
+  })
+  if (window.goatcounter?.count) send()
+  else document.getElementById('goatcounter')?.addEventListener('load', send, { once: true })
+}
+
 export default function App() {
   const [state, dispatch] = useReducer(reducer, null, buildInitialState)
 
@@ -2026,6 +2037,8 @@ export default function App() {
       }))
     } catch { /* quota exceeded — ignore */ }
   }, [state.profiles, state.activeProfile])
+
+  useEffect(() => countScreen(state.activeSection), [state.activeSection])
 
   // Derived / computed values — all optimizer results are pure functions of state
   const ownedIds = useMemo(
